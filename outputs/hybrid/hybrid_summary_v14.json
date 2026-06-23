@@ -1,0 +1,62 @@
+{
+  "version": "v14",
+  "total_frames": 115,
+  "counts": {
+    "VPR_FIX": 37,
+    "SAT_FIX": 41,
+    "VPR_FALLBACK": 37
+  },
+  "overall": {
+    "count": 115,
+    "median": 11.49,
+    "mean": 13.6,
+    "min": 0.49,
+    "max": 38.44,
+    "pct_5m": 13.9,
+    "pct_10m": 40.0,
+    "pct_15m": 63.5,
+    "pct_20m": 77.4
+  },
+  "by_status": {
+    "VPR_FIX": {
+      "count": 37,
+      "median": 9.9,
+      "mean": 10.4,
+      "min": 2.63,
+      "max": 21.16,
+      "pct_5m": 8.1,
+      "pct_10m": 54.1,
+      "pct_15m": 81.1,
+      "pct_20m": 94.6
+    },
+    "SAT_FIX": {
+      "count": 41,
+      "median": 11.58,
+      "mean": 14.01,
+      "min": 1.9,
+      "max": 24.73,
+      "pct_5m": 9.8,
+      "pct_10m": 34.1,
+      "pct_15m": 63.4,
+      "pct_20m": 70.7
+    },
+    "VPR_FALLBACK": {
+      "count": 37,
+      "median": 16.12,
+      "mean": 16.34,
+      "min": 0.49,
+      "max": 38.44,
+      "pct_5m": 24.3,
+      "pct_10m": 32.4,
+      "pct_15m": 45.9,
+      "pct_20m": 67.6
+    }
+  },
+  "thresholds_overall": {
+    "pct_le_5m": 13.9,
+    "pct_le_10m": 40.0,
+    "pct_le_15m": 63.5,
+    "pct_le_20m": 77.4,
+    "pct_le_30m": 94.8
+  }
+}

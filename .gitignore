@@ -1,0 +1,43 @@
+# Python caches
+__pycache__/
+*.py[cod]
+.pycache_tmp/
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+.venv/
+.venv-anyloc/
+venv/
+
+
+
+# Local media. SRT files are kept because they are small telemetry inputs.
+data/raw/*.MP4
+data/raw/*.mp4
+data/raw/*.MOV
+data/raw/*.mov
+data/raw/.*
+
+# Extracted frames are reproducible from the videos.
+data/processed/frames_*/
+data/processed/frames*/
+
+# Third-party checkouts and model caches are too large for this repo.
+third_party/
+outputs/torch_hub/
+outputs/models/
+*.ckpt
+*.pth
+*.pt
+
+# Large intermediate caches — reproducible by re-running the pipeline.
+# Keep CSV/JSON/KML/SVG/HTML reports (small, human-readable results).
+outputs/anyloc/*.npy
+outputs/anyloc/*.pkl
+outputs/anyloc/*_sweep.csv
+
+# OS/editor noise
+.DS_Store
+.idea/
+.vscode/

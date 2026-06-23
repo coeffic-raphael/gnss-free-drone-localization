@@ -1,0 +1,1298 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Visual Retrieval Debug</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #111827;
+      background: #f1f5f9;
+    }
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+    h1, h2, p {
+      margin: 0;
+    }
+    .intro {
+      margin-bottom: 22px;
+    }
+    .intro p {
+      margin-top: 8px;
+      color: #475569;
+    }
+    .case {
+      margin: 0 0 28px;
+      padding: 18px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .case header {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 16px;
+    }
+    .case header p {
+      margin-top: 6px;
+      color: #475569;
+    }
+    .case-grid {
+      display: grid;
+      grid-template-columns: minmax(360px, 1fr) 340px;
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    }
+    .query p {
+      margin-top: 8px;
+      color: #475569;
+      font-size: 13px;
+    }
+    svg {
+      width: 100%;
+      height: auto;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+    }
+    svg text {
+      font-size: 10px;
+      fill: #334155;
+    }
+    .candidates {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .candidate {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #f8fafc;
+    }
+    .candidate.selected {
+      border: 3px solid #dc2626;
+    }
+    .meta {
+      display: grid;
+      gap: 4px;
+      padding: 10px;
+      font-size: 13px;
+      color: #334155;
+    }
+    .meta strong {
+      color: #111827;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="intro">
+      <h1>Worst visual-retrieval errors</h1>
+      <p>Top 6 DINO candidates with LightGlue scores. Red border means the Motion-Viterbi selected candidate.</p>
+    </div>
+    
+            <section class="case">
+              <header>
+                <div>
+                  <h2>Worst #1 - query frame 421</h2>
+                  <p>
+                    selected v13
+                    frame 9472,
+                    error 72.53 m,
+                    selected rank 4
+                  </p>
+                </div>
+              </header>
+              <div class="case-grid">
+                <div class="query">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v14_1fps/frame_000015.jpg" alt="query frame">
+                  <p>Query / ground truth center:
+                  32.1041001, 35.2057292</p>
+                </div>
+                <div class="map">
+                  <svg viewBox="0 0 320 220" role="img"><rect x="0" y="0" width="320" height="220" rx="6" fill="#f8fafc" /><text x="12" y="20">local map: green=truth, red=selected, blue=top candidates</text><circle cx="221.8" cy="26.0" r="7" fill="#16a34a" /><text x="228.8" y="19.0">GT</text><circle cx="26.0" cy="194.0" r="4" fill="#2563eb" /><text x="33.0" y="187.0">1</text><circle cx="96.6" cy="159.8" r="4" fill="#2563eb" /><text x="103.6" y="152.8">2</text><circle cx="212.6" cy="54.6" r="4" fill="#2563eb" /><text x="219.6" y="47.6">3</text><circle cx="294.0" cy="139.4" r="6" fill="#dc2626" /><text x="301.0" y="132.4">SEL</text><circle cx="204.1" cy="70.4" r="4" fill="#2563eb" /><text x="211.1" y="63.4">5</text><circle cx="219.1" cy="39.0" r="4" fill="#2563eb" /><text x="226.1" y="32.0">6</text></svg>
+                </div>
+              </div>
+              <div class="candidates">
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v12_1fps/frame_000097.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 1 - v12
+                    frame 2878</strong>
+                    <span>error 112.72 m</span>
+                    <span>DINO 0.961</span>
+                    <span>LG inliers 172</span>
+                    <span>LG ratio 0.520</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v12_1fps/frame_000098.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 2 - v12
+                    frame 2908</strong>
+                    <span>error 87.69 m</span>
+                    <span>DINO 0.960</span>
+                    <span>LG inliers 154</span>
+                    <span>LG ratio 0.440</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v11_1fps/frame_000776.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 3 - v11
+                    frame 23966</strong>
+                    <span>error 18.02 m</span>
+                    <span>DINO 0.960</span>
+                    <span>LG inliers 8</span>
+                    <span>LG ratio 0.222</span>
+                  </div>
+                </article>
+                
+                <article class="candidate selected">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000317.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 4 - v13
+                    frame 9472</strong>
+                    <span>error 72.53 m</span>
+                    <span>DINO 0.960</span>
+                    <span>LG inliers 149</span>
+                    <span>LG ratio 0.492</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v11_1fps/frame_000777.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 5 - v11
+                    frame 23996</strong>
+                    <span>error 28.01 m</span>
+                    <span>DINO 0.960</span>
+                    <span>LG inliers 20</span>
+                    <span>LG ratio 0.400</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v11_1fps/frame_000775.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 6 - v11
+                    frame 23936</strong>
+                    <span>error 8.18 m</span>
+                    <span>DINO 0.959</span>
+                    <span>LG inliers 7</span>
+                    <span>LG ratio 0.163</span>
+                  </div>
+                </article>
+                
+              </div>
+            </section>
+            
+            <section class="case">
+              <header>
+                <div>
+                  <h2>Worst #2 - query frame 241</h2>
+                  <p>
+                    selected v13
+                    frame 24819,
+                    error 70.60 m,
+                    selected rank 3
+                  </p>
+                </div>
+              </header>
+              <div class="case-grid">
+                <div class="query">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v14_1fps/frame_000009.jpg" alt="query frame">
+                  <p>Query / ground truth center:
+                  32.1043314, 35.2051088</p>
+                </div>
+                <div class="map">
+                  <svg viewBox="0 0 320 220" role="img"><rect x="0" y="0" width="320" height="220" rx="6" fill="#f8fafc" /><text x="12" y="20">local map: green=truth, red=selected, blue=top candidates</text><circle cx="294.0" cy="194.0" r="7" fill="#16a34a" /><text x="301.0" y="187.0">GT</text><circle cx="100.2" cy="89.2" r="4" fill="#2563eb" /><text x="107.2" y="82.2">1</text><circle cx="26.0" cy="26.0" r="4" fill="#2563eb" /><text x="33.0" y="19.0">2</text><circle cx="174.4" cy="152.5" r="6" fill="#dc2626" /><text x="181.4" y="145.5">SEL</text><circle cx="115.1" cy="101.4" r="4" fill="#2563eb" /><text x="122.1" y="94.4">4</text><circle cx="85.3" cy="76.9" r="4" fill="#2563eb" /><text x="92.3" y="69.9">5</text><circle cx="174.3" cy="150.9" r="4" fill="#2563eb" /><text x="181.3" y="143.9">6</text></svg>
+                </div>
+              </div>
+              <div class="candidates">
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000805.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 1 - v13
+                    frame 24099</strong>
+                    <span>error 119.85 m</span>
+                    <span>DINO 0.963</span>
+                    <span>LG inliers 37</span>
+                    <span>LG ratio 0.435</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000800.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 2 - v13
+                    frame 23949</strong>
+                    <span>error 169.98 m</span>
+                    <span>DINO 0.962</span>
+                    <span>LG inliers 6</span>
+                    <span>LG ratio 0.154</span>
+                  </div>
+                </article>
+                
+                <article class="candidate selected">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000829.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 3 - v13
+                    frame 24819</strong>
+                    <span>error 70.60 m</span>
+                    <span>DINO 0.961</span>
+                    <span>LG inliers 157</span>
+                    <span>LG ratio 0.689</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000806.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 4 - v13
+                    frame 24129</strong>
+                    <span>error 109.93 m</span>
+                    <span>DINO 0.961</span>
+                    <span>LG inliers 72</span>
+                    <span>LG ratio 0.626</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000804.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 5 - v13
+                    frame 24069</strong>
+                    <span>error 129.80 m</span>
+                    <span>DINO 0.960</span>
+                    <span>LG inliers 31</span>
+                    <span>LG ratio 0.463</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000811.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 6 - v13
+                    frame 24279</strong>
+                    <span>error 70.85 m</span>
+                    <span>DINO 0.960</span>
+                    <span>LG inliers 145</span>
+                    <span>LG ratio 0.639</span>
+                  </div>
+                </article>
+                
+              </div>
+            </section>
+            
+            <section class="case">
+              <header>
+                <div>
+                  <h2>Worst #3 - query frame 451</h2>
+                  <p>
+                    selected v13
+                    frame 9472,
+                    error 66.73 m,
+                    selected rank 1
+                  </p>
+                </div>
+              </header>
+              <div class="case-grid">
+                <div class="query">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v14_1fps/frame_000016.jpg" alt="query frame">
+                  <p>Query / ground truth center:
+                  32.1040601, 35.2058302</p>
+                </div>
+                <div class="map">
+                  <svg viewBox="0 0 320 220" role="img"><rect x="0" y="0" width="320" height="220" rx="6" fill="#f8fafc" /><text x="12" y="20">local map: green=truth, red=selected, blue=top candidates</text><circle cx="61.4" cy="26.0" r="7" fill="#16a34a" /><text x="68.4" y="19.0">GT</text><circle cx="65.3" cy="119.1" r="6" fill="#dc2626" /><text x="72.3" y="112.1">SEL</text><circle cx="36.3" cy="137.0" r="4" fill="#2563eb" /><text x="43.3" y="130.0">2</text><circle cx="26.0" cy="166.9" r="4" fill="#2563eb" /><text x="33.0" y="159.9">3</text><circle cx="280.3" cy="191.8" r="4" fill="#2563eb" /><text x="287.3" y="184.8">4</text><circle cx="287.1" cy="193.2" r="4" fill="#2563eb" /><text x="294.1" y="186.2">5</text><circle cx="294.0" cy="194.0" r="4" fill="#2563eb" /><text x="301.0" y="187.0">6</text></svg>
+                </div>
+              </div>
+              <div class="candidates">
+                
+                <article class="candidate selected">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000317.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 1 - v13
+                    frame 9472</strong>
+                    <span>error 66.73 m</span>
+                    <span>DINO 0.966</span>
+                    <span>LG inliers 173</span>
+                    <span>LG ratio 0.496</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v12_1fps/frame_000098.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 2 - v12
+                    frame 2908</strong>
+                    <span>error 86.88 m</span>
+                    <span>DINO 0.962</span>
+                    <span>LG inliers 163</span>
+                    <span>LG ratio 0.474</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v12_1fps/frame_000097.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 3 - v12
+                    frame 2878</strong>
+                    <span>error 112.49 m</span>
+                    <span>DINO 0.961</span>
+                    <span>LG inliers 149</span>
+                    <span>LG ratio 0.460</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000493.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 4 - v13
+                    frame 14748</strong>
+                    <span>error 332.00 m</span>
+                    <span>DINO 0.959</span>
+                    <span>LG inliers 6</span>
+                    <span>LG ratio 0.194</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000494.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 5 - v13
+                    frame 14778</strong>
+                    <span>error 341.46 m</span>
+                    <span>DINO 0.958</span>
+                    <span>LG inliers 6</span>
+                    <span>LG ratio 0.188</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000495.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 6 - v13
+                    frame 14808</strong>
+                    <span>error 350.81 m</span>
+                    <span>DINO 0.958</span>
+                    <span>LG inliers 6</span>
+                    <span>LG ratio 0.273</span>
+                  </div>
+                </article>
+                
+              </div>
+            </section>
+            
+            <section class="case">
+              <header>
+                <div>
+                  <h2>Worst #4 - query frame 211</h2>
+                  <p>
+                    selected v13
+                    frame 24879,
+                    error 60.07 m,
+                    selected rank 4
+                  </p>
+                </div>
+              </header>
+              <div class="case-grid">
+                <div class="query">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v14_1fps/frame_000008.jpg" alt="query frame">
+                  <p>Query / ground truth center:
+                  32.1043724, 35.2050059</p>
+                </div>
+                <div class="map">
+                  <svg viewBox="0 0 320 220" role="img"><rect x="0" y="0" width="320" height="220" rx="6" fill="#f8fafc" /><text x="12" y="20">local map: green=truth, red=selected, blue=top candidates</text><circle cx="294.0" cy="194.0" r="7" fill="#16a34a" /><text x="301.0" y="187.0">GT</text><circle cx="184.5" cy="160.7" r="4" fill="#2563eb" /><text x="191.5" y="153.7">1</text><circle cx="89.3" cy="80.2" r="4" fill="#2563eb" /><text x="96.3" y="73.2">2</text><circle cx="105.2" cy="93.3" r="4" fill="#2563eb" /><text x="112.2" y="86.3">3</text><circle cx="184.5" cy="160.7" r="6" fill="#dc2626" /><text x="191.5" y="153.7">SEL</text><circle cx="26.0" cy="26.0" r="4" fill="#2563eb" /><text x="33.0" y="19.0">5</text><circle cx="166.4" cy="145.5" r="4" fill="#2563eb" /><text x="173.4" y="138.5">6</text></svg>
+                </div>
+              </div>
+              <div class="candidates">
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000829.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 1 - v13
+                    frame 24819</strong>
+                    <span>error 60.07 m</span>
+                    <span>DINO 0.971</span>
+                    <span>LG inliers 209</span>
+                    <span>LG ratio 0.766</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000804.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 2 - v13
+                    frame 24069</strong>
+                    <span>error 119.08 m</span>
+                    <span>DINO 0.970</span>
+                    <span>LG inliers 57</span>
+                    <span>LG ratio 0.576</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000805.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 3 - v13
+                    frame 24099</strong>
+                    <span>error 109.13 m</span>
+                    <span>DINO 0.969</span>
+                    <span>LG inliers 80</span>
+                    <span>LG ratio 0.559</span>
+                  </div>
+                </article>
+                
+                <article class="candidate selected">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000831.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 4 - v13
+                    frame 24879</strong>
+                    <span>error 60.07 m</span>
+                    <span>DINO 0.969</span>
+                    <span>LG inliers 214</span>
+                    <span>LG ratio 0.764</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000800.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 5 - v13
+                    frame 23949</strong>
+                    <span>error 159.26 m</span>
+                    <span>DINO 0.969</span>
+                    <span>LG inliers 6</span>
+                    <span>LG ratio 0.176</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000809.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 6 - v13
+                    frame 24219</strong>
+                    <span>error 71.03 m</span>
+                    <span>DINO 0.968</span>
+                    <span>LG inliers 198</span>
+                    <span>LG ratio 0.710</span>
+                  </div>
+                </article>
+                
+              </div>
+            </section>
+            
+            <section class="case">
+              <header>
+                <div>
+                  <h2>Worst #5 - query frame 181</h2>
+                  <p>
+                    selected v13
+                    frame 24819,
+                    error 49.43 m,
+                    selected rank 1
+                  </p>
+                </div>
+              </header>
+              <div class="case-grid">
+                <div class="query">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v14_1fps/frame_000007.jpg" alt="query frame">
+                  <p>Query / ground truth center:
+                  32.1044090, 35.2048999</p>
+                </div>
+                <div class="map">
+                  <svg viewBox="0 0 320 220" role="img"><rect x="0" y="0" width="320" height="220" rx="6" fill="#f8fafc" /><text x="12" y="20">local map: green=truth, red=selected, blue=top candidates</text><circle cx="294.0" cy="194.0" r="7" fill="#16a34a" /><text x="301.0" y="187.0">GT</text><circle cx="163.1" cy="156.0" r="6" fill="#dc2626" /><text x="170.1" y="149.0">SEL</text><circle cx="163.1" cy="156.0" r="4" fill="#2563eb" /><text x="170.1" y="149.0">2</text><circle cx="137.1" cy="131.5" r="4" fill="#2563eb" /><text x="144.1" y="124.5">3</text><circle cx="48.9" cy="47.1" r="4" fill="#2563eb" /><text x="55.9" y="40.1">4</text><circle cx="162.9" cy="156.0" r="4" fill="#2563eb" /><text x="169.9" y="149.0">5</text><circle cx="26.0" cy="26.0" r="4" fill="#2563eb" /><text x="33.0" y="19.0">6</text></svg>
+                </div>
+              </div>
+              <div class="candidates">
+                
+                <article class="candidate selected">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000829.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 1 - v13
+                    frame 24819</strong>
+                    <span>error 49.43 m</span>
+                    <span>DINO 0.978</span>
+                    <span>LG inliers 271</span>
+                    <span>LG ratio 0.844</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000831.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 2 - v13
+                    frame 24879</strong>
+                    <span>error 49.43 m</span>
+                    <span>DINO 0.976</span>
+                    <span>LG inliers 270</span>
+                    <span>LG ratio 0.839</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000809.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 3 - v13
+                    frame 24219</strong>
+                    <span>error 60.30 m</span>
+                    <span>DINO 0.975</span>
+                    <span>LG inliers 245</span>
+                    <span>LG ratio 0.778</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000805.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 4 - v13
+                    frame 24099</strong>
+                    <span>error 98.35 m</span>
+                    <span>DINO 0.975</span>
+                    <span>LG inliers 101</span>
+                    <span>LG ratio 0.631</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000828.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 5 - v13
+                    frame 24789</strong>
+                    <span>error 49.52 m</span>
+                    <span>DINO 0.975</span>
+                    <span>LG inliers 262</span>
+                    <span>LG ratio 0.837</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000804.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 6 - v13
+                    frame 24069</strong>
+                    <span>error 108.30 m</span>
+                    <span>DINO 0.975</span>
+                    <span>LG inliers 80</span>
+                    <span>LG ratio 0.615</span>
+                  </div>
+                </article>
+                
+              </div>
+            </section>
+            
+            <section class="case">
+              <header>
+                <div>
+                  <h2>Worst #6 - query frame 331</h2>
+                  <p>
+                    selected v11
+                    frame 24865,
+                    error 46.92 m,
+                    selected rank 4
+                  </p>
+                </div>
+              </header>
+              <div class="case-grid">
+                <div class="query">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v14_1fps/frame_000012.jpg" alt="query frame">
+                  <p>Query / ground truth center:
+                  32.1042117, 35.2054154</p>
+                </div>
+                <div class="map">
+                  <svg viewBox="0 0 320 220" role="img"><rect x="0" y="0" width="320" height="220" rx="6" fill="#f8fafc" /><text x="12" y="20">local map: green=truth, red=selected, blue=top candidates</text><circle cx="242.0" cy="122.9" r="7" fill="#16a34a" /><text x="249.0" y="115.9">GT</text><circle cx="64.4" cy="144.2" r="4" fill="#2563eb" /><text x="71.4" y="137.2">1</text><circle cx="294.0" cy="26.0" r="4" fill="#2563eb" /><text x="301.0" y="19.0">2</text><circle cx="28.8" cy="122.1" r="4" fill="#2563eb" /><text x="35.8" y="115.1">3</text><circle cx="208.3" cy="181.2" r="6" fill="#dc2626" /><text x="215.3" y="174.2">SEL</text><circle cx="26.0" cy="134.9" r="4" fill="#2563eb" /><text x="33.0" y="127.9">5</text><circle cx="212.3" cy="194.0" r="4" fill="#2563eb" /><text x="219.3" y="187.0">6</text></svg>
+                </div>
+              </div>
+              <div class="candidates">
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000306.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 1 - v13
+                    frame 9143</strong>
+                    <span>error 44.79 m</span>
+                    <span>DINO 0.956</span>
+                    <span>LG inliers 166</span>
+                    <span>LG ratio 0.888</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v12_1fps/frame_000012.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 2 - v12
+                    frame 331</strong>
+                    <span>error 77.71 m</span>
+                    <span>DINO 0.955</span>
+                    <span>LG inliers 5</span>
+                    <span>LG ratio 0.179</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v12_1fps/frame_000080.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 3 - v12
+                    frame 2369</strong>
+                    <span>error 49.77 m</span>
+                    <span>DINO 0.955</span>
+                    <span>LG inliers 29</span>
+                    <span>LG ratio 0.326</span>
+                  </div>
+                </article>
+                
+                <article class="candidate selected">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v11_1fps/frame_000806.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 4 - v11
+                    frame 24865</strong>
+                    <span>error 46.92 m</span>
+                    <span>DINO 0.954</span>
+                    <span>LG inliers 6</span>
+                    <span>LG ratio 0.140</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v12_1fps/frame_000081.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 5 - v12
+                    frame 2399</strong>
+                    <span>error 51.32 m</span>
+                    <span>DINO 0.954</span>
+                    <span>LG inliers 55</span>
+                    <span>LG ratio 0.474</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v11_1fps/frame_000805.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 6 - v11
+                    frame 24835</strong>
+                    <span>error 56.80 m</span>
+                    <span>DINO 0.953</span>
+                    <span>LG inliers 6</span>
+                    <span>LG ratio 0.200</span>
+                  </div>
+                </article>
+                
+              </div>
+            </section>
+            
+            <section class="case">
+              <header>
+                <div>
+                  <h2>Worst #7 - query frame 810</h2>
+                  <p>
+                    selected v13
+                    frame 9712,
+                    error 43.86 m,
+                    selected rank 3
+                  </p>
+                </div>
+              </header>
+              <div class="case-grid">
+                <div class="query">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v14_1fps/frame_000028.jpg" alt="query frame">
+                  <p>Query / ground truth center:
+                  32.1036001, 35.2070587</p>
+                </div>
+                <div class="map">
+                  <svg viewBox="0 0 320 220" role="img"><rect x="0" y="0" width="320" height="220" rx="6" fill="#f8fafc" /><text x="12" y="20">local map: green=truth, red=selected, blue=top candidates</text><circle cx="281.5" cy="109.9" r="7" fill="#16a34a" /><text x="288.5" y="102.9">GT</text><circle cx="139.5" cy="42.3" r="4" fill="#2563eb" /><text x="146.5" y="35.3">1</text><circle cx="101.2" cy="27.3" r="4" fill="#2563eb" /><text x="108.2" y="20.3">2</text><circle cx="174.0" cy="35.7" r="6" fill="#dc2626" /><text x="181.0" y="28.7">SEL</text><circle cx="257.2" cy="191.4" r="4" fill="#2563eb" /><text x="264.2" y="184.4">4</text><circle cx="26.0" cy="26.0" r="4" fill="#2563eb" /><text x="33.0" y="19.0">5</text><circle cx="294.0" cy="194.0" r="4" fill="#2563eb" /><text x="301.0" y="187.0">6</text></svg>
+                </div>
+              </div>
+              <div class="candidates">
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000324.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 1 - v13
+                    frame 9682</strong>
+                    <span>error 48.38 m</span>
+                    <span>DINO 0.985</span>
+                    <span>LG inliers 251</span>
+                    <span>LG ratio 0.605</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000323.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 2 - v13
+                    frame 9652</strong>
+                    <span>error 60.52 m</span>
+                    <span>DINO 0.981</span>
+                    <span>LG inliers 162</span>
+                    <span>LG ratio 0.481</span>
+                  </div>
+                </article>
+                
+                <article class="candidate selected">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000325.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 3 - v13
+                    frame 9712</strong>
+                    <span>error 43.86 m</span>
+                    <span>DINO 0.978</span>
+                    <span>LG inliers 304</span>
+                    <span>LG ratio 0.670</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v12_1fps/frame_000113.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 4 - v12
+                    frame 3358</strong>
+                    <span>error 37.16 m</span>
+                    <span>DINO 0.976</span>
+                    <span>LG inliers 283</span>
+                    <span>LG ratio 0.573</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000321.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 5 - v13
+                    frame 9592</strong>
+                    <span>error 77.55 m</span>
+                    <span>DINO 0.972</span>
+                    <span>LG inliers 132</span>
+                    <span>LG ratio 0.514</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v12_1fps/frame_000114.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 6 - v12
+                    frame 3388</strong>
+                    <span>error 37.93 m</span>
+                    <span>DINO 0.972</span>
+                    <span>LG inliers 271</span>
+                    <span>LG ratio 0.579</span>
+                  </div>
+                </article>
+                
+              </div>
+            </section>
+            
+            <section class="case">
+              <header>
+                <div>
+                  <h2>Worst #8 - query frame 481</h2>
+                  <p>
+                    selected v13
+                    frame 9502,
+                    error 41.88 m,
+                    selected rank 3
+                  </p>
+                </div>
+              </header>
+              <div class="case-grid">
+                <div class="query">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v14_1fps/frame_000017.jpg" alt="query frame">
+                  <p>Query / ground truth center:
+                  32.1040211, 35.2059322</p>
+                </div>
+                <div class="map">
+                  <svg viewBox="0 0 320 220" role="img"><rect x="0" y="0" width="320" height="220" rx="6" fill="#f8fafc" /><text x="12" y="20">local map: green=truth, red=selected, blue=top candidates</text><circle cx="60.0" cy="26.0" r="7" fill="#16a34a" /><text x="67.0" y="19.0">GT</text><circle cx="56.9" cy="116.7" r="4" fill="#2563eb" /><text x="63.9" y="109.7">1</text><circle cx="294.0" cy="194.0" r="4" fill="#2563eb" /><text x="301.0" y="187.0">2</text><circle cx="69.7" cy="84.2" r="6" fill="#dc2626" /><text x="76.7" y="77.2">SEL</text><circle cx="286.7" cy="192.5" r="4" fill="#2563eb" /><text x="293.7" y="185.5">4</text><circle cx="26.0" cy="135.4" r="4" fill="#2563eb" /><text x="33.0" y="128.4">5</text><circle cx="104.1" cy="40.3" r="4" fill="#2563eb" /><text x="111.1" y="33.3">6</text></svg>
+                </div>
+              </div>
+              <div class="candidates">
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000317.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 1 - v13
+                    frame 9472</strong>
+                    <span>error 62.30 m</span>
+                    <span>DINO 0.971</span>
+                    <span>LG inliers 184</span>
+                    <span>LG ratio 0.503</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000494.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 2 - v13
+                    frame 14778</strong>
+                    <span>error 330.93 m</span>
+                    <span>DINO 0.967</span>
+                    <span>LG inliers 6</span>
+                    <span>LG ratio 0.140</span>
+                  </div>
+                </article>
+                
+                <article class="candidate selected">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000318.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 3 - v13
+                    frame 9502</strong>
+                    <span>error 41.88 m</span>
+                    <span>DINO 0.967</span>
+                    <span>LG inliers 204</span>
+                    <span>LG ratio 0.474</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000493.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 4 - v13
+                    frame 14748</strong>
+                    <span>error 321.47 m</span>
+                    <span>DINO 0.967</span>
+                    <span>LG inliers 5</span>
+                    <span>LG ratio 0.179</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v12_1fps/frame_000098.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 5 - v12
+                    frame 2908</strong>
+                    <span>error 87.49 m</span>
+                    <span>DINO 0.966</span>
+                    <span>LG inliers 140</span>
+                    <span>LG ratio 0.443</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000323.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 6 - v13
+                    frame 9652</strong>
+                    <span>error 59.22 m</span>
+                    <span>DINO 0.966</span>
+                    <span>LG inliers 96</span>
+                    <span>LG ratio 0.358</span>
+                  </div>
+                </article>
+                
+              </div>
+            </section>
+            
+            <section class="case">
+              <header>
+                <div>
+                  <h2>Worst #9 - query frame 2639</h2>
+                  <p>
+                    selected v11
+                    frame 1277,
+                    error 41.54 m,
+                    selected rank 6
+                  </p>
+                </div>
+              </header>
+              <div class="case-grid">
+                <div class="query">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v14_1fps/frame_000089.jpg" alt="query frame">
+                  <p>Query / ground truth center:
+                  32.1024823, 35.2097892</p>
+                </div>
+                <div class="map">
+                  <svg viewBox="0 0 320 220" role="img"><rect x="0" y="0" width="320" height="220" rx="6" fill="#f8fafc" /><text x="12" y="20">local map: green=truth, red=selected, blue=top candidates</text><circle cx="294.0" cy="194.0" r="7" fill="#16a34a" /><text x="301.0" y="187.0">GT</text><circle cx="48.6" cy="50.0" r="4" fill="#2563eb" /><text x="55.6" y="43.0">1</text><circle cx="53.7" cy="59.4" r="4" fill="#2563eb" /><text x="60.7" y="52.4">2</text><circle cx="43.4" cy="41.6" r="4" fill="#2563eb" /><text x="50.4" y="34.6">3</text><circle cx="35.5" cy="33.2" r="4" fill="#2563eb" /><text x="42.5" y="26.2">4</text><circle cx="57.2" cy="67.6" r="4" fill="#2563eb" /><text x="64.2" y="60.6">5</text><circle cx="26.0" cy="26.0" r="6" fill="#dc2626" /><text x="33.0" y="19.0">SEL</text></svg>
+                </div>
+              </div>
+              <div class="candidates">
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v11_1fps/frame_000016.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 1 - v11
+                    frame 1187</strong>
+                    <span>error 36.10 m</span>
+                    <span>DINO 0.934</span>
+                    <span>LG inliers 288</span>
+                    <span>LG ratio 0.720</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v11_1fps/frame_000015.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 2 - v11
+                    frame 1157</strong>
+                    <span>error 34.09 m</span>
+                    <span>DINO 0.930</span>
+                    <span>LG inliers 261</span>
+                    <span>LG ratio 0.674</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v11_1fps/frame_000017.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 3 - v11
+                    frame 1217</strong>
+                    <span>error 37.92 m</span>
+                    <span>DINO 0.927</span>
+                    <span>LG inliers 308</span>
+                    <span>LG ratio 0.740</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v11_1fps/frame_000018.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 4 - v11
+                    frame 1247</strong>
+                    <span>error 39.83 m</span>
+                    <span>DINO 0.927</span>
+                    <span>LG inliers 304</span>
+                    <span>LG ratio 0.736</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v11_1fps/frame_000014.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 5 - v11
+                    frame 1127</strong>
+                    <span>error 32.39 m</span>
+                    <span>DINO 0.926</span>
+                    <span>LG inliers 204</span>
+                    <span>LG ratio 0.620</span>
+                  </div>
+                </article>
+                
+                <article class="candidate selected">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v11_1fps/frame_000019.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 6 - v11
+                    frame 1277</strong>
+                    <span>error 41.54 m</span>
+                    <span>DINO 0.925</span>
+                    <span>LG inliers 308</span>
+                    <span>LG ratio 0.821</span>
+                  </div>
+                </article>
+                
+              </div>
+            </section>
+            
+            <section class="case">
+              <header>
+                <div>
+                  <h2>Worst #10 - query frame 151</h2>
+                  <p>
+                    selected v13
+                    frame 24819,
+                    error 39.07 m,
+                    selected rank 1
+                  </p>
+                </div>
+              </header>
+              <div class="case-grid">
+                <div class="query">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v14_1fps/frame_000006.jpg" alt="query frame">
+                  <p>Query / ground truth center:
+                  32.1044488, 35.2047965</p>
+                </div>
+                <div class="map">
+                  <svg viewBox="0 0 320 220" role="img"><rect x="0" y="0" width="320" height="220" rx="6" fill="#f8fafc" /><text x="12" y="20">local map: green=truth, red=selected, blue=top candidates</text><circle cx="294.0" cy="194.0" r="7" fill="#16a34a" /><text x="301.0" y="187.0">GT</text><circle cx="79.5" cy="116.7" r="6" fill="#dc2626" /><text x="86.5" y="109.7">SEL</text><circle cx="79.5" cy="116.7" r="4" fill="#2563eb" /><text x="86.5" y="109.7">2</text><circle cx="26.0" cy="26.0" r="4" fill="#2563eb" /><text x="33.0" y="19.0">3</text><circle cx="79.5" cy="116.7" r="4" fill="#2563eb" /><text x="86.5" y="109.7">4</text><circle cx="79.0" cy="116.7" r="4" fill="#2563eb" /><text x="86.0" y="109.7">5</text><circle cx="79.0" cy="116.7" r="4" fill="#2563eb" /><text x="86.0" y="109.7">6</text></svg>
+                </div>
+              </div>
+              <div class="candidates">
+                
+                <article class="candidate selected">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000829.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 1 - v13
+                    frame 24819</strong>
+                    <span>error 39.07 m</span>
+                    <span>DINO 0.985</span>
+                    <span>LG inliers 345</span>
+                    <span>LG ratio 0.858</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000831.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 2 - v13
+                    frame 24879</strong>
+                    <span>error 39.07 m</span>
+                    <span>DINO 0.985</span>
+                    <span>LG inliers 338</span>
+                    <span>LG ratio 0.856</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000809.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 3 - v13
+                    frame 24219</strong>
+                    <span>error 49.74 m</span>
+                    <span>DINO 0.984</span>
+                    <span>LG inliers 308</span>
+                    <span>LG ratio 0.853</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000830.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 4 - v13
+                    frame 24849</strong>
+                    <span>error 39.07 m</span>
+                    <span>DINO 0.983</span>
+                    <span>LG inliers 324</span>
+                    <span>LG ratio 0.822</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000828.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 5 - v13
+                    frame 24789</strong>
+                    <span>error 39.16 m</span>
+                    <span>DINO 0.982</span>
+                    <span>LG inliers 340</span>
+                    <span>LG ratio 0.863</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000824.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 6 - v13
+                    frame 24669</strong>
+                    <span>error 39.16 m</span>
+                    <span>DINO 0.982</span>
+                    <span>LG inliers 305</span>
+                    <span>LG ratio 0.792</span>
+                  </div>
+                </article>
+                
+              </div>
+            </section>
+            
+            <section class="case">
+              <header>
+                <div>
+                  <h2>Worst #11 - query frame 301</h2>
+                  <p>
+                    selected v13
+                    frame 9143,
+                    error 38.56 m,
+                    selected rank 3
+                  </p>
+                </div>
+              </header>
+              <div class="case-grid">
+                <div class="query">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v14_1fps/frame_000011.jpg" alt="query frame">
+                  <p>Query / ground truth center:
+                  32.1042544, 35.2053138</p>
+                </div>
+                <div class="map">
+                  <svg viewBox="0 0 320 220" role="img"><rect x="0" y="0" width="320" height="220" rx="6" fill="#f8fafc" /><text x="12" y="20">local map: green=truth, red=selected, blue=top candidates</text><circle cx="283.2" cy="66.5" r="7" fill="#16a34a" /><text x="290.2" y="59.5">GT</text><circle cx="30.2" cy="76.8" r="4" fill="#2563eb" /><text x="37.2" y="69.8">1</text><circle cx="26.0" cy="102.2" r="4" fill="#2563eb" /><text x="33.0" y="95.2">2</text><circle cx="82.4" cy="120.7" r="6" fill="#dc2626" /><text x="89.4" y="113.7">SEL</text><circle cx="294.0" cy="194.0" r="4" fill="#2563eb" /><text x="301.0" y="187.0">4</text><circle cx="53.8" cy="98.5" r="4" fill="#2563eb" /><text x="60.8" y="91.5">5</text><circle cx="45.2" cy="26.0" r="4" fill="#2563eb" /><text x="52.2" y="19.0">6</text></svg>
+                </div>
+              </div>
+              <div class="candidates">
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v12_1fps/frame_000080.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 1 - v12
+                    frame 2369</strong>
+                    <span>error 40.40 m</span>
+                    <span>DINO 0.963</span>
+                    <span>LG inliers 25</span>
+                    <span>LG ratio 0.281</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v12_1fps/frame_000081.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 2 - v12
+                    frame 2399</strong>
+                    <span>error 43.28 m</span>
+                    <span>DINO 0.961</span>
+                    <span>LG inliers 23</span>
+                    <span>LG ratio 0.264</span>
+                  </div>
+                </article>
+                
+                <article class="candidate selected">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000306.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 3 - v13
+                    frame 9143</strong>
+                    <span>error 38.56 m</span>
+                    <span>DINO 0.959</span>
+                    <span>LG inliers 181</span>
+                    <span>LG ratio 0.923</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v11_1fps/frame_000806.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 4 - v11
+                    frame 24865</strong>
+                    <span>error 51.04 m</span>
+                    <span>DINO 0.959</span>
+                    <span>LG inliers 8</span>
+                    <span>LG ratio 0.242</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v13_1fps/frame_000305.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 5 - v13
+                    frame 9113</strong>
+                    <span>error 38.62 m</span>
+                    <span>DINO 0.957</span>
+                    <span>LG inliers 164</span>
+                    <span>LG ratio 0.872</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v12_1fps/frame_000078.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 6 - v12
+                    frame 2309</strong>
+                    <span>error 41.12 m</span>
+                    <span>DINO 0.957</span>
+                    <span>LG inliers 8</span>
+                    <span>LG ratio 0.163</span>
+                  </div>
+                </article>
+                
+              </div>
+            </section>
+            
+            <section class="case">
+              <header>
+                <div>
+                  <h2>Worst #12 - query frame 2669</h2>
+                  <p>
+                    selected v11
+                    frame 1187,
+                    error 36.06 m,
+                    selected rank 1
+                  </p>
+                </div>
+              </header>
+              <div class="case-grid">
+                <div class="query">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v14_1fps/frame_000090.jpg" alt="query frame">
+                  <p>Query / ground truth center:
+                  32.1024806, 35.2097844</p>
+                </div>
+                <div class="map">
+                  <svg viewBox="0 0 320 220" role="img"><rect x="0" y="0" width="320" height="220" rx="6" fill="#f8fafc" /><text x="12" y="20">local map: green=truth, red=selected, blue=top candidates</text><circle cx="294.0" cy="194.0" r="7" fill="#16a34a" /><text x="301.0" y="187.0">GT</text><circle cx="49.1" cy="49.9" r="6" fill="#dc2626" /><text x="56.1" y="42.9">SEL</text><circle cx="54.4" cy="59.3" r="4" fill="#2563eb" /><text x="61.4" y="52.3">2</text><circle cx="58.0" cy="67.4" r="4" fill="#2563eb" /><text x="65.0" y="60.4">3</text><circle cx="43.9" cy="41.5" r="4" fill="#2563eb" /><text x="50.9" y="34.5">4</text><circle cx="35.8" cy="33.1" r="4" fill="#2563eb" /><text x="42.8" y="26.1">5</text><circle cx="26.0" cy="26.0" r="4" fill="#2563eb" /><text x="33.0" y="19.0">6</text></svg>
+                </div>
+              </div>
+              <div class="candidates">
+                
+                <article class="candidate selected">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v11_1fps/frame_000016.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 1 - v11
+                    frame 1187</strong>
+                    <span>error 36.06 m</span>
+                    <span>DINO 0.947</span>
+                    <span>LG inliers 263</span>
+                    <span>LG ratio 0.721</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v11_1fps/frame_000015.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 2 - v11
+                    frame 1157</strong>
+                    <span>error 34.04 m</span>
+                    <span>DINO 0.945</span>
+                    <span>LG inliers 249</span>
+                    <span>LG ratio 0.677</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v11_1fps/frame_000014.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 3 - v11
+                    frame 1127</strong>
+                    <span>error 32.33 m</span>
+                    <span>DINO 0.941</span>
+                    <span>LG inliers 232</span>
+                    <span>LG ratio 0.629</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v11_1fps/frame_000017.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 4 - v11
+                    frame 1217</strong>
+                    <span>error 37.88 m</span>
+                    <span>DINO 0.938</span>
+                    <span>LG inliers 259</span>
+                    <span>LG ratio 0.719</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v11_1fps/frame_000018.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 5 - v11
+                    frame 1247</strong>
+                    <span>error 39.80 m</span>
+                    <span>DINO 0.932</span>
+                    <span>LG inliers 240</span>
+                    <span>LG ratio 0.725</span>
+                  </div>
+                </article>
+                
+                <article class="candidate">
+                  <img src="file:///Users/raphaelcoeffic/University/Algo%20Navigation/Visual-Navigation-for-Drones/data/processed/frames_v11_1fps/frame_000019.jpg" alt="reference candidate">
+                  <div class="meta">
+                    <strong>rank 6 - v11
+                    frame 1277</strong>
+                    <span>error 41.51 m</span>
+                    <span>DINO 0.932</span>
+                    <span>LG inliers 233</span>
+                    <span>LG ratio 0.782</span>
+                  </div>
+                </article>
+                
+              </div>
+            </section>
+            
+  </main>
+</body>
+</html>

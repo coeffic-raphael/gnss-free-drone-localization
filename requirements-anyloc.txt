@@ -1,0 +1,12 @@
+torch
+torchvision
+pillow
+numpy
+tqdm
+natsort
+einops
+scikit-learn
+tyro
+opencv-python
+kornia
+git+https://github.com/cvg/LightGlue.git

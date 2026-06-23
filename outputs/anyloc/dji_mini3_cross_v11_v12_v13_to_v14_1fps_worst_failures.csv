@@ -1,0 +1,11 @@
+query_dataset,query_frame_count,query_frame_path,dino_reference_dataset,dino_reference_frame_count,dino_position_error_m,temporal_reference_dataset,temporal_reference_frame_count,temporal_reference_frame_path,temporal_rank,lg_match_count,lg_inlier_count,lg_inlier_ratio,temporal_position_error_m
+v14,421,data/processed/frames_v14_1fps/frame_000015.jpg,v12,2878,112.72004573599214,v13,9472,data/processed/frames_v13_1fps/frame_000317.jpg,4,303,149,0.49174917491749176,72.5289749351578
+v14,241,data/processed/frames_v14_1fps/frame_000009.jpg,v13,24099,119.85233978132281,v13,24819,data/processed/frames_v13_1fps/frame_000829.jpg,3,228,157,0.6885964912280702,70.60029165844975
+v14,451,data/processed/frames_v14_1fps/frame_000016.jpg,v13,9472,66.7313323121365,v13,9472,data/processed/frames_v13_1fps/frame_000317.jpg,1,349,173,0.49570200573065903,66.7313323121365
+v14,211,data/processed/frames_v14_1fps/frame_000008.jpg,v13,24819,60.06595839690396,v13,24879,data/processed/frames_v13_1fps/frame_000831.jpg,4,280,214,0.7642857142857142,60.06595839690396
+v14,181,data/processed/frames_v14_1fps/frame_000007.jpg,v13,24819,49.43162600311435,v13,24819,data/processed/frames_v13_1fps/frame_000829.jpg,1,321,271,0.8442367601246106,49.43162600311435
+v14,331,data/processed/frames_v14_1fps/frame_000012.jpg,v13,9143,44.78798608281962,v11,24865,data/processed/frames_v11_1fps/frame_000806.jpg,4,43,6,0.13953488372093023,46.9226291623067
+v14,810,data/processed/frames_v14_1fps/frame_000028.jpg,v13,9682,48.376493484711624,v13,9712,data/processed/frames_v13_1fps/frame_000325.jpg,3,454,304,0.6696035242290749,43.86156991315498
+v14,481,data/processed/frames_v14_1fps/frame_000017.jpg,v13,9472,62.302906376049556,v13,9502,data/processed/frames_v13_1fps/frame_000318.jpg,3,430,204,0.4744186046511628,41.882284373749556
+v14,151,data/processed/frames_v14_1fps/frame_000006.jpg,v13,24819,39.06546971223486,v13,24819,data/processed/frames_v13_1fps/frame_000829.jpg,1,402,345,0.8582089552238806,39.06546971223486
+v14,301,data/processed/frames_v14_1fps/frame_000011.jpg,v12,2369,40.39740251913362,v13,9143,data/processed/frames_v13_1fps/frame_000306.jpg,3,196,181,0.923469387755102,38.55713439162289
