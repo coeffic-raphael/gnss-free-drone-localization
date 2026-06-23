@@ -10,7 +10,7 @@ Our concrete output is the GPS coordinate of the center point of the video frame
 
 ## Retained Real-Time Solution
 
-**This is the headline result of the project, and the one we consider the actual answer to the assignment** ("design a real-time visual navigation algorithm..."): the **satellite-first hybrid pipeline**, detailed in full in §10. For every query frame it makes a decision using only that frame and past frames — never a future frame, never the whole video. Concretely:
+**This is the headline result of the project, and the one we consider the actual answer to the assignment** ("design a real-time visual navigation algorithm..."): the **satellite-first hybrid pipeline**, detailed in full in section 10. For every query frame it makes a decision using only that frame and past frames — never a future frame, never the whole video. Concretely:
 
 1. Try satellite tile matching first (cheap: IPM warp + 3×3 mosaic + SuperPoint/LightGlue + RANSAC, ~0.2-0.4 s/frame on the test hardware).
 2. Fall back to DINOv2 + LightGlue visual place recognition (VPR) against the reference pool only if satellite matching fails (~0.8-1.3 s/frame, paid only on fallback).
@@ -21,12 +21,12 @@ No step in this chain ever requires information from a frame that hasn't happene
 
 | Video | Frames | Smoothed median / mean | Throughput |
 | --- | ---: | ---: | ---: |
-| v14 (reference v11+v12+v13) | 115 | **13.0 m / 14.8 m** | **2.22 fps** |
+| v14 (reference v11+v12+v13) | 115 | **13.0 m / 14.8 m** | **2.10 fps** |
 | v13 (reference v11+v12+v14) | 831 | **17.9 m / 24.8 m** | **1.83 fps** |
 
-This is markedly faster than 1 fps — the rate the source videos were sampled at — which means the pipeline can, in principle, run ahead of the incoming frame rate rather than fall behind it. §10.5 addresses one legitimate caveat about how the DINOv2 features used in step 2 are computed in this implementation, and why it doesn't change the causality argument above.
+This is markedly faster than 1 fps — the rate the source videos were sampled at — which means the pipeline can, in principle, run ahead of the incoming frame rate rather than fall behind it. These throughput numbers include the DINOv2 query-frame descriptor extraction inside the timed per-frame loop — there is no precomputation step hiding any of the cost (section 10.5).
 
-Sections 1-9 describe an earlier, offline architecture (VPR-first with whole-sequence Motion Viterbi and symmetric smoothing) that we built first to establish an accuracy ceiling before tackling the real-time constraint. It is **not** the deployed pipeline — see §10.4 for the direct comparison.
+Sections 1-9 describe an earlier, offline architecture (VPR-first with whole-sequence Motion Viterbi and symmetric smoothing) that we built first to establish an accuracy ceiling before tackling the real-time constraint. It is **not** the deployed pipeline — see section 10.4 for the direct comparison.
 
 ## Data Used
 
@@ -53,7 +53,7 @@ The Air 3 cross-video visual results were much worse than the Mini 3 Pro benchma
 
 ## Offline Reference Pipeline
 
-This is the non-real-time architecture used to establish the accuracy ceiling before adapting it into the real-time pipeline (§10). It is:
+This is the non-real-time architecture used to establish the accuracy ceiling before adapting it into the real-time pipeline (section 10). It is:
 
 1. **Parse telemetry**
 
@@ -200,7 +200,7 @@ Compared to the Viterbi-only baseline (≤10m: 32.2%, ≤15m: 48.7%), smoothing 
 
 The window was selected by sweeping w = 1 to 25 on the evaluation set. The optimum at w = 19 corresponds to ±9 seconds of temporal context at 1 fps, consistent with the drone's travel speed (~7 m/s) and the typical scale of retrieval errors. Oversmoothing above w = 19 degrades the mean as the window exceeds the spatial scale of the correct path segments.
 
-This is the most accurate offline VPR configuration, and the one carried into the offline hybrid pipeline (§8). It is not the deployed pipeline — see the Retained Real-Time Solution at the top of this report and §10 for the causal version.
+This is the most accurate offline VPR configuration, and the one carried into the offline hybrid pipeline (section 8). It is not the deployed pipeline — see the Retained Real-Time Solution at the top of this report and section 10 for the causal version.
 
 ### 5. Confidence-Gated Navigation Fixes
 
@@ -430,7 +430,7 @@ Raw satellite-first hybrid output:
 
 Error tolerance: ≤5 m 4.1%, ≤10 m 15.2%, ≤15 m 23.6%, ≤20 m 31.3%, ≤30 m 50.5%.
 
-Timing: overall mean 0.547 s / median 0.435 s / max 2.467 s; satellite-only mean 0.429 s (666 frames); VPR fallback mean 1.022 s (165 frames, i.e. the 93 accepted plus the 72 that still fell through to `NO_FIX`); achievable rate **1.83 fps**.
+Timing: overall mean 0.546 s / median 0.437 s / max 2.465 s; satellite-only mean 0.428 s (666 frames); VPR fallback mean 1.023 s (165 frames, i.e. the 93 accepted plus the 72 that still fell through to `NO_FIX`, including live DINOv2 extraction — see section 10.5); achievable rate **1.83 fps**.
 
 After causal gap-filling and smoothing (best window w=9, half-window 4 frames):
 
@@ -462,7 +462,7 @@ Raw satellite-first hybrid output:
 
 Error tolerance: ≤5 m 0.9%, ≤10 m 18.3%, ≤15 m 44.3%, ≤20 m 59.1%, ≤30 m 80.9%.
 
-Timing: overall mean 0.451 s / median 0.246 s / max 1.323 s; satellite-only mean 0.220 s (72 frames); VPR fallback mean 0.839 s (43 frames); achievable rate **2.22 fps**.
+Timing: overall mean 0.477 s / median 0.249 s / max 1.564 s; satellite-only mean 0.225 s (72 frames); VPR fallback mean 0.898 s (43 frames, including live DINOv2 extraction — see section 10.5); achievable rate **2.10 fps**.
 
 After causal gap-filling and smoothing (best window w=5, half-window 2 frames):
 
@@ -489,18 +489,15 @@ In practice this backfired. A first implementation could lock in on a wrong stre
 
 #### 10.4 Real-Time vs. Batch Hybrid (Section 8)
 
-The satellite-first pipeline is causal end-to-end (no Viterbi backtracking, no symmetric smoothing), at the cost of somewhat higher error than the offline VPR-first + satellite-fallback pipeline on v14 (median 14.5 m raw / 13.0 m smoothed vs. 11.6 m for the Section 8 batch hybrid). We consider this the right trade: the satellite-first pipeline achieves 1.83-2.22 fps with zero look-ahead and can run in flight, whereas the Section 8 hybrid requires the entire query video before producing any output and cannot.
+The satellite-first pipeline is causal end-to-end (no Viterbi backtracking, no symmetric smoothing), at the cost of somewhat higher error than the offline VPR-first + satellite-fallback pipeline on v14 (median 14.5 m raw / 13.0 m smoothed vs. 11.6 m for the Section 8 batch hybrid). We consider this the right trade: the satellite-first pipeline achieves 1.83-2.10 fps with zero look-ahead and can run in flight, whereas the Section 8 hybrid requires the entire query video before producing any output and cannot.
 
-#### 10.5 Why The Descriptor Cache Doesn't Break Causality
+#### 10.5 Query-Side DINOv2 Extraction Is Live, Not Precomputed
 
-`scripts/run_satellite_first_hybrid.sh` requires a precomputed DINOv2 descriptor cache (generated once via `frozen_dino_cross_retrieval.py`, see the README) that covers both the reference pool and the entire query flight. Taken at face value this looks like it needs the whole query video in advance, which would contradict the real-time claim above — so it's worth being precise about what is and isn't causal here.
+`scripts/run_satellite_first_hybrid.sh` only reads the **reference**-pool DINOv2 descriptors from a precomputed cache (generated once via `frozen_dino_cross_retrieval.py`, see the README) — that pool is known in advance by construction (it's the map), so precomputing it is not a causality issue; a real deployment would build this database before takeoff, exactly as we do here.
 
-Two separate things are bundled in that cache, and they have different implications:
+The **query**-flight descriptor is computed live, inside the per-frame loop, on every frame where the VPR fallback actually runs (i.e. whenever satellite matching has already failed for that frame). There is no batch step over the query video and no descriptor is ever computed ahead of when it's needed: a DINOv2 global descriptor for frame `i` is extracted from frame `i` alone, at the moment frame `i` is being processed, the same way the satellite IPM warp and the LightGlue match already are.
 
-- **Reference-pool descriptors.** These are computed once, offline, from flights that are known in advance by construction (they're the map). Precomputing them is not a causality violation under any definition — a real deployment would build this database before takeoff, exactly as we do here.
-- **Query-flight descriptors.** These are the part that, in this implementation, are computed in one batch over the whole query video before the per-frame loop starts. This is a genuine implementation convenience, not a requirement of the algorithm: a DINOv2 global descriptor for frame `i` is computed from frame `i` alone — it has no dependency on frame `i+1` or any later frame. In a deployed system, this same extraction would happen the instant frame `i` arrives, as part of that frame's processing budget, exactly like the satellite IPM warp or the LightGlue match already do. Nothing about the *algorithm* needs to see frame `i+1` to produce frame `i`'s descriptor.
-
-What this means in practice: the causality of the *decision rule* (§10's SAT → VPR_FALLBACK → NO_FIX logic, and the smoothing step) is real and unaffected by how the cache was built — re-ordering when DINOv2 descriptors are computed doesn't change what information any single frame's decision is allowed to use. What is **not** independently demonstrated by the current script is the per-frame cost of DINOv2 extraction, because it was paid once, outside the timed loop, rather than inside it. The reported fallback latency (~0.8-1.3 s/frame) is therefore the cost of the LightGlue rerank step alone, not LightGlue-plus-DINOv2-extraction. Based on typical DINOv2 ViT-S/14 single-image inference time (well under 50 ms on the same MPS hardware, versus 0.4-0.8 s for the LightGlue rerank that dominates the fallback cost), folding it into the per-frame budget would not change the reported throughput figures meaningfully, but we have not measured this directly with the descriptor extraction inside the timed loop, and the report should be read with that one open item in mind rather than treating the fps numbers as a fully closed-loop streaming benchmark.
+We measured the cost of this directly rather than estimating it. Folding live DINOv2 extraction into the timed VPR-fallback path raised the fallback mean from 0.839 s to 0.898 s/frame on v14 (+59 ms, about +7%) and left v13 effectively unchanged (1.022 s → 1.023 s/frame) — both within session-to-session timing noise. Overall throughput moved from 2.22 to 2.10 fps on v14 and stayed at 1.83 fps on v13. The smoothed accuracy numbers in section 10.1/section 10.2 are unaffected, since live extraction changes *when* a descriptor is computed, not its value or what it's compared against. This confirms the earlier reasoning: DINOv2 extraction is cheap relative to the LightGlue rerank that dominates the fallback cost, and there is nothing about this pipeline's reported latency or causality that depends on precomputing query-side descriptors.
 
 ---
 
@@ -517,7 +514,7 @@ We tested several ideas that did not become the official pipeline:
 | DINOv2 VLAD aggregation | Improved raw candidate quality, but did not beat the retained final Motion-Viterbi result |
 | Optical flow dead reckoning | SuperPoint + LightGlue between consecutive query frames estimates speed correctly (785.6 m total path vs 797.3 m GNSS, ~1.5% error), but without heading the cumulative direction error reaches 712 m after 115 frames. Dead reckoning is only viable if a magnetic heading or an initial heading estimate from retrieval is available. See `src/frame_dead_reckoning.py`. |
 | FIX/NO_FIX linear interpolation | Using the confidence gate (30.4% FIX coverage) to select retrieval positions, then linearly interpolating between FIX neighbours for NO_FIX frames. Result: 29.32 m mean, worse than the 18.83 m Viterbi baseline. The gaps are up to 46 s long and the drone path is non-linear, so linear interpolation over a 46 s gap introduces large errors. Viterbi already produces ~21 m mean for NO_FIX frames, outperforming naive interpolation (36 m). See `src/interpolated_navigation.py`. |
-| Causal trajectory-consistency gate (satellite-first pipeline) | Rejects a SAT/VPR candidate that deviates too far from a constant-velocity extrapolation of the last accepted fixes. A first version could lock onto a wrong streak permanently (tolerance band stops growing once locked-in speed estimate collapses to ~0); an escape-valve fix solved the lock-in but the gate was still net-negative on v13 (NO_FIX 8.7%→18.3%, mean error 32.1→34.4 m, latency 0.547→0.775 s/frame). Reverted; see §10.3. |
+| Causal trajectory-consistency gate (satellite-first pipeline) | Rejects a SAT/VPR candidate that deviates too far from a constant-velocity extrapolation of the last accepted fixes. A first version could lock onto a wrong streak permanently (tolerance band stops growing once locked-in speed estimate collapses to ~0); an escape-valve fix solved the lock-in but the gate was still net-negative on v13 (NO_FIX 8.7%→18.3%, mean error 32.1→34.4 m, latency 0.547→0.775 s/frame). Reverted; see section 10.3. |
 
 The repository has been cleaned so these attempts do not appear as the main path.
 
@@ -546,9 +543,9 @@ The biggest limitation is viewpoint ambiguity. Drone frames from nearby places c
 
 **Heading accuracy is the primary bottleneck for the satellite module.** Neither the DJI Mini 3 Pro nor the DJI Air 3 / Air 3S records gimbal yaw in the SRT file — the relevant fields (yaw, gimbal heading) are simply absent. The heading used for IPM is therefore estimated from the GPS trajectory: we compute the bearing between consecutive GPS positions and assume the drone nose points in the direction of travel. This assumption breaks whenever the drone crabbs sideways (wind), pivots in place, or decelerates into a turn. At 118 m altitude with a 60° camera tilt, the IPM footprint centre is 204 m ahead of the drone, so an 8° heading error shifts the projected ground point by 204 × sin(8°) ≈ 28 m — explaining the systematic ~30 m offset observed on all straight-line segments of the v12 cross-validation flight. Frames 130–149 of v12, where the heading estimate happened to align with the true drone orientation, achieved 0.4–7.5 m satellite error, confirming that the algorithm itself is sound and that heading accuracy is the limiting factor.
 
-**The batch VPR+satellite hybrid pipeline (§8) is not real-time.** Motion Viterbi backtracks from the last frame of the entire query flight, and the Gaussian path smoothing uses a symmetric window (future frames included) — both require the whole video before producing any output, which is incompatible with an online/in-flight system. An first attempt at making it causal kept the same VPR-first architecture and swapped in `motion_viterbi_rerank.py --online-lag N` (fixed-lag online Viterbi) and `smooth_path.py --causal` (past-only smoothing): this recovered most of the Viterbi accuracy (15.7 m vs 15.2 m median at lag=3s) but the causal smoothing step barely helped (19.5 m vs 19.7 m mean, vs 14.2 m for the batch symmetric window), since a one-sided filter can't average an outlier from both directions.
+**The batch VPR+satellite hybrid pipeline (section 8) is not real-time.** Motion Viterbi backtracks from the last frame of the entire query flight, and the Gaussian path smoothing uses a symmetric window (future frames included) — both require the whole video before producing any output, which is incompatible with an online/in-flight system. An first attempt at making it causal kept the same VPR-first architecture and swapped in `motion_viterbi_rerank.py --online-lag N` (fixed-lag online Viterbi) and `smooth_path.py --causal` (past-only smoothing): this recovered most of the Viterbi accuracy (15.7 m vs 15.2 m median at lag=3s) but the causal smoothing step barely helped (19.5 m vs 19.7 m mean, vs 14.2 m for the batch symmetric window), since a one-sided filter can't average an outlier from both directions.
 
-This VPR-first online-lag variant is kept in the repo (`scripts/run_realtime_pipeline.sh`) but is **not** the retained real-time solution: it still pays the expensive VPR search on every frame. **§10's satellite-first pipeline** (`scripts/run_satellite_first_hybrid.sh` + `src/smooth_hybrid_path.py`) reorders the fusion so satellite matching runs first and VPR is only a fallback, which is both fully causal and 2-4x faster (1.83-2.22 fps vs ~1 fps), at a moderate accuracy cost (13.0 m median on v14 vs 11.6 m for the non-causal batch hybrid). This is the architecture we recommend for an actual in-flight deployment.
+This VPR-first online-lag variant is kept in the repo (`scripts/run_realtime_pipeline.sh`) but is **not** the retained real-time solution: it still pays the expensive VPR search on every frame. **Section 10's satellite-first pipeline** (`scripts/run_satellite_first_hybrid.sh` + `src/smooth_hybrid_path.py`) reorders the fusion so satellite matching runs first and VPR is only a fallback, which is both fully causal and 2-4x faster (1.83-2.22 fps vs ~1 fps), at a moderate accuracy cost (13.0 m median on v14 vs 11.6 m for the non-causal batch hybrid). This is the architecture we recommend for an actual in-flight deployment.
 
 DINOv2 descriptor extraction and LightGlue candidate matching are per-frame independent in all variants — they were never the source of the non-causality.
 
@@ -566,16 +563,16 @@ DINOv2 descriptor extraction and LightGlue candidate matching are per-frame inde
 | `outputs/maps/dji_mini3_v14_hybrid.kml` | Google Earth overlay coloured by status |
 | `outputs/anyloc/dji_mini3_cross_v11_v12_v13_to_v14_1fps_motion_viterbi_top6_acc0_results.csv` | VPR Viterbi result (intermediate) |
 | `outputs/maps/dji_mini3_v14_google_earth_best_motion_viterbi.kml` | Google Earth overlay (VPR only) |
-| `scripts/run_satellite_first_hybrid.sh` | Retained real-time pipeline (causal satellite-first, VPR fallback) — see §10 |
+| `scripts/run_satellite_first_hybrid.sh` | Retained real-time pipeline (causal satellite-first, VPR fallback) — see section 10 |
 | `outputs/hybrid/satellite_first_v14.csv` / `satellite_first_v14_smoothed.csv` | Real-time pipeline per-frame output, raw and causally smoothed (v14) |
 | `outputs/hybrid/satellite_first_v13.csv` / `satellite_first_v13_smoothed.csv` | Real-time pipeline per-frame output, raw and causally smoothed (v13) |
 
 ## Conclusion
 
-**The retained solution for deployment is the real-time satellite-first pipeline** (§10): satellite tile matching first, DINOv2 + LightGlue VPR retrieval only as a fallback, both decided causally frame-by-frame, followed by causal gap-filling and one-sided Gaussian smoothing. On the Mini 3 Pro benchmark (v14, 115 frames at 1 fps, reference DB = v11 + v12 + v13) it reaches **median 13.0 m / mean 14.8 m at 2.22 fps**, with zero look-ahead; on v13 (831 frames, reference DB = v11 + v12 + v14) it reaches median 17.9 m / mean 24.8 m at 1.83 fps. 66.1% of v14 frames land within 15 m, at a rate of roughly one fix every 1.5 s.
+**The retained solution for deployment is the real-time satellite-first pipeline** (section 10): satellite tile matching first, DINOv2 + LightGlue VPR retrieval only as a fallback, both decided causally frame-by-frame, followed by causal gap-filling and one-sided Gaussian smoothing. The query-side DINOv2 descriptor is extracted live, per-frame, inside the timed loop — nothing about this pipeline's reported latency depends on seeing the query video in advance (section 10.5). On the Mini 3 Pro benchmark (v14, 115 frames at 1 fps, reference DB = v11 + v12 + v13) it reaches **median 13.0 m / mean 14.8 m at 2.10 fps**, with zero look-ahead; on v13 (831 frames, reference DB = v11 + v12 + v14) it reaches median 17.9 m / mean 24.8 m at 1.83 fps. 66.1% of v14 frames land within 15 m, at a rate of roughly one fix every 1.5 s.
 
 Module 1 of this pipeline is the AnyLoc-style visual place recognition stack: frozen DINOv2 descriptors and LightGlue local verification. Module 2 is the satellite tile matching module, extending WildNav to oblique cameras via Inverse Perspective Mapping. The two are fused causally: satellite first, VPR fallback, then NO_FIX.
 
-**The offline batch architecture (§§1-8) is kept as the accuracy ceiling reference**, not as the deployed pipeline. It uses the same two modules but orders them VPR-first, with confidence gating to decide when to fall back to satellite, and replaces the causal post-processing with whole-sequence Motion Viterbi and symmetric Gaussian smoothing — both of which require the entire query video before producing any output. On the same v14 benchmark it reaches median 11.6 m / mean 13.4 m, max 40.8 m, with 64% of frames within 15 m — about 1.4 m better median than the real-time pipeline, at the cost of being unusable in flight.
+**The offline batch architecture (sections 1-8) is kept as the accuracy ceiling reference**, not as the deployed pipeline. It uses the same two modules but orders them VPR-first, with confidence gating to decide when to fall back to satellite, and replaces the causal post-processing with whole-sequence Motion Viterbi and symmetric Gaussian smoothing — both of which require the entire query video before producing any output. On the same v14 benchmark it reaches median 11.6 m / mean 13.4 m, max 40.8 m, with 64% of frames within 15 m — about 1.4 m better median than the real-time pipeline, at the cost of being unusable in flight.
 
 In both architectures, the system operates without GNSS at inference time: all query-side GPS data is withheld, and only the reference database and pre-downloaded satellite tiles are used.

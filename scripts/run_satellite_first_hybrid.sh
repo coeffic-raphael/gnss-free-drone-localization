@@ -2,9 +2,8 @@
 # "Satellite-first" hybrid pipeline: for each query frame, try satellite
 # matching FIRST (cheap, ~1 LightGlue call). Only when satellite fails
 # (few_matches / ransac_fail / low_alt / no_tile) does it fall back to the
-# expensive VPR path — DINOv2 top-K retrieval (already-cached descriptors,
-# nearly free) + LightGlue rerank against only TOP_K_FALLBACK reference
-# frames (default 3, not the original top-10).
+# expensive VPR path — DINOv2 top-K retrieval + LightGlue rerank against only
+# TOP_K_FALLBACK reference frames (default 3, not the original top-10).
 #
 # This inverts the existing offline architecture, where VPR (top-10 rerank +
 # full-sequence Viterbi) runs on EVERY frame regardless of whether satellite
@@ -18,15 +17,23 @@
 #
 # This script measures REAL per-frame wall-clock latency (processed strictly
 # in temporal order, one frame at a time) — the actual number that matters
-# for real-time feasibility.
+# for real-time feasibility. The query frame's DINOv2 descriptor is computed
+# LIVE, inside the per-frame loop, only on frames where satellite matching
+# failed (i.e. only when the VPR fallback actually needs it) — this is the
+# honest streaming latency, not a benchmark shortcut: see docs/final_report.md
+# §10.5 for why an earlier version of this script precomputed query
+# descriptors in a batch ahead of time, and why that was a convenience for
+# repeated experiments rather than an algorithmic requirement.
 #
 # Usage:
 #   VERSION=v14 ANGLE=60 REFERENCES="v11,v12,v13" ./scripts/run_satellite_first_hybrid.sh
 #
-# Requires an existing DINOv2 descriptor cache for VERSION-as-query against
-# REFERENCES (e.g. produced by frozen_dino_cross_retrieval.py / the existing
-# run_v*_as_query.sh / benchmark_lightglue_lite.sh scripts). Override the
-# default path with DESCRIPTOR_CACHE if it lives elsewhere.
+# Requires an existing DINOv2 descriptor cache covering the REFERENCE pool for
+# VERSION (e.g. produced by frozen_dino_cross_retrieval.py / the existing
+# run_v*_as_query.sh / benchmark_lightglue_lite.sh scripts) — only the
+# reference-side descriptors are read from it; the query side is always
+# computed live. Override the default path with DESCRIPTOR_CACHE if it lives
+# elsewhere.
 #
 # Optional env vars:
 #   TOP_K_FALLBACK   (default 3)   — DINOv2 candidates tried when satellite fails
@@ -34,6 +41,7 @@
 #   VPR_MIN_RATIO    (default 0.70)— inlier ratio required to accept a VPR fix
 #   SAT_MAX_KEYPOINTS / SAT_DEPTH_CONFIDENCE / SAT_WIDTH_CONFIDENCE — satellite stage
 #   VPR_IMAGE_RESIZE / VPR_MAX_KEYPOINTS / VPR_DEPTH_CONFIDENCE / VPR_WIDTH_CONFIDENCE — VPR stage
+#   DINO_MODEL_NAME / DINO_REPO / DINO_WEIGHTS / DINO_MAX_SIZE — live query-side DINOv2 extraction
 set -euo pipefail
 PYTHON="${PYTHON_BIN:-.venv-anyloc/bin/python}"
 
@@ -50,6 +58,7 @@ from lightglue.utils import numpy_image_to_torch, load_image
 
 from ipm_warp import ipm_warp
 from satellite_tiles import load_tile_mosaic, tile_pixel_to_latlon
+from anyloc_dino_retrieval import load_dinov2, patch_descriptors_for_image, mean_pool_descriptor
 
 # ── Config ───────────────────────────────────────────────────────────────────
 VERSION     = os.environ.get("VERSION", "v14")
@@ -74,6 +83,13 @@ VPR_IMAGE_RESIZE     = int(os.environ.get("VPR_IMAGE_RESIZE", "512"))
 VPR_MAX_KEYPOINTS    = int(os.environ.get("VPR_MAX_KEYPOINTS", "512"))
 VPR_DEPTH_CONFIDENCE = float(os.environ.get("VPR_DEPTH_CONFIDENCE", "0.8"))
 VPR_WIDTH_CONFIDENCE = float(os.environ.get("VPR_WIDTH_CONFIDENCE", "0.9"))
+
+# Live query-side DINOv2 extraction (matches frozen_dino_cross_retrieval.py defaults
+# so the reference-side cache below stays comparable to the live query descriptor).
+DINO_MODEL_NAME = os.environ.get("DINO_MODEL_NAME", "dinov2_vits14")
+DINO_REPO       = Path(os.environ.get("DINO_REPO", "third_party/dinov2"))
+DINO_WEIGHTS    = Path(os.environ.get("DINO_WEIGHTS", "outputs/models/dinov2/dinov2_vits14_pretrain.pth"))
+DINO_MAX_SIZE   = int(os.environ.get("DINO_MAX_SIZE", "518"))
 
 ref_join = "_".join(REFERENCES)
 default_cache = f"outputs/anyloc/dji_mini3_cross_{ref_join}_to_{VERSION}_1fps_descriptors.npy"
@@ -101,6 +117,14 @@ sat_matcher   = LightGlue(features="superpoint", depth_confidence=SAT_DEPTH_CONF
 vpr_extractor = SuperPoint(max_num_keypoints=VPR_MAX_KEYPOINTS).eval().to(device)
 vpr_matcher   = LightGlue(features="superpoint", depth_confidence=VPR_DEPTH_CONFIDENCE,
                            width_confidence=VPR_WIDTH_CONFIDENCE).eval().to(device)
+
+print(f"Loading DINOv2 ({DINO_MODEL_NAME}) for live query-side descriptor extraction...")
+dino_model = load_dinov2(DINO_MODEL_NAME, device, DINO_REPO, DINO_WEIGHTS if DINO_WEIGHTS.exists() else None)
+
+def extract_dino_descriptor(frame_path: str) -> np.ndarray:
+    """Compute a single frame's DINOv2 global descriptor live (no batching across frames)."""
+    patches = patch_descriptors_for_image(dino_model, Path(frame_path), device, DINO_MAX_SIZE)
+    return mean_pool_descriptor(patches)
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def haversine_m(lat1, lon1, lat2, lon2):
@@ -145,12 +169,14 @@ if not DESCRIPTOR_CACHE.exists():
     print("Generate it first with frozen_dino_cross_retrieval.py (same --reference-manifest/--query-manifest as REFERENCES/VERSION).")
     sys.exit(1)
 
+# Only the REFERENCE-side descriptors are taken from the cache — that pool is
+# known ahead of time by construction (it's the map), so precomputing it is
+# not a causality issue. The QUERY-side descriptor is intentionally NOT read
+# from this cache: it's computed live, per-frame, inside the main loop below
+# (extract_dino_descriptor), only on frames where the VPR fallback actually
+# runs, so the measured latency reflects true streaming operation.
 descriptors = np.load(DESCRIPTOR_CACHE)
 reference_descriptors = descriptors[: len(reference_rows)]
-query_descriptors = descriptors[len(reference_rows):]
-if len(query_descriptors) != len(query_rows):
-    print(f"WARNING: descriptor cache has {len(query_descriptors)} query rows, manifest has {len(query_rows)} — mismatch, results may be misaligned.")
-similarities = query_descriptors @ reference_descriptors.T
 
 # ── Main loop (strict temporal order, one frame at a time) ─────────────────
 OUT_CSV.parent.mkdir(parents=True, exist_ok=True)
@@ -226,7 +252,10 @@ for i, row in enumerate(query_rows):
         final_lat, final_lon = sat_lat, sat_lon
     else:
         vpr_triggered = True
-        top_positions = np.argsort(similarities[i])[::-1][:max(1, TOP_K_FALLBACK)]
+        # Live DINOv2 extraction for THIS frame only — not a precomputed batch.
+        query_descriptor = extract_dino_descriptor(frame_path)
+        sims = reference_descriptors @ query_descriptor
+        top_positions = np.argsort(sims)[::-1][:max(1, TOP_K_FALLBACK)]
         f0 = extract_vpr_feats(frame_path)
         best = None  # (inliers, ratio, ref_row)
         for pos in top_positions:

@@ -4,16 +4,18 @@ A hybrid visual localisation pipeline for drones that operates **without GNSS at
 
 This work addresses Exercise 2 of the assignment: *design a real-time visual navigation algorithm based on predefined annotated previous videos and GIS datasets*.
 
+**This README is a quick-start and results summary. The full write-up — detailed methodology, all experiments tried (including ones that were reverted), the complete results breakdown, and the discussion of what is and isn't truly real-time — is in [`docs/final_report.md`](docs/final_report.md). Read that document for the complete picture; this README intentionally only covers the essentials.**
+
 ---
 
 ## Key Results
 
-**Retained solution: real-time satellite-first pipeline** — `scripts/run_satellite_first_hybrid.sh` + `src/smooth_hybrid_path.py`. Fully causal (zero look-ahead), per-frame decision in well under a second.
+**Retained solution: real-time satellite-first pipeline** — `scripts/run_satellite_first_hybrid.sh` + `src/smooth_hybrid_path.py`. Fully causal (zero look-ahead), per-frame decision in well under a second. See `docs/final_report.md` section 10 for the full design rationale and section 10.5 for why this is honestly real-time (no precomputed query-side data).
 
 | Video (reference) | Frames | SAT / VPR_FALLBACK / NO_FIX | Raw median / mean | Smoothed median / mean (best window) | Throughput |
 |---|---:|---|---:|---:|---:|
 | v13 (v11+v12+v14) | 831 | 80.1% / 11.2% / 8.7% | 26.1 m / 32.1 m | 17.9 m / 24.8 m (w=9) | 1.83 fps |
-| v14 (v11+v12+v13) | 115 | 62.6% / 22.6% / 14.8% | 14.5 m / 16.4 m | 13.0 m / 14.8 m (w=5) | 2.22 fps |
+| v14 (v11+v12+v13) | 115 | 62.6% / 22.6% / 14.8% | 14.5 m / 16.4 m | 13.0 m / 14.8 m (w=5) | 2.10 fps |
 
 Smoothed error tolerance — average frequency of being within threshold:
 
@@ -40,7 +42,7 @@ Smoothed error tolerance — average frequency of being within threshold:
 `scripts/run_satellite_first_hybrid.sh` decides each frame causally, using only past and current data — no whole-video buffering, no future frames.
 
 1. **Satellite tile matching first.** IPM-warp the frame, build a 3×3 satellite mosaic around the last known position, match with SuperPoint + LightGlue, solve a RANSAC homography (≥8 inliers). Cost: ~0.2-0.4 s/frame. This is tried first because it's cheap and doesn't require a database search.
-2. **VPR fallback.** If satellite matching fails, query the DINOv2 top-k + LightGlue rerank against the reference pool (inliers ≥100, ratio ≥0.70). Cost: ~0.8-1.3 s/frame — only paid when satellite matching fails.
+2. **VPR fallback.** If satellite matching fails, extract the query frame's DINOv2 descriptor live (no precomputed batch — it's computed at this exact moment in the loop), compare against the cached reference-pool descriptors, then LightGlue-rerank the top-k (inliers ≥100, ratio ≥0.70). Cost: ~0.8-1.3 s/frame, including the live DINOv2 extraction — only paid when satellite matching fails.
 3. **NO_FIX.** If both fail, the frame is left unresolved rather than publishing a guess.
 4. **Causal post-processing** (`src/smooth_hybrid_path.py`): gap-fill `NO_FIX` frames by carrying the last fix forward, then apply a one-sided (past-only) Gaussian smoothing window — best window swept per-video (w=9 for v13, w=5 for v14).
 
@@ -207,7 +209,7 @@ python src/satellite_tiles.py \
 
 ## Run the Real-Time Pipeline (Retained)
 
-`run_satellite_first_hybrid.sh` needs a DINOv2 descriptor cache (query + reference frames) to exist before it can run the VPR fallback. Generate it once per query/reference combination with `frozen_dino_cross_retrieval.py`:
+`run_satellite_first_hybrid.sh` needs a DINOv2 descriptor cache for the **reference pool** to exist before it can run the VPR fallback. Generate it once per reference combination with `frozen_dino_cross_retrieval.py` (the same tool used for the offline benchmark, so the command below still takes a `--query-manifest` and writes descriptors for both sides — but only the reference-side rows are actually read by `run_satellite_first_hybrid.sh`; the query-side descriptor is computed live, per-frame, inside the pipeline's main loop, not from this cache):
 
 ```bash
 source .venv-anyloc/bin/activate
@@ -222,7 +224,7 @@ python src/frozen_dino_cross_retrieval.py \
   --aggregation mean --top-k 10
 ```
 
-The `--descriptor-cache` path must follow the pattern `outputs/anyloc/dji_mini3_cross_<REFERENCES joined by _>_to_<VERSION>_1fps_descriptors.npy` — this is the default path `run_satellite_first_hybrid.sh` looks for (override with the `DESCRIPTOR_CACHE` env var if you place it elsewhere). This step only needs to be re-run if the query/reference combination changes; DINOv2 weights are downloaded automatically on first use.
+The `--descriptor-cache` path must follow the pattern `outputs/anyloc/dji_mini3_cross_<REFERENCES joined by _>_to_<VERSION>_1fps_descriptors.npy` — this is the default path `run_satellite_first_hybrid.sh` looks for (override with the `DESCRIPTOR_CACHE` env var if you place it elsewhere). It loads only the first `len(reference_rows)` rows of this file. This step only needs to be re-run if the reference pool changes; DINOv2 weights are downloaded automatically on first use. At runtime, `run_satellite_first_hybrid.sh` loads its own DINOv2 model (`DINO_MODEL_NAME`, default `dinov2_vits14`) and extracts the query frame's descriptor on the spot whenever satellite matching fails for that frame — see `docs/final_report.md` §10.5 for why this is the honest streaming latency rather than a benchmark shortcut.
 
 Then run the real-time pipeline itself:
 

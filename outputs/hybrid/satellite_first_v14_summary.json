@@ -16,10 +16,10 @@
     "20": 68,
     "30": 93
   },
-  "frame_seconds_mean": 0.45141385466913164,
-  "frame_seconds_median": 0.24617120798211545,
-  "frame_seconds_max": 1.3227451250422746,
-  "frame_seconds_sat_only_mean": 0.22003280091222324,
-  "frame_seconds_vpr_mean": 0.83884259584349,
-  "achievable_fps": 2.2152620918845307
+  "frame_seconds_mean": 0.4765711166410019,
+  "frame_seconds_median": 0.24903075001202524,
+  "frame_seconds_max": 1.5641039999900386,
+  "frame_seconds_sat_only_mean": 0.22462494386450593,
+  "frame_seconds_vpr_mean": 0.8984344757086229,
+  "achievable_fps": 2.0983227163413973
 }
