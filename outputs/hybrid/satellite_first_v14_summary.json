@@ -1,0 +1,25 @@
+{
+  "version": "v14",
+  "frames_total": 115,
+  "counts_by_source": {
+    "SAT": 72,
+    "VPR_FALLBACK": 26,
+    "NO_FIX": 17
+  },
+  "vpr_trigger_rate": 0.3739130434782609,
+  "error_median_m": 14.512099837385147,
+  "error_mean_m": 16.43563381414158,
+  "thresholds": {
+    "5": 1,
+    "10": 21,
+    "15": 51,
+    "20": 68,
+    "30": 93
+  },
+  "frame_seconds_mean": 0.45141385466913164,
+  "frame_seconds_median": 0.24617120798211545,
+  "frame_seconds_max": 1.3227451250422746,
+  "frame_seconds_sat_only_mean": 0.22003280091222324,
+  "frame_seconds_vpr_mean": 0.83884259584349,
+  "achievable_fps": 2.2152620918845307
+}

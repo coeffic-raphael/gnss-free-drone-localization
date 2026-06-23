@@ -7,6 +7,7 @@ import csv
 import json
 import math
 import pickle
+import time
 from pathlib import Path
 
 import cv2
@@ -136,9 +137,10 @@ def build_candidates(
     matcher: LightGlue,
     device: torch.device,
     image_resize: int,
-) -> list[list[dict[str, float | int]]]:
+) -> tuple[list[list[dict[str, float | int]]], float]:
     feature_cache: dict[str, dict[str, torch.Tensor]] = {}
     all_candidates: list[list[dict[str, float | int]]] = []
+    start = time.perf_counter()
     for query_index, query in enumerate(tqdm(query_rows, desc="LightGlue candidates")):
         top_positions = np.argsort(similarities[query_index])[::-1][: max(1, top_k)]
         query_candidates: list[dict[str, float | int]] = []
@@ -162,7 +164,8 @@ def build_candidates(
                 }
             )
         all_candidates.append(query_candidates)
-    return all_candidates
+    elapsed = time.perf_counter() - start
+    return all_candidates, elapsed
 
 
 def load_or_build_candidates(
@@ -176,11 +179,11 @@ def load_or_build_candidates(
     matcher: LightGlue,
     device: torch.device,
     image_resize: int,
-) -> list[list[dict[str, float | int]]]:
+) -> tuple[list[list[dict[str, float | int]]], float | None]:
     if candidates_cache is not None and candidates_cache.exists() and not recompute:
         with candidates_cache.open("rb") as cache_file:
-            return pickle.load(cache_file)
-    candidates = build_candidates(
+            return pickle.load(cache_file), None
+    candidates, elapsed = build_candidates(
         reference_rows,
         query_rows,
         similarities,
@@ -194,7 +197,7 @@ def load_or_build_candidates(
         candidates_cache.parent.mkdir(parents=True, exist_ok=True)
         with candidates_cache.open("wb") as cache_file:
             pickle.dump(candidates, cache_file)
-    return candidates
+    return candidates, elapsed
 
 
 def unary_cost(candidate: dict[str, float | int], dino_weight: float, inlier_weight: float, ratio_weight: float) -> float:
@@ -275,14 +278,30 @@ def dynamic_programming(
     return selected
 
 
-def summarize(results: list[dict[str, object]]) -> dict[str, float | int]:
+def summarize(
+    results: list[dict[str, object]],
+    lightglue_seconds: float | None = None,
+    image_resize: int | None = None,
+    max_keypoints: int | None = None,
+    depth_confidence: float | None = None,
+    width_confidence: float | None = None,
+) -> dict[str, float | int]:
     dino_errors = np.array([float(row["dino_position_error_m"]) for row in results])
     temporal_errors = np.array([float(row["temporal_position_error_m"]) for row in results])
     improved = int((temporal_errors < dino_errors).sum())
     worsened = int((temporal_errors > dino_errors).sum())
     unchanged = len(results) - improved - worsened
+    timing: dict[str, float | int | None] = {}
+    if lightglue_seconds is not None and len(results):
+        timing["lightglue_total_seconds"] = lightglue_seconds
+        timing["lightglue_seconds_per_query"] = lightglue_seconds / len(results)
+        timing["lightglue_image_resize"] = image_resize
+        timing["lightglue_max_keypoints"] = max_keypoints
+        timing["lightglue_depth_confidence"] = depth_confidence
+        timing["lightglue_width_confidence"] = width_confidence
     return {
         "queries": len(results),
+        **timing,
         "dino_mean_error_m": float(dino_errors.mean()) if len(dino_errors) else 0.0,
         "dino_median_error_m": float(np.median(dino_errors)) if len(dino_errors) else 0.0,
         "dino_p90_error_m": float(np.percentile(dino_errors, 90)) if len(dino_errors) else 0.0,
@@ -318,6 +337,16 @@ def main() -> None:
     parser.add_argument("--recompute-candidates", action="store_true")
     parser.add_argument("--image-resize", type=int, default=1024)
     parser.add_argument("--max-keypoints", type=int, default=1024)
+    parser.add_argument(
+        "--lg-depth-confidence", type=float, default=0.95,
+        help="LightGlue early-stopping threshold (library default 0.95). "
+             "Lower = stop earlier = faster, slightly less accurate. -1 disables early stop.",
+    )
+    parser.add_argument(
+        "--lg-width-confidence", type=float, default=0.99,
+        help="LightGlue point-pruning threshold (library default 0.99). "
+             "Lower = prune more points = faster, slightly less accurate. -1 disables pruning.",
+    )
     parser.add_argument("--dino-weight", type=float, default=4.0)
     parser.add_argument("--inlier-weight", type=float, default=1.0)
     parser.add_argument("--ratio-weight", type=float, default=1.0)
@@ -340,8 +369,12 @@ def main() -> None:
     device = choose_device()
     print(f"device: {device}")
     extractor = SuperPoint(max_num_keypoints=args.max_keypoints).eval().to(device)
-    matcher = LightGlue(features="superpoint").eval().to(device)
-    candidates = load_or_build_candidates(
+    matcher = LightGlue(
+        features="superpoint",
+        depth_confidence=args.lg_depth_confidence,
+        width_confidence=args.lg_width_confidence,
+    ).eval().to(device)
+    candidates, lightglue_seconds = load_or_build_candidates(
         args.candidates_cache,
         args.recompute_candidates,
         reference_rows,
@@ -393,7 +426,14 @@ def main() -> None:
         )
 
     write_results(results, args.output_csv)
-    summary = summarize(results)
+    summary = summarize(
+        results,
+        lightglue_seconds=lightglue_seconds,
+        image_resize=args.image_resize,
+        max_keypoints=args.max_keypoints,
+        depth_confidence=args.lg_depth_confidence,
+        width_confidence=args.lg_width_confidence,
+    )
     args.summary_json.parent.mkdir(parents=True, exist_ok=True)
     args.summary_json.write_text(json.dumps(summary, indent=2), encoding="utf-8")
     for key, value in summary.items():

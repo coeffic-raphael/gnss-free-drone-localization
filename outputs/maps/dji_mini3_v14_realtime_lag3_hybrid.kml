@@ -1,0 +1,1813 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Hybrid localisation — v14 (VPR + satellite)</name>
+    <Style id="gtPath">
+      <LineStyle><color>ff88aa88</color><width>2</width></LineStyle>
+      <PolyStyle><fill>0</fill></PolyStyle>
+    </Style>
+    <Style id="vprFixLine">
+      <LineStyle><color>ff00aa00</color><width>3</width></LineStyle>
+      <PolyStyle><fill>0</fill></PolyStyle>
+    </Style>
+    <Style id="satFixLine">
+      <LineStyle><color>ffff5500</color><width>3</width></LineStyle>
+      <PolyStyle><fill>0</fill></PolyStyle>
+    </Style>
+    <Style id="vprFbLine">
+      <LineStyle><color>ff0055ff</color><width>3</width></LineStyle>
+      <PolyStyle><fill>0</fill></PolyStyle>
+    </Style>
+    <Style id="errorLine">
+      <LineStyle><color>44ffffff</color><width>1</width></LineStyle>
+      <PolyStyle><fill>0</fill></PolyStyle>
+    </Style>
+    <Style id="vprFix">
+      <IconStyle>
+        <color>ff00aa00</color>
+        <scale>0.6</scale>
+        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
+      </IconStyle>
+      <LabelStyle><scale>0</scale></LabelStyle>
+    </Style>
+    <Style id="satFix">
+      <IconStyle>
+        <color>ffff5500</color>
+        <scale>0.6</scale>
+        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
+      </IconStyle>
+      <LabelStyle><scale>0</scale></LabelStyle>
+    </Style>
+    <Style id="vprFallback">
+      <IconStyle>
+        <color>ff0055ff</color>
+        <scale>0.6</scale>
+        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
+      </IconStyle>
+      <LabelStyle><scale>0</scale></LabelStyle>
+    </Style>
+    <Style id="gtDot">
+      <IconStyle>
+        <color>ff888888</color>
+        <scale>0.4</scale>
+        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
+      </IconStyle>
+      <LabelStyle><scale>0</scale></LabelStyle>
+    </Style>
+    <Placemark>
+      <name>Ground truth path</name>
+      <styleUrl>#gtPath</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>
+            35.20442785,32.10455678,0
+            35.20445435,32.10457277,0
+            35.20450478,32.10455933,0
+            35.20458911,32.10452795,0
+            35.20469388,32.10449042,0
+            35.20479648,32.10444876,0
+            35.20489992,32.10440898,0
+            35.20500588,32.10437242,0
+            35.20510882,32.10433141,0
+            35.20521170,32.10429408,0
+            35.20531382,32.10425441,0
+            35.20541540,32.10421174,0
+            35.20552035,32.10417642,0
+            35.20562488,32.10413842,0
+            35.20572923,32.10410009,0
+            35.20583017,32.10406006,0
+            35.20593217,32.10402106,0
+            35.20603470,32.10398408,0
+            35.20613717,32.10394406,0
+            35.20623906,32.10390776,0
+            35.20634159,32.10387078,0
+            35.20644359,32.10383278,0
+            35.20654417,32.10379206,0
+            35.20664528,32.10375139,0
+            35.20675023,32.10371609,0
+            35.20685323,32.10367809,0
+            35.20695623,32.10363909,0
+            35.20705870,32.10360008,0
+            35.20716070,32.10356108,0
+            35.20726370,32.10352308,0
+            35.20736570,32.10348408,0
+            35.20746870,32.10344608,0
+            35.20757070,32.10340708,0
+            35.20767370,32.10336908,0
+            35.20777570,32.10333008,0
+            35.20788011,32.10329479,0
+            35.20798017,32.10325306,0
+            35.20808270,32.10321508,0
+            35.20818711,32.10317979,0
+            35.20828717,32.10313806,0
+            35.20838917,32.10309906,0
+            35.20849259,32.10306378,0
+            35.20859317,32.10302306,0
+            35.20869517,32.10298406,0
+            35.20879859,32.10294878,0
+            35.20889917,32.10290806,0
+            35.20900117,32.10286906,0
+            35.20910459,32.10283378,0
+            35.20920659,32.10279578,0
+            35.20930859,32.10275778,0
+            35.20941059,32.10271978,0
+            35.20951259,32.10268178,0
+            35.20961317,32.10264106,0
+            35.20971319,32.10259833,0
+            35.20981670,32.10256407,0
+            35.20991396,32.10253150,0
+            35.20998108,32.10249712,0
+            35.21003036,32.10248534,0
+            35.21006259,32.10248165,0
+            35.21008978,32.10246708,0
+            35.21011387,32.10245087,0
+            35.21012285,32.10244018,0
+            35.21014478,32.10246378,0
+            35.21014951,32.10244863,0
+            35.21015034,32.10242507,0
+            35.21016744,32.10242875,0
+            35.21019012,32.10244206,0
+            35.21020544,32.10243868,0
+            35.21019176,32.10243979,0
+            35.21017335,32.10244653,0
+            35.21015737,32.10245247,0
+            35.21014139,32.10245741,0
+            35.21012442,32.10246335,0
+            35.21010787,32.10246949,0
+            35.21009090,32.10247444,0
+            35.21007349,32.10248118,0
+            35.21005651,32.10248712,0
+            35.20987132,32.10297634,0
+            35.20984947,32.10298259,0
+            35.20983922,32.10296714,0
+            35.20983098,32.10295370,0
+            35.20982273,32.10293925,0
+            35.20981318,32.10292636,0
+            35.20980325,32.10291336,0
+            35.20979400,32.10289991,0
+            35.20978476,32.10288647,0
+            35.20977452,32.10287402,0
+            35.20976527,32.10286058,0
+            35.20978924,32.10248231,0
+            35.20978437,32.10248058,0
+            35.20976968,32.10248015,0
+            35.20976238,32.10248903,0
+            35.20975007,32.10250191,0
+            35.20972877,32.10250979,0
+            35.20975928,32.10270533,0
+            35.20975648,32.10270732,0
+            35.20974704,32.10269961,0
+            35.20973331,32.10257426,0
+            35.20973845,32.10254744,0
+            35.20974530,32.10252866,0
+            35.20973965,32.10253567,0
+            35.20972791,32.10254947,0
+            35.20971942,32.10256249,0
+            35.20971548,32.10255982,0
+            35.20971022,32.10255860,0
+            35.20970142,32.10257107,0
+            35.20969777,32.10257708,0
+            35.20970177,32.10257108,0
+            35.20970577,32.10256608,0
+            35.20970045,32.10256052,0
+            35.20969286,32.10256887,0
+            35.20968877,32.10257566,0
+            35.20968751,32.10257744,0
+            35.20968494,32.10257966,0
+            35.20968400,32.10258100,0
+        </coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX path (smoothed VPR, 9.1 m median)</name>
+      <styleUrl>#vprFixLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>
+            35.20438620,32.10449720,0
+            35.20438620,32.10449720,0
+            35.20438620,32.10449720,0
+            35.20438620,32.10449720,0
+            35.20438620,32.10449720,0
+            35.20438540,32.10449720,0
+            35.20652910,32.10393780,0
+            35.20663710,32.10388510,0
+            35.20673630,32.10389420,0
+            35.20675600,32.10389930,0
+            35.20675630,32.10389940,0
+            35.20839660,32.10282570,0
+            35.20842150,32.10279590,0
+            35.20878870,32.10293810,0
+            35.20881770,32.10296590,0
+            35.20895850,32.10285800,0
+            35.20899350,32.10283090,0
+            35.20913790,32.10270270,0
+            35.20927550,32.10276330,0
+            35.20930140,32.10278590,0
+            35.20946570,32.10275460,0
+            35.20950650,32.10274670,0
+            35.20958950,32.10273110,0
+            35.20977610,32.10269580,0
+            35.20990020,32.10267150,0
+            35.20994240,32.10266410,0
+            35.21000510,32.10265440,0
+            35.20999150,32.10248540,0
+            35.21006240,32.10242100,0
+            35.21008210,32.10241460,0
+            35.21008240,32.10241450,0
+            35.21008240,32.10241450,0
+            35.21016190,32.10239070,0
+            35.21018180,32.10238470,0
+            35.21018210,32.10238460,0
+            35.21018210,32.10238460,0
+            35.21008270,32.10241440,0
+        </coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX path (satellite, 12.1 m median)</name>
+      <styleUrl>#satFixLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>
+            35.20506000,32.10426700,0
+            35.20519600,32.10422500,0
+            35.20529600,32.10418300,0
+            35.20540200,32.10415600,0
+            35.20551000,32.10410700,0
+            35.20561200,32.10407000,0
+            35.20571000,32.10402700,0
+            35.20579500,32.10400000,0
+            35.20588700,32.10396200,0
+            35.20599400,32.10392000,0
+            35.20609000,32.10388000,0
+            35.20619000,32.10384800,0
+            35.20626000,32.10381700,0
+            35.20635200,32.10378300,0
+            35.20642500,32.10376400,0
+            35.20653000,32.10372000,0
+            35.20709600,32.10351000,0
+            35.20724500,32.10345500,0
+            35.20730200,32.10343600,0
+            35.20742000,32.10339400,0
+            35.20752000,32.10336000,0
+            35.20762600,32.10332000,0
+            35.20772600,32.10327000,0
+            35.20789700,32.10322000,0
+            35.20790500,32.10321800,0
+            35.20798500,32.10317600,0
+            35.20807300,32.10315000,0
+            35.20813800,32.10313000,0
+            35.20821800,32.10310700,0
+            35.20826700,32.10311000,0
+            35.20859000,32.10298000,0
+            35.20988000,32.10249300,0
+            35.21005200,32.10243600,0
+            35.21011400,32.10238300,0
+            35.21010600,32.10238300,0
+            35.21002600,32.10246300,0
+            35.21007000,32.10244400,0
+            35.21005200,32.10246700,0
+            35.20993400,32.10249300,0
+            35.20996000,32.10243600,0
+            35.20982000,32.10296200,0
+        </coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK path (raw VPR, 14.8 m median)</name>
+      <styleUrl>#vprFbLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>
+            35.20983920,32.10268300,0
+            35.20965270,32.10271910,0
+            35.20956340,32.10290710,0
+            35.20957230,32.10288570,0
+            35.20957250,32.10288530,0
+            35.20957630,32.10287200,0
+            35.20957720,32.10286860,0
+            35.20958480,32.10284180,0
+            35.20959050,32.10282570,0
+            35.20959700,32.10281190,0
+            35.20960310,32.10279600,0
+            35.20961110,32.10276520,0
+            35.20961490,32.10274450,0
+            35.20961680,32.10272750,0
+            35.20961710,32.10272410,0
+            35.20961850,32.10271150,0
+            35.20962110,32.10269810,0
+            35.20962160,32.10269550,0
+            35.20962840,32.10267350,0
+            35.20963010,32.10266800,0
+            35.20962630,32.10267980,0
+            35.20962540,32.10268270,0
+            35.20963220,32.10266000,0
+            35.20963760,32.10264330,0
+            35.20964320,32.10262860,0
+            35.20964430,32.10262570,0
+            35.20964820,32.10261460,0
+            35.20965270,32.10260210,0
+            35.20965370,32.10259960,0
+            35.20965370,32.10259960,0
+            35.20965570,32.10259530,0
+            35.20971350,32.10259320,0
+            35.20966880,32.10259390,0
+            35.20969890,32.10257000,0
+            35.20971290,32.10256640,0
+            35.20971070,32.10256450,0
+            35.20970990,32.10256390,0
+        </coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1 (7.7 m)</name>
+      <description>Frame: 1  t=0.0s
+Status: VPR_FIX
+Error: 7.7 m
+GT: 32.10455677694773, 35.20442785378902
+Est: 32.1044972, 35.2043862</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20438620,32.10449720,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #31 (10.6 m)</name>
+      <description>Frame: 31  t=1.0s
+Status: VPR_FIX
+Error: 10.6 m
+GT: 32.104572768755574, 35.204454347381414
+Est: 32.1044972, 35.2043862</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20438620,32.10449720,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #61 (13.2 m)</name>
+      <description>Frame: 61  t=2.001s
+Status: VPR_FIX
+Error: 13.2 m
+GT: 32.10455932596225, 35.204504779459725
+Est: 32.1044972, 35.2043862</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20438620,32.10449720,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #91 (19.4 m)</name>
+      <description>Frame: 91  t=3.002s
+Status: VPR_FIX
+Error: 19.4 m
+GT: 32.104527948686, 35.20458910770476
+Est: 32.1044972, 35.2043862</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20438620,32.10449720,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #121 (29.0 m)</name>
+      <description>Frame: 121  t=4.003s
+Status: VPR_FIX
+Error: 29.0 m
+GT: 32.10449042019838, 35.204693879470966
+Est: 32.1044972, 35.2043862</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20438620,32.10449720,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #151 (39.1 m)</name>
+      <description>Frame: 151  t=5.004s
+Status: VPR_FIX
+Error: 39.1 m
+GT: 32.10444876391301, 35.20479648235561
+Est: 32.1044972, 35.2043854</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20438540,32.10449720,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #181 (21.9 m)</name>
+      <description>Frame: 181  t=6.005s
+Status: SAT_FIX
+Error: 21.9 m
+GT: 32.10440897610566, 35.20489992367119
+Est: 32.104267, 35.20506</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20506000,32.10426700,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #211 (24.3 m)</name>
+      <description>Frame: 211  t=7.006s
+Status: SAT_FIX
+Error: 24.3 m
+GT: 32.104372420198374, 35.20500587947097
+Est: 32.104225, 35.205196</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20519600,32.10422500,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #241 (24.2 m)</name>
+      <description>Frame: 241  t=8.007s
+Status: SAT_FIX
+Error: 24.2 m
+GT: 32.104331407096986, 35.20510882228229
+Est: 32.104183, 35.205296</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20529600,32.10418300,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #271 (23.6 m)</name>
+      <description>Frame: 271  t=9.008s
+Status: SAT_FIX
+Error: 23.6 m
+GT: 32.10429408237294, 35.20521170277337
+Est: 32.104156, 35.205402</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20540200,32.10415600,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #301 (24.7 m)</name>
+      <description>Frame: 301  t=10.008s
+Status: SAT_FIX
+Error: 24.7 m
+GT: 32.10425440709698, 35.20531382228229
+Est: 32.104107, 35.20551</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20551000,32.10410700,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #331 (24.3 m)</name>
+      <description>Frame: 331  t=11.009s
+Status: SAT_FIX
+Error: 24.3 m
+GT: 32.10421173797127, 35.20541540478371
+Est: 32.10407, 35.205612</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20561200,32.10407000,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #361 (24.4 m)</name>
+      <description>Frame: 361  t=12.01s
+Status: SAT_FIX
+Error: 24.4 m
+GT: 32.10417641730536, 35.20552035407427
+Est: 32.104027, 35.20571</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20571000,32.10402700,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #391 (22.2 m)</name>
+      <description>Frame: 391  t=13.011s
+Status: SAT_FIX
+Error: 22.2 m
+GT: 32.10413842019841, 35.20562487947099
+Est: 32.104, 35.205795</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20579500,32.10400000,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #421 (21.4 m)</name>
+      <description>Frame: 421  t=14.012s
+Status: SAT_FIX
+Error: 21.4 m
+GT: 32.10410009337327, 35.2057292307157
+Est: 32.103962, 35.205887</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20588700,32.10396200,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #451 (21.9 m)</name>
+      <description>Frame: 451  t=15.013s
+Status: SAT_FIX
+Error: 21.9 m
+GT: 32.1040600639128, 35.205830168334856
+Est: 32.10392, 35.205994</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20599400,32.10392000,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #481 (21.6 m)</name>
+      <description>Frame: 481  t=16.014s
+Status: SAT_FIX
+Error: 21.6 m
+GT: 32.104021063912825, 35.20593216833486
+Est: 32.10388, 35.20609</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20609000,32.10388000,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #511 (21.1 m)</name>
+      <description>Frame: 511  t=17.015s
+Status: SAT_FIX
+Error: 21.1 m
+GT: 32.10398408237294, 35.206034702773366
+Est: 32.103848, 35.20619</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20619000,32.10384800,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #541 (18.3 m)</name>
+      <description>Frame: 541  t=18.016s
+Status: SAT_FIX
+Error: 18.3 m
+GT: 32.10394406391283, 35.20613716833487
+Est: 32.103817, 35.20626</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20626000,32.10381700,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #570 (17.5 m)</name>
+      <description>Frame: 570  t=18.983s
+Status: SAT_FIX
+Error: 17.5 m
+GT: 32.103907761626324, 35.206239057761266
+Est: 32.103783, 35.206352</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20635200,32.10378300,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #600 (14.2 m)</name>
+      <description>Frame: 600  t=19.984s
+Status: SAT_FIX
+Error: 14.2 m
+GT: 32.103870780848794, 35.20634158824796
+Est: 32.103764, 35.206425</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20642500,32.10376400,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #630 (15.0 m)</name>
+      <description>Frame: 630  t=20.985s
+Status: SAT_FIX
+Error: 15.0 m
+GT: 32.1038327808488, 35.206443588247964
+Est: 32.10372, 35.20653</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20653000,32.10372000,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #660 (16.3 m)</name>
+      <description>Frame: 660  t=21.986s
+Status: VPR_FIX
+Error: 16.3 m
+GT: 32.10379206391283, 35.20654416833487
+Est: 32.1039378, 35.2065291</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20652910,32.10393780,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #690 (14.9 m)</name>
+      <description>Frame: 690  t=22.987s
+Status: VPR_FIX
+Error: 14.9 m
+GT: 32.103751389503906, 35.20664528399616
+Est: 32.1038851, 35.2066371</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20663710,32.10388510,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #720 (19.9 m)</name>
+      <description>Frame: 720  t=23.988s
+Status: VPR_FIX
+Error: 19.9 m
+GT: 32.103716093373265, 35.20675023071569
+Est: 32.1038942, 35.2067363</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20673630,32.10389420,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #750 (26.3 m)</name>
+      <description>Frame: 750  t=24.989s
+Status: VPR_FIX
+Error: 26.3 m
+GT: 32.103678093373276, 35.206853230715694
+Est: 32.1038993, 35.206756</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20675600,32.10389930,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #780 (34.6 m)</name>
+      <description>Frame: 780  t=25.989s
+Status: VPR_FIX
+Error: 34.6 m
+GT: 32.10363909337324, 35.20695623071568
+Est: 32.1038994, 35.2067563</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20675630,32.10389940,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #810 (10.6 m)</name>
+      <description>Frame: 810  t=26.99s
+Status: SAT_FIX
+Error: 10.6 m
+GT: 32.103600082372935, 35.20705870277337
+Est: 32.10351, 35.207096</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20709600,32.10351000,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #840 (14.2 m)</name>
+      <description>Frame: 840  t=27.991s
+Status: SAT_FIX
+Error: 14.2 m
+GT: 32.10356108237294, 35.20716070277337
+Est: 32.103455, 35.207245</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20724500,32.10345500,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #870 (10.3 m)</name>
+      <description>Frame: 870  t=28.992s
+Status: SAT_FIX
+Error: 10.3 m
+GT: 32.1035230823729, 35.20726370277335
+Est: 32.103436, 35.207302</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20730200,32.10343600,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #900 (11.3 m)</name>
+      <description>Frame: 900  t=29.993s
+Status: SAT_FIX
+Error: 11.3 m
+GT: 32.10348408237294, 35.207365702773366
+Est: 32.103394, 35.20742</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20742000,32.10339400,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #930 (10.7 m)</name>
+      <description>Frame: 930  t=30.994s
+Status: SAT_FIX
+Error: 10.7 m
+GT: 32.10344608237295, 35.20746870277338
+Est: 32.10336, 35.20752</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20752000,32.10336000,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #960 (11.0 m)</name>
+      <description>Frame: 960  t=31.995s
+Status: SAT_FIX
+Error: 11.0 m
+GT: 32.10340708237295, 35.20757070277337
+Est: 32.10332, 35.207626</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20762600,32.10332000,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #990 (12.1 m)</name>
+      <description>Frame: 990  t=32.996s
+Status: SAT_FIX
+Error: 12.1 m
+GT: 32.103369082372936, 35.20767370277337
+Est: 32.10327, 35.207726</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20772600,32.10327000,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #1020 (16.8 m)</name>
+      <description>Frame: 1020  t=33.997s
+Status: SAT_FIX
+Error: 16.8 m
+GT: 32.103330082372935, 35.20777570277337
+Est: 32.10322, 35.207897</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20789700,32.10322000,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #1050 (8.9 m)</name>
+      <description>Frame: 1050  t=34.998s
+Status: SAT_FIX
+Error: 8.9 m
+GT: 32.1032947925362, 35.20788011223788
+Est: 32.103218, 35.207905</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20790500,32.10321800,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #1080 (8.6 m)</name>
+      <description>Frame: 1080  t=35.998s
+Status: SAT_FIX
+Error: 8.6 m
+GT: 32.103253063912824, 35.20798016833487
+Est: 32.103176, 35.207985</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20798500,32.10317600,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #1110 (7.3 m)</name>
+      <description>Frame: 1110  t=36.999s
+Status: SAT_FIX
+Error: 7.3 m
+GT: 32.10321508237291, 35.20808270277335
+Est: 32.10315, 35.208073</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20807300,32.10315000,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #1140 (7.2 m)</name>
+      <description>Frame: 1140  t=38.0s
+Status: SAT_FIX
+Error: 7.2 m
+GT: 32.103179792536196, 35.20818711223788
+Est: 32.10313, 35.208138</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20813800,32.10313000,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #1170 (7.4 m)</name>
+      <description>Frame: 1170  t=39.001s
+Status: SAT_FIX
+Error: 7.4 m
+GT: 32.10313806391284, 35.20828716833488
+Est: 32.103107, 35.208218</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20821800,32.10310700,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #1200 (11.6 m)</name>
+      <description>Frame: 1200  t=40.002s
+Status: SAT_FIX
+Error: 11.6 m
+GT: 32.10309906391282, 35.20838916833486
+Est: 32.10311, 35.208267</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20826700,32.10311000,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1230 (28.0 m)</name>
+      <description>Frame: 1230  t=41.003s
+Status: VPR_FIX
+Error: 28.0 m
+GT: 32.1030637808488, 35.208492588247964
+Est: 32.1028257, 35.2083966</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20839660,32.10282570,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1260 (30.0 m)</name>
+      <description>Frame: 1260  t=42.004s
+Status: VPR_FIX
+Error: 30.0 m
+GT: 32.103023063912836, 35.20859316833487
+Est: 32.1027959, 35.2084215</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20842150,32.10279590,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #1290 (9.9 m)</name>
+      <description>Frame: 1290  t=43.005s
+Status: SAT_FIX
+Error: 9.9 m
+GT: 32.1029840639128, 35.208695168334856
+Est: 32.10298, 35.20859</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20859000,32.10298000,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1320 (1.5 m)</name>
+      <description>Frame: 1320  t=44.006s
+Status: VPR_FIX
+Error: 1.5 m
+GT: 32.10294878084879, 35.20879858824796
+Est: 32.1029381, 35.2087887</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20878870,32.10293810,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1350 (10.0 m)</name>
+      <description>Frame: 1350  t=45.007s
+Status: VPR_FIX
+Error: 10.0 m
+GT: 32.10290806391283, 35.20889916833487
+Est: 32.1029659, 35.2088177</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20881770,32.10296590,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1380 (4.2 m)</name>
+      <description>Frame: 1380  t=46.007s
+Status: VPR_FIX
+Error: 4.2 m
+GT: 32.10286906391283, 35.20900116833487
+Est: 32.102858, 35.2089585</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20895850,32.10285800,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1410 (10.5 m)</name>
+      <description>Frame: 1410  t=47.008s
+Status: VPR_FIX
+Error: 10.5 m
+GT: 32.1028337808488, 35.20910458824796
+Est: 32.1028309, 35.2089935</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20899350,32.10283090,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1440 (12.2 m)</name>
+      <description>Frame: 1440  t=48.009s
+Status: VPR_FIX
+Error: 12.2 m
+GT: 32.1027957808488, 35.209206588247966
+Est: 32.1027027, 35.2091379</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20913790,32.10270270,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1470 (3.2 m)</name>
+      <description>Frame: 1470  t=49.01s
+Status: VPR_FIX
+Error: 3.2 m
+GT: 32.102757780848826, 35.20930858824797
+Est: 32.1027633, 35.2092755</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20927550,32.10276330,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1500 (12.7 m)</name>
+      <description>Frame: 1500  t=50.011s
+Status: VPR_FIX
+Error: 12.7 m
+GT: 32.1027197808488, 35.20941058824797
+Est: 32.1027859, 35.2093014</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20930140,32.10278590,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1530 (9.2 m)</name>
+      <description>Frame: 1530  t=51.012s
+Status: VPR_FIX
+Error: 9.2 m
+GT: 32.10268178084879, 35.20951258824796
+Est: 32.1027546, 35.2094657</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20946570,32.10275460,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1560 (15.5 m)</name>
+      <description>Frame: 1560  t=52.013s
+Status: VPR_FIX
+Error: 15.5 m
+GT: 32.102641063912806, 35.209613168334855
+Est: 32.1027467, 35.2095065</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20950650,32.10274670,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1590 (18.8 m)</name>
+      <description>Frame: 1590  t=53.014s
+Status: VPR_FIX
+Error: 18.8 m
+GT: 32.102598331882554, 35.2097131875364
+Est: 32.1027311, 35.2095895</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20958950,32.10273110,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1620 (15.2 m)</name>
+      <description>Frame: 1620  t=54.015s
+Status: VPR_FIX
+Error: 15.2 m
+GT: 32.10256406865984, 35.209816695594746
+Est: 32.1026958, 35.2097761</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20977610,32.10269580,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1650 (15.6 m)</name>
+      <description>Frame: 1650  t=55.016s
+Status: VPR_FIX
+Error: 15.6 m
+GT: 32.10253149959249, 35.209913960775125
+Est: 32.1026715, 35.2099002</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20990020,32.10267150,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #1680 (9.5 m)</name>
+      <description>Frame: 1680  t=56.016s
+Status: SAT_FIX
+Error: 9.5 m
+GT: 32.102497124458544, 35.20998107640782
+Est: 32.102493, 35.20988</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20988000,32.10249300,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1709 (21.6 m)</name>
+      <description>Frame: 1709  t=56.984s
+Status: VPR_FIX
+Error: 21.6 m
+GT: 32.10248534496606, 35.21003036169797
+Est: 32.1026641, 35.2099424</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20994240,32.10266410,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1739 (20.0 m)</name>
+      <description>Frame: 1739  t=57.985s
+Status: VPR_FIX
+Error: 20.0 m
+GT: 32.102481647904774, 35.210062591501085
+Est: 32.1026544, 35.2100051</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.21000510,32.10265440,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #1769 (5.0 m)</name>
+      <description>Frame: 1769  t=58.986s
+Status: SAT_FIX
+Error: 5.0 m
+GT: 32.10246708232203, 35.210089776554724
+Est: 32.102436, 35.210052</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.21005200,32.10243600,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1799 (12.2 m)</name>
+      <description>Frame: 1799  t=59.987s
+Status: VPR_FIX
+Error: 12.2 m
+GT: 32.10245087029353, 35.210113867648595
+Est: 32.1024854, 35.2099915</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.20999150,32.10248540,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1829 (6.1 m)</name>
+      <description>Frame: 1829  t=60.988s
+Status: VPR_FIX
+Error: 6.1 m
+GT: 32.102440179055655, 35.210122853669596
+Est: 32.102421, 35.2100624</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.21006240,32.10242100,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1859 (8.1 m)</name>
+      <description>Frame: 1859  t=61.988s
+Status: VPR_FIX
+Error: 8.1 m
+GT: 32.102463782476136, 35.210144779891465
+Est: 32.1024146, 35.2100821</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.21008210,32.10241460,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1889 (7.4 m)</name>
+      <description>Frame: 1889  t=62.989s
+Status: VPR_FIX
+Error: 7.4 m
+GT: 32.10244863159942, 35.210149513101896
+Est: 32.1024145, 35.2100824</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.21008240,32.10241450,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1919 (6.5 m)</name>
+      <description>Frame: 1919  t=63.99s
+Status: VPR_FIX
+Error: 6.5 m
+GT: 32.102425065522766, 35.21015033619306
+Est: 32.1024145, 35.2100824</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.21008240,32.10241450,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1949 (4.3 m)</name>
+      <description>Frame: 1949  t=64.991s
+Status: VPR_FIX
+Error: 4.3 m
+GT: 32.102428746571384, 35.21016743950773
+Est: 32.1023907, 35.2101619</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.21016190,32.10239070,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #1979 (6.4 m)</name>
+      <description>Frame: 1979  t=65.992s
+Status: VPR_FIX
+Error: 6.4 m
+GT: 32.1024420602966, 35.210190120321386
+Est: 32.1023847, 35.2101818</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.21018180,32.10238470,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #2009 (6.4 m)</name>
+      <description>Frame: 2009  t=66.993s
+Status: VPR_FIX
+Error: 6.4 m
+GT: 32.102438675582896, 35.21020544081003
+Est: 32.1023846, 35.2101821</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.21018210,32.10238460,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #2039 (6.2 m)</name>
+      <description>Frame: 2039  t=67.994s
+Status: VPR_FIX
+Error: 6.2 m
+GT: 32.10243978560367, 35.210191755418506
+Est: 32.1023846, 35.2101821</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.21018210,32.10238460,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #2069 (9.0 m)</name>
+      <description>Frame: 2069  t=68.995s
+Status: SAT_FIX
+Error: 9.0 m
+GT: 32.10244652920552, 35.21017334512748
+Est: 32.102383, 35.210114</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.21011400,32.10238300,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FIX #2099 (8.2 m)</name>
+      <description>Frame: 2099  t=69.996s
+Status: VPR_FIX
+Error: 8.2 m
+GT: 32.102452470862616, 35.21015736896435
+Est: 32.1024144, 35.2100827</description>
+      <styleUrl>#vprFix</styleUrl>
+      <Point>
+        <coordinates>35.21008270,32.10241440,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #2129 (8.9 m)</name>
+      <description>Frame: 2129  t=70.997s
+Status: SAT_FIX
+Error: 8.9 m
+GT: 32.10245741251971, 35.21014139280122
+Est: 32.102383, 35.210106</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.21010600,32.10238300,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #2159 (9.3 m)</name>
+      <description>Frame: 2159  t=71.997s
+Status: SAT_FIX
+Error: 9.3 m
+GT: 32.1024633541768, 35.210124416638095
+Est: 32.102463, 35.210026</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.21002600,32.10246300,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #2189 (4.6 m)</name>
+      <description>Frame: 2189  t=72.998s
+Status: SAT_FIX
+Error: 4.6 m
+GT: 32.10246949388913, 35.21010787460286
+Est: 32.102444, 35.21007</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.21007000,32.10244400,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #2219 (3.8 m)</name>
+      <description>Frame: 2219  t=73.999s
+Status: SAT_FIX
+Error: 3.8 m
+GT: 32.10247443554621, 35.210090898439724
+Est: 32.102467, 35.210052</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.21005200,32.10246700,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #2249 (13.2 m)</name>
+      <description>Frame: 2249  t=75.0s
+Status: SAT_FIX
+Error: 13.2 m
+GT: 32.10248117914807, 35.21007348814871
+Est: 32.102493, 35.209934</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20993400,32.10249300,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #2279 (10.7 m)</name>
+      <description>Frame: 2279  t=76.001s
+Status: SAT_FIX
+Error: 10.7 m
+GT: 32.102487120805165, 35.21005651198558
+Est: 32.102436, 35.20996</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20996000,32.10243600,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2309 (32.8 m)</name>
+      <description>Frame: 2309  t=77.002s
+Status: VPR_FALLBACK
+Error: 32.8 m
+GT: 32.10297634304494, 35.20987132115185
+Est: 32.102683, 35.2098392</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20983920,32.10268300,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2339 (34.7 m)</name>
+      <description>Frame: 2339  t=78.003s
+Status: VPR_FALLBACK
+Error: 34.7 m
+GT: 32.102982586813916, 35.20984946593463
+Est: 32.1027191, 35.2096527</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20965270,32.10271910,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SAT_FIX #2369 (1.9 m)</name>
+      <description>Frame: 2369  t=79.004s
+Status: SAT_FIX
+Error: 1.9 m
+GT: 32.10296714137843, 35.209839222197736
+Est: 32.102962, 35.20982</description>
+      <styleUrl>#satFix</styleUrl>
+      <Point>
+        <coordinates>35.20982000,32.10296200,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2399 (25.8 m)</name>
+      <description>Frame: 2399  t=80.005s
+Status: VPR_FALLBACK
+Error: 25.8 m
+GT: 32.10295369594295, 35.20983097846084
+Est: 32.1029071, 35.2095634</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20956340,32.10290710,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2429 (24.4 m)</name>
+      <description>Frame: 2429  t=81.006s
+Status: VPR_FALLBACK
+Error: 24.4 m
+GT: 32.10293925050747, 35.20982273472395
+Est: 32.1028857, 35.2095723</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20957230,32.10288570,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2459 (23.1 m)</name>
+      <description>Frame: 2459  t=82.006s
+Status: VPR_FALLBACK
+Error: 23.1 m
+GT: 32.102926356890805, 35.20981318286249
+Est: 32.1028853, 35.2095725</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20957250,32.10288530,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2489 (21.9 m)</name>
+      <description>Frame: 2489  t=83.007s
+Status: VPR_FALLBACK
+Error: 21.9 m
+GT: 32.1029133596365, 35.20980324725015
+Est: 32.102872, 35.2095763</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20957630,32.10287200,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2519 (20.7 m)</name>
+      <description>Frame: 2519  t=84.008s
+Status: VPR_FALLBACK
+Error: 20.7 m
+GT: 32.102899914201025, 35.20979400351326
+Est: 32.1028686, 35.2095772</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20957720,32.10286860,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2549 (19.5 m)</name>
+      <description>Frame: 2549  t=85.009s
+Status: VPR_FALLBACK
+Error: 19.5 m
+GT: 32.10288646876554, 35.20978475977636
+Est: 32.1028418, 35.2095848</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20958480,32.10284180,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2579 (18.2 m)</name>
+      <description>Frame: 2579  t=86.01s
+Status: VPR_FALLBACK
+Error: 18.2 m
+GT: 32.10287402333006, 35.20977451603947
+Est: 32.1028257, 35.2095905</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20959050,32.10282570,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2609 (16.8 m)</name>
+      <description>Frame: 2609  t=87.011s
+Status: VPR_FALLBACK
+Error: 16.8 m
+GT: 32.102860577894575, 35.20976527230257
+Est: 32.1028119, 35.209597</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20959700,32.10281190,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2639 (39.1 m)</name>
+      <description>Frame: 2639  t=88.012s
+Status: VPR_FALLBACK
+Error: 39.1 m
+GT: 32.102482309465664, 35.20978924449873
+Est: 32.102796, 35.2096031</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20960310,32.10279600,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2669 (35.6 m)</name>
+      <description>Frame: 2669  t=89.013s
+Status: VPR_FALLBACK
+Error: 35.6 m
+GT: 32.10248058453807, 35.20978436929948
+Est: 32.1027652, 35.2096111</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20961110,32.10276520,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2699 (32.9 m)</name>
+      <description>Frame: 2699  t=90.014s
+Status: VPR_FALLBACK
+Error: 32.9 m
+GT: 32.10248014756002, 35.20976968195198
+Est: 32.1027445, 35.2096149</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20961490,32.10274450,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2729 (29.9 m)</name>
+      <description>Frame: 2729  t=91.015s
+Status: VPR_FALLBACK
+Error: 29.9 m
+GT: 32.10248902792697, 35.20976237765843
+Est: 32.1027275, 35.2096168</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20961680,32.10272750,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2759 (27.7 m)</name>
+      <description>Frame: 2759  t=92.015s
+Status: VPR_FALLBACK
+Error: 27.7 m
+GT: 32.10250190829391, 35.20975007336487
+Est: 32.1027241, 35.2096171</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20961710,32.10272410,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2789 (24.7 m)</name>
+      <description>Frame: 2789  t=93.016s
+Status: VPR_FALLBACK
+Error: 24.7 m
+GT: 32.102509788660846, 35.20972876907132
+Est: 32.1027115, 35.2096185</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20961850,32.10271150,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2818 (13.1 m)</name>
+      <description>Frame: 2818  t=93.984s
+Status: VPR_FALLBACK
+Error: 13.1 m
+GT: 32.102705333132896, 35.20975927746043
+Est: 32.1026981, 35.2096211</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20962110,32.10269810,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2848 (12.8 m)</name>
+      <description>Frame: 2848  t=94.985s
+Status: VPR_FALLBACK
+Error: 12.8 m
+GT: 32.10270732134793, 35.20975648202187
+Est: 32.1026955, 35.2096216</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20962160,32.10269550,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2878 (11.6 m)</name>
+      <description>Frame: 2878  t=95.986s
+Status: VPR_FALLBACK
+Error: 11.6 m
+GT: 32.10269961438102, 35.209747040407045
+Est: 32.1026735, 35.2096284</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20962840,32.10267350,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2908 (14.3 m)</name>
+      <description>Frame: 2908  t=96.987s
+Status: VPR_FALLBACK
+Error: 14.3 m
+GT: 32.1025742565981, 35.20973330884409
+Est: 32.102668, 35.2096301</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20963010,32.10266800,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2938 (18.1 m)</name>
+      <description>Frame: 2938  t=97.987s
+Status: VPR_FALLBACK
+Error: 18.1 m
+GT: 32.10254743518062, 35.20973845185549
+Est: 32.1026798, 35.2096263</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20962630,32.10267980,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2968 (20.5 m)</name>
+      <description>Frame: 2968  t=98.988s
+Status: VPR_FALLBACK
+Error: 20.5 m
+GT: 32.10252865588639, 35.20974530172725
+Est: 32.1026827, 35.2096254</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20962540,32.10268270,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #2998 (17.1 m)</name>
+      <description>Frame: 2998  t=99.989s
+Status: VPR_FALLBACK
+Error: 17.1 m
+GT: 32.10253566835256, 35.20973964586879
+Est: 32.10266, 35.2096322</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20963220,32.10266000,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #3028 (13.5 m)</name>
+      <description>Frame: 3028  t=100.99s
+Status: VPR_FALLBACK
+Error: 13.5 m
+GT: 32.10254946759984, 35.209727905223644
+Est: 32.1026433, 35.2096376</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20963760,32.10264330,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #3058 (10.3 m)</name>
+      <description>Frame: 3058  t=101.991s
+Status: VPR_FALLBACK
+Error: 10.3 m
+GT: 32.102562486299085, 35.209719421435935
+Est: 32.1026286, 35.2096432</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20964320,32.10262860,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #3088 (9.9 m)</name>
+      <description>Frame: 3088  t=102.992s
+Status: VPR_FALLBACK
+Error: 9.9 m
+GT: 32.102559821710116, 35.20971547879286
+Est: 32.1026257, 35.2096443</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20964430,32.10262570,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #3118 (8.6 m)</name>
+      <description>Frame: 3118  t=103.993s
+Status: VPR_FALLBACK
+Error: 8.6 m
+GT: 32.10255860225815, 35.209710221935424
+Est: 32.1026146, 35.2096482</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20964820,32.10261460,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #3148 (5.7 m)</name>
+      <description>Frame: 3148  t=104.994s
+Status: VPR_FALLBACK
+Error: 5.7 m
+GT: 32.102571066094406, 35.20970142393337
+Est: 32.1026021, 35.2096527</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20965270,32.10260210,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #3178 (4.9 m)</name>
+      <description>Frame: 3178  t=105.995s
+Status: VPR_FALLBACK
+Error: 4.9 m
+GT: 32.10257707856057, 35.20969776807489
+Est: 32.1025996, 35.2096537</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20965370,32.10259960,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #3208 (5.5 m)</name>
+      <description>Frame: 3208  t=106.996s
+Status: VPR_FALLBACK
+Error: 5.5 m
+GT: 32.10257107856057, 35.20970176807489
+Est: 32.1025996, 35.2096537</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20965370,32.10259960,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #3238 (5.7 m)</name>
+      <description>Frame: 3238  t=107.996s
+Status: VPR_FALLBACK
+Error: 5.7 m
+GT: 32.10256607856057, 35.20970576807489
+Est: 32.1025953, 35.2096557</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20965570,32.10259530,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #3268 (3.8 m)</name>
+      <description>Frame: 3268  t=108.997s
+Status: VPR_FALLBACK
+Error: 3.8 m
+GT: 32.102560523697576, 35.20970045386053
+Est: 32.1025932, 35.2097135</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20971350,32.10259320,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #3298 (3.6 m)</name>
+      <description>Frame: 3298  t=109.998s
+Status: VPR_FALLBACK
+Error: 3.6 m
+GT: 32.102568871574775, 35.20969285535898
+Est: 32.1025939, 35.2096688</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20966880,32.10259390,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #3328 (1.1 m)</name>
+      <description>Frame: 3328  t=110.999s
+Status: VPR_FALLBACK
+Error: 1.1 m
+GT: 32.102575658355896, 35.20968877057231
+Est: 32.10257, 35.2096989</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20969890,32.10257000,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #3358 (2.7 m)</name>
+      <description>Frame: 3358  t=112.0s
+Status: VPR_FALLBACK
+Error: 2.7 m
+GT: 32.10257743890393, 35.209687513714876
+Est: 32.1025664, 35.2097129</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20971290,32.10256640,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #3388 (3.0 m)</name>
+      <description>Frame: 3388  t=113.001s
+Status: VPR_FALLBACK
+Error: 3.0 m
+GT: 32.10257966458897, 35.20968494264308
+Est: 32.1025645, 35.2097107</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20971070,32.10256450,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>VPR_FALLBACK #3418 (3.1 m)</name>
+      <description>Frame: 3418  t=114.002s
+Status: VPR_FALLBACK
+Error: 3.1 m
+GT: 32.102581, 35.209684
+Est: 32.1025639, 35.2097099</description>
+      <styleUrl>#vprFallback</styleUrl>
+      <Point>
+        <coordinates>35.20970990,32.10256390,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#errorLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>35.20479648,32.10444876,0 35.20438540,32.10449720,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#errorLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>35.20978924,32.10248231,0 35.20960310,32.10279600,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#errorLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>35.20978437,32.10248058,0 35.20961110,32.10276520,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#errorLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>35.20984947,32.10298259,0 35.20965270,32.10271910,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#errorLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>35.20695623,32.10363909,0 35.20675630,32.10389940,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#errorLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>35.20976968,32.10248015,0 35.20961490,32.10274450,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#errorLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>35.20987132,32.10297634,0 35.20983920,32.10268300,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#errorLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>35.20859317,32.10302306,0 35.20842150,32.10279590,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#errorLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>35.20976238,32.10248903,0 35.20961680,32.10272750,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#errorLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>35.20469388,32.10449042,0 35.20438620,32.10449720,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#errorLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>35.20849259,32.10306378,0 35.20839660,32.10282570,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#errorLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>35.20975007,32.10250191,0 35.20961710,32.10272410,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#errorLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>35.20685323,32.10367809,0 35.20675600,32.10389930,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#errorLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>35.20983098,32.10295370,0 35.20956340,32.10290710,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#errorLine</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>35.20972877,32.10250979,0 35.20961850,32.10271150,0</coordinates>
+      </LineString>
+    </Placemark>
+  </Document>
+</kml>

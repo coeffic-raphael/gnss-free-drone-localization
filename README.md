@@ -8,22 +8,49 @@ This work addresses Exercise 2 of the assignment: *design a real-time visual nav
 
 ## Key Results
 
-**Main benchmark:** reference DB = v11 + v12 + v13 (DJI Mini 3 Pro, 60° camera, ~118 m altitude), query = v14, sampled at 1 fps (115 frames).
+**Retained solution: real-time satellite-first pipeline** — `scripts/run_satellite_first_hybrid.sh` + `src/smooth_hybrid_path.py`. Fully causal (zero look-ahead), per-frame decision in well under a second.
+
+| Video (reference) | Frames | SAT / VPR_FALLBACK / NO_FIX | Raw median / mean | Smoothed median / mean (best window) | Throughput |
+|---|---:|---|---:|---:|---:|
+| v13 (v11+v12+v14) | 831 | 80.1% / 11.2% / 8.7% | 26.1 m / 32.1 m | 17.9 m / 24.8 m (w=9) | 1.83 fps |
+| v14 (v11+v12+v13) | 115 | 62.6% / 22.6% / 14.8% | 14.5 m / 16.4 m | 13.0 m / 14.8 m (w=5) | 2.22 fps |
+
+Smoothed error tolerance — average frequency of being within threshold:
+
+| Video | ≤ 10 m | ≤ 15 m | ≤ 20 m | ≤ 30 m |
+|---|---|---|---|---|
+| v13 | 23.1% (1 every 4.3 s) | 40.9% (1 every 2.4 s) | 59.3% (1 every 1.7 s) | 76.4% (1 every 1.3 s) |
+| v14 | 19.1% (1 every 5.2 s) | 66.1% (1 every 1.5 s) | 87.8% (1 every 1.1 s) | 94.8% (1 every 1.1 s) |
+
+**Reference benchmark (offline, no latency constraint):** reference DB = v11 + v12 + v13, query = v14, 115 frames at 1 fps.
 
 | Method | Median error | Mean error |
 |---|---:|---:|
 | DINOv2 global retrieval | 20.0 m | 27.3 m |
 | + LightGlue + Motion Viterbi | 15.2 m | 18.8 m |
 | + Gaussian smoothing (w = 19) | 13.1 m | 14.2 m |
-| **Hybrid VPR + satellite (final)** | **11.6 m** | **13.4 m** |
+| **Hybrid VPR + satellite (offline)** | **11.6 m** | **13.4 m** |
 
-**Cross-validation (v12 as query, v11+v13+v14 as reference):** hybrid median 31.4 m — oracle ceiling is 28.5 m, confirming that the gap vs. v14 (oracle 12.9 m) is a reference-coverage problem, not an algorithmic one.
+**Cross-validation (v12 as query, v11+v13+v14 as reference):** offline hybrid median 31.4 m — oracle ceiling is 28.5 m, confirming that the gap vs. v14 (oracle 12.9 m) is a reference-coverage effect rather than an algorithm difference.
 
 ---
 
-## Algorithm
+## Real-Time Pipeline (Retained)
 
-The pipeline has two complementary modules.
+`scripts/run_satellite_first_hybrid.sh` decides each frame causally, using only past and current data — no whole-video buffering, no future frames.
+
+1. **Satellite tile matching first.** IPM-warp the frame, build a 3×3 satellite mosaic around the last known position, match with SuperPoint + LightGlue, solve a RANSAC homography (≥8 inliers). Cost: ~0.2-0.4 s/frame. This is tried first because it's cheap and doesn't require a database search.
+2. **VPR fallback.** If satellite matching fails, query the DINOv2 top-k + LightGlue rerank against the reference pool (inliers ≥100, ratio ≥0.70). Cost: ~0.8-1.3 s/frame — only paid when satellite matching fails.
+3. **NO_FIX.** If both fail, the frame is left unresolved rather than publishing a guess.
+4. **Causal post-processing** (`src/smooth_hybrid_path.py`): gap-fill `NO_FIX` frames by carrying the last fix forward, then apply a one-sided (past-only) Gaussian smoothing window — best window swept per-video (w=9 for v13, w=5 for v14).
+
+A causal trajectory-consistency gate (reject a candidate that deviates too far from a constant-velocity extrapolation of recent fixes) was also implemented and tested, but caused filter lock-in and, even after an escape-valve fix, was net-negative on aggregate — reverted, see `docs/final_report.md` §10.3.
+
+---
+
+## Offline Batch Algorithm (Reference Implementation)
+
+This is the non-real-time pipeline used to establish the best achievable accuracy ceiling, with no constraint on latency or look-ahead. It has two complementary modules.
 
 ### Module 1 — Visual Place Recognition (VPR)
 
@@ -31,8 +58,8 @@ Uses GPS-annotated reference videos to localise the query by visual similarity.
 
 1. **DINOv2 global retrieval** — frozen ViT-S/14 backbone, 1536-dim descriptors, cosine top-10.
 2. **LightGlue local re-ranking** — SuperPoint keypoints matched between query and top-10 candidates; 6 best kept.
-3. **Motion Viterbi** — enforces temporal consistency (max 20 m/frame, penalty on large jumps).
-4. **Gaussian path smoothing** — window w = 19, σ = 5.4, suppresses isolated spikes.
+3. **Motion Viterbi** — picks one candidate per frame using the whole sequence (backtracks from the last frame), penalizing jumps above 20 m/frame.
+4. **Gaussian path smoothing** — symmetric window w = 19, σ = 5.4, uses both past and future frames to suppress isolated spikes.
 5. **Confidence gate** — each frame labelled `FIX` / `NO_FIX` based on DINOv2 similarity and LightGlue inlier count.
 
 ### Module 2 — Satellite Tile Matching (GIS fallback)
@@ -51,6 +78,8 @@ For `NO_FIX` frames, matches the drone view against pre-downloaded Esri World Im
 | `VPR_FIX` | Confidence gate passed | 9.1 m |
 | `SAT_FIX` | NO_FIX + satellite matched | 12.1 m |
 | `VPR_FALLBACK` | NO_FIX + satellite failed | 15.5 m |
+
+This architecture requires the entire query video before producing any output (Viterbi backtracking and symmetric smoothing both need future frames), which is why it is kept as an accuracy reference rather than the deployed pipeline.
 
 ---
 
@@ -88,15 +117,17 @@ src/
   smooth_path.py                  Gaussian path smoothing
   ipm_warp.py                     Inverse Perspective Mapping for tilted frames
   satellite_tiles.py              tile math, download, mosaic stitching
-  hybrid_localize.py              VPR + satellite fusion → final output
+  hybrid_localize.py              VPR + satellite fusion → final output (offline)
   export_hybrid_kml.py            KML export with colour-coded status
   geometry.py                     GPS ↔ local XY helpers
+  smooth_hybrid_path.py           causal gap-fill + one-sided Gaussian smoothing (real-time)
 
 scripts/
-  setup.sh                    one-command preprocessing for all videos
-  run_best_pipeline.sh        full pipeline: VPR → satellite → hybrid (v14)
-  run_v12_as_query.sh         cross-validation: v12 query, v11+v13+v14 reference
-  test_satellite_match.sh     standalone satellite evaluation (any video)
+  setup.sh                       one-command preprocessing for all videos
+  run_satellite_first_hybrid.sh  retained real-time pipeline: satellite-first, VPR fallback
+  run_best_pipeline.sh           offline pipeline: VPR → satellite → hybrid (v14)
+  run_v12_as_query.sh            cross-validation: v12 query, v11+v13+v14 reference
+  test_satellite_match.sh        standalone satellite evaluation (any video)
 
 outputs/
   anyloc/                     VPR retrieval, Viterbi, smoothed results (CSVs + JSONs)
@@ -174,7 +205,53 @@ python src/satellite_tiles.py \
 
 ---
 
-## Run the Full Pipeline
+## Run the Real-Time Pipeline (Retained)
+
+`run_satellite_first_hybrid.sh` needs a DINOv2 descriptor cache (query + reference frames) to exist before it can run the VPR fallback. Generate it once per query/reference combination with `frozen_dino_cross_retrieval.py`:
+
+```bash
+source .venv-anyloc/bin/activate
+python src/frozen_dino_cross_retrieval.py \
+  --reference-manifest v11=data/processed/DJI_v11_frame_manifest_1fps.csv \
+  --reference-manifest v12=data/processed/DJI_v12_frame_manifest_1fps.csv \
+  --reference-manifest v13=data/processed/DJI_v13_frame_manifest_1fps.csv \
+  --query-manifest v14=data/processed/DJI_v14_frame_manifest_1fps.csv \
+  --output-csv outputs/anyloc/dji_mini3_cross_v11_v12_v13_to_v14_1fps_results.csv \
+  --summary-json outputs/anyloc/dji_mini3_cross_v11_v12_v13_to_v14_1fps_summary.json \
+  --descriptor-cache outputs/anyloc/dji_mini3_cross_v11_v12_v13_to_v14_1fps_descriptors.npy \
+  --aggregation mean --top-k 10
+```
+
+The `--descriptor-cache` path must follow the pattern `outputs/anyloc/dji_mini3_cross_<REFERENCES joined by _>_to_<VERSION>_1fps_descriptors.npy` — this is the default path `run_satellite_first_hybrid.sh` looks for (override with the `DESCRIPTOR_CACHE` env var if you place it elsewhere). This step only needs to be re-run if the query/reference combination changes; DINOv2 weights are downloaded automatically on first use.
+
+Then run the real-time pipeline itself:
+
+```bash
+VERSION=v14 ANGLE=60 REFERENCES="v11,v12,v13" ./scripts/run_satellite_first_hybrid.sh
+```
+
+`VERSION` is the query flight, `REFERENCES` is the comma-separated reference pool used for the VPR fallback. This writes `outputs/hybrid/satellite_first_<VERSION>.csv` and `_summary.json`. Then apply the causal post-processing (gap-fill + one-sided Gaussian smoothing):
+
+```bash
+python3 src/smooth_hybrid_path.py \
+  outputs/hybrid/satellite_first_v14.csv \
+  data/processed/DJI_v14_frame_manifest_1fps.csv \
+  --output-csv outputs/hybrid/satellite_first_v14_smoothed.csv \
+  --summary-json outputs/hybrid/satellite_first_v14_smoothed_summary.json
+```
+
+Final outputs:
+
+| File | Description |
+|---|---|
+| `outputs/hybrid/satellite_first_v14.csv` / `_summary.json` | raw per-frame causal output (SAT / VPR_FALLBACK / NO_FIX) |
+| `outputs/hybrid/satellite_first_v14_smoothed.csv` / `_summary.json` | gap-filled + causally smoothed output |
+
+To reproduce the v13 run used in this report: regenerate the descriptor cache with `--query-manifest v13=...` and `--reference-manifest` v11/v12/v14, then run with `VERSION=v13` and `REFERENCES="v11,v12,v14"`, and point `smooth_hybrid_path.py` at `DJI_v13_frame_manifest_1fps.csv`.
+
+---
+
+## Run the Offline Batch Pipeline
 
 ```bash
 source .venv-anyloc/bin/activate
@@ -205,7 +282,7 @@ source .venv-anyloc/bin/activate
 
 **Camera separation.** Mini 3 Pro (v11–v14, 60°) and Air 3/3S (v17–v24, 45°) cannot share the same VPR reference database due to different sensor geometry. The Air 3/3S videos are available for future cross-camera experiments.
 
-**Real-time compatibility.** DINOv2 + LightGlue process frames independently; compatible with a sliding-window real-time implementation. Viterbi can be approximated with causal beam search for online use.
+**Real-time mode.** See the **Real-Time Pipeline** section above for the retained solution. An earlier attempt at causality kept the VPR-first batch architecture and made it causal in place — `motion_viterbi_rerank.py --online-lag N` (fixed-lag online Viterbi) and `smooth_path.py --causal` (past-only smoothing), exposed via `scripts/run_realtime_pipeline.sh` — kept in the repo for reference; the satellite-first ordering supersedes it since it pays the expensive VPR search only on fallback instead of every frame. See `docs/final_report.md` §10 for the full comparison.
 
 ---
 

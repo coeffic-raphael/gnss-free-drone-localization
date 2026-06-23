@@ -74,6 +74,34 @@ def smooth_path(
     return out_lats, out_lons
 
 
+def smooth_path_causal(
+    lats: list[float],
+    lons: list[float],
+    window: int,
+    sigma: float = 1.0,
+) -> tuple[list[float], list[float]]:
+    """Causal Gaussian-weighted moving average using only the current frame
+    and up to ``window - 1`` *past* frames (no look-ahead at all). This is
+    the real-time-deployable counterpart of ``smooth_path``: each output
+    point can be produced the instant its own frame arrives, with zero
+    added latency, because it never needs frames that haven't happened yet.
+    """
+    n = len(lats)
+    weights = [math.exp(-0.5 * (j / sigma) ** 2) for j in range(window)]
+    out_lats, out_lons = [], []
+    for i in range(n):
+        w_sum = lat_sum = lon_sum = 0.0
+        for j, w in enumerate(weights):
+            idx = i - j
+            if idx >= 0:
+                lat_sum += w * lats[idx]
+                lon_sum += w * lons[idx]
+                w_sum += w
+        out_lats.append(lat_sum / w_sum)
+        out_lons.append(lon_sum / w_sum)
+    return out_lats, out_lons
+
+
 def stats(errors: list[float]) -> dict:
     s = sorted(errors)
     n = len(s)
@@ -96,6 +124,15 @@ def main() -> None:
                         default=Path("outputs/anyloc/dji_mini3_smoothed_results.csv"))
     parser.add_argument("--summary-json", type=Path,
                         default=Path("outputs/anyloc/dji_mini3_smoothed_summary.json"))
+    parser.add_argument(
+        "--causal",
+        action="store_true",
+        help=(
+            "Use one-sided (past-only) Gaussian smoothing instead of the "
+            "symmetric window. Zero added latency, real-time-deployable, "
+            "at the cost of some accuracy versus the batch/symmetric mode."
+        ),
+    )
     args = parser.parse_args()
 
     # Load reference manifests → (dataset, frame_count) → (lat, lon)
@@ -154,6 +191,9 @@ def main() -> None:
     for half_window in range(0, 13):
         if half_window == 0:
             slats, slons = raw_lats, raw_lons
+        elif args.causal:
+            window = 2 * half_window + 1
+            slats, slons = smooth_path_causal(raw_lats, raw_lons, window, sigma=half_window * 0.6)
         else:
             slats, slons = smooth_path(raw_lats, raw_lons, half_window, sigma=half_window * 0.6)
 
@@ -175,10 +215,14 @@ def main() -> None:
               f"{s['p90_m']:>7.2f}m  {s['max_m']:>7.2f}m{marker}")
 
     # Write best smoothed output
-    best_lats, best_lons = (
-        (raw_lats, raw_lons) if best_hw == 0
-        else smooth_path(raw_lats, raw_lons, best_hw, sigma=best_hw * 0.6)
-    )
+    if best_hw == 0:
+        best_lats, best_lons = raw_lats, raw_lons
+    elif args.causal:
+        best_lats, best_lons = smooth_path_causal(
+            raw_lats, raw_lons, 2 * best_hw + 1, sigma=best_hw * 0.6
+        )
+    else:
+        best_lats, best_lons = smooth_path(raw_lats, raw_lons, best_hw, sigma=best_hw * 0.6)
 
     output_rows = []
     best_errors = []
@@ -206,6 +250,7 @@ def main() -> None:
         w.writerows(output_rows)
 
     summary = {
+        "causal": args.causal,
         "best_half_window": best_hw,
         "best_full_window": 2 * best_hw + 1,
         "best_smoothed": stats(best_errors),

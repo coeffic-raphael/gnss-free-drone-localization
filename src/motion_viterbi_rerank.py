@@ -278,6 +278,138 @@ def second_order_viterbi(
     return selected
 
 
+def second_order_viterbi_online(
+    candidates: list[list[dict[str, float | int]]],
+    reference_rows: list[dict[str, str]],
+    origin: tuple[float, float],
+    dino_weight: float,
+    inlier_weight: float,
+    ratio_weight: float,
+    max_step_m: float,
+    transition_weight: float,
+    acceleration_scale_m: float,
+    acceleration_weight: float,
+    direction_scale_degrees: float,
+    direction_weight: float,
+    min_direction_step_m: float,
+    lag: int,
+) -> list[int]:
+    """Fixed-lag online variant of ``second_order_viterbi``.
+
+    Same cost model, but never backtracks from the end of the whole query
+    sequence. Each frame's decision is committed using only information up
+    to ``lag`` frames in its future (e.g. ``lag=3`` at 1 fps == at most 3 s
+    of buffering), instead of requiring the entire video. ``lag=0`` commits
+    a frame as soon as it has been processed (fully causal, no extra
+    latency). This is what makes the pipeline real-time-deployable: a fixed,
+    small, bounded delay rather than "wait for the whole flight to land".
+    """
+    n = len(candidates)
+    if n < 3:
+        return first_order_viterbi(
+            candidates,
+            reference_rows,
+            origin,
+            dino_weight,
+            inlier_weight,
+            ratio_weight,
+            max_step_m,
+            transition_weight,
+        )
+
+    pair_parents: list[dict[tuple[int, int], int]] = [{} for _ in range(n)]
+    selected: list[int | None] = [None] * n
+    last_decided = -1
+
+    def decide(decision_step: int, costs_at_step: dict[tuple[int, int], float]) -> list[int]:
+        last_pair = min(costs_at_step, key=costs_at_step.get)
+        local_selected = [0] * (decision_step + 1)
+        local_selected[decision_step - 1], local_selected[decision_step] = last_pair
+        for qi in range(decision_step, 1, -1):
+            parent = pair_parents[qi][(local_selected[qi - 1], local_selected[qi])]
+            local_selected[qi - 2] = parent
+        return local_selected
+
+    pair_costs: dict[tuple[int, int], float] = {}
+    for i, cand0 in enumerate(candidates[0]):
+        ref0 = reference_rows[int(cand0["reference_index"])]
+        cost0 = unary_cost(cand0, dino_weight, inlier_weight, ratio_weight)
+        for j, cand1 in enumerate(candidates[1]):
+            ref1 = reference_rows[int(cand1["reference_index"])]
+            cost1 = unary_cost(cand1, dino_weight, inlier_weight, ratio_weight)
+            pair_costs[(i, j)] = cost0 + cost1 + step_cost(
+                ref0,
+                ref1,
+                origin,
+                max_step_m,
+                transition_weight,
+            )
+
+    target = 1 - lag
+    if target >= 0 and target > last_decided:
+        local = decide(1, pair_costs)
+        for k in range(last_decided + 1, min(target, 1) + 1):
+            selected[k] = local[k]
+        last_decided = target
+
+    for query_idx in range(2, n):
+        next_pair_costs: dict[tuple[int, int], float] = {}
+        for prev_pair, prev_cost in pair_costs.items():
+            older_idx, previous_idx = prev_pair
+            older_reference = reference_rows[int(candidates[query_idx - 2][older_idx]["reference_index"])]
+            previous_reference = reference_rows[int(candidates[query_idx - 1][previous_idx]["reference_index"])]
+            for current_idx, current_candidate in enumerate(candidates[query_idx]):
+                current_reference = reference_rows[int(current_candidate["reference_index"])]
+                cost = (
+                    prev_cost
+                    + unary_cost(current_candidate, dino_weight, inlier_weight, ratio_weight)
+                    + step_cost(
+                        previous_reference,
+                        current_reference,
+                        origin,
+                        max_step_m,
+                        transition_weight,
+                    )
+                    + acceleration_cost(
+                        older_reference,
+                        previous_reference,
+                        current_reference,
+                        origin,
+                        acceleration_scale_m,
+                        acceleration_weight,
+                    )
+                    + direction_change_cost(
+                        older_reference,
+                        previous_reference,
+                        current_reference,
+                        origin,
+                        direction_scale_degrees,
+                        direction_weight,
+                        min_direction_step_m,
+                    )
+                )
+                next_pair = (previous_idx, current_idx)
+                if cost < next_pair_costs.get(next_pair, math.inf):
+                    next_pair_costs[next_pair] = cost
+                    pair_parents[query_idx][next_pair] = older_idx
+        pair_costs = next_pair_costs
+
+        target = query_idx - lag
+        if target >= 0 and target > last_decided:
+            local = decide(query_idx, pair_costs)
+            for k in range(last_decided + 1, min(target, query_idx) + 1):
+                selected[k] = local[k]
+            last_decided = target
+
+    if last_decided < n - 1:
+        local = decide(n - 1, pair_costs)
+        for k in range(last_decided + 1, n):
+            selected[k] = local[k]
+        last_decided = n - 1
+
+    return [int(idx) for idx in selected]  # type: ignore[arg-type]
+
+
 def summarize(results: list[dict[str, object]]) -> dict[str, float | int]:
     dino_errors = np.array([float(row["dino_position_error_m"]) for row in results])
     temporal_errors = np.array([float(row["motion_viterbi_position_error_m"]) for row in results])
@@ -327,6 +459,18 @@ def main() -> None:
     parser.add_argument("--direction-weight", type=float, default=0.0)
     parser.add_argument("--min-direction-step-m", type=float, default=3.0)
     parser.add_argument("--candidate-limit", type=int, default=0)
+    parser.add_argument(
+        "--online-lag",
+        type=int,
+        default=None,
+        help=(
+            "If set, run the fixed-lag ONLINE Viterbi instead of the global "
+            "batch one: each frame is committed using at most this many "
+            "future frames (e.g. 3 at 1 fps == 3 s latency, 0 == fully "
+            "causal). Omit this flag to keep the original whole-sequence "
+            "batch behaviour."
+        ),
+    )
     args = parser.parse_args()
 
     reference_rows: list[dict[str, str]] = []
@@ -345,21 +489,39 @@ def main() -> None:
         float(reference_rows[0]["ground_latitude"]),
         float(reference_rows[0]["ground_longitude"]),
     )
-    selected_indices = second_order_viterbi(
-        candidates,
-        reference_rows,
-        origin,
-        args.dino_weight,
-        args.inlier_weight,
-        args.ratio_weight,
-        args.max_step_m,
-        args.transition_weight,
-        args.acceleration_scale_m,
-        args.acceleration_weight,
-        args.direction_scale_degrees,
-        args.direction_weight,
-        args.min_direction_step_m,
-    )
+    if args.online_lag is not None:
+        selected_indices = second_order_viterbi_online(
+            candidates,
+            reference_rows,
+            origin,
+            args.dino_weight,
+            args.inlier_weight,
+            args.ratio_weight,
+            args.max_step_m,
+            args.transition_weight,
+            args.acceleration_scale_m,
+            args.acceleration_weight,
+            args.direction_scale_degrees,
+            args.direction_weight,
+            args.min_direction_step_m,
+            args.online_lag,
+        )
+    else:
+        selected_indices = second_order_viterbi(
+            candidates,
+            reference_rows,
+            origin,
+            args.dino_weight,
+            args.inlier_weight,
+            args.ratio_weight,
+            args.max_step_m,
+            args.transition_weight,
+            args.acceleration_scale_m,
+            args.acceleration_weight,
+            args.direction_scale_degrees,
+            args.direction_weight,
+            args.min_direction_step_m,
+        )
 
     results: list[dict[str, object]] = []
     for query_index, (query, selected_idx) in enumerate(zip(query_rows, selected_indices)):
@@ -401,6 +563,7 @@ def main() -> None:
             "direction_weight": args.direction_weight,
             "min_direction_step_m": args.min_direction_step_m,
             "candidate_limit": args.candidate_limit,
+            "online_lag": args.online_lag,
         }
     )
     args.summary_json.parent.mkdir(parents=True, exist_ok=True)
