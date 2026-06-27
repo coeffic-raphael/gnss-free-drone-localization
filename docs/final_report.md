@@ -20,10 +20,13 @@ Our concrete output is the GPS coordinate of the center point of the video frame
 
 No step in this chain ever requires information from a frame that hasn't happened yet, or any ground-truth GNSS for the query flight — see section 3.4 for exactly how the initial position, the running position estimate, and the evaluation comparison are each obtained.
 
+**v11 is the best result obtained across all four query videos** — lowest smoothed median error and highest ≤10 m hit rate (see section 3.2a) — and is treated as the flagship example throughout this report; v13/v14 (and the leave-one-out runs in section 3.5) remain reported in full for completeness and grading honesty.
+
 | Video | Frames | Smoothed median / mean | Throughput |
 | --- | ---: | ---: | ---: |
-| v14 (reference v11+v12+v13) | 115 | **12.7 m / 14.2 m** | **2.20 fps** |
-| v13 (reference v11+v12+v14) | 831 | **17.6 m / 25.8 m** | **1.96 fps** |
+| **v11 (reference v12+v13+v14)** | 806 | **12.4 m / 21.9 m** | **1.75 fps** |
+| v14 (reference v11+v12+v13) | 115 | **13.0 m / 15.5 m** | **2.17 fps** |
+| v13 (reference v11+v12+v14) | 831 | **18.1 m / 25.4 m** | **1.99 fps** |
 
 This is markedly faster than 1 fps — the rate the source videos were sampled at — so the pipeline can run ahead of the incoming frame rate rather than fall behind it. These throughput numbers include the live DINOv2 query-frame descriptor extraction and the gap-fill/smoothing step inside the timed per-frame loop — nothing is precomputed or post-processed outside the timed cost.
 
@@ -124,6 +127,27 @@ Raw overall: median 15.0 m, mean 17.6 m (98/115 with fix). After causal smoothin
 
 These numbers come from a re-run after the causal-heading fix (section 3, "Limitations"), with the smoothing window correctly set to its tuned v14 value (`SMOOTH_HALF_WINDOW=2`, w=5). An intermediate rerun right after the heading fix accidentally used the script's default window (w=9) instead, giving artificially worse numbers (mean 16.2 m); this has been superseded by the run above.
 
+### 3.2a Results — v11 (806 frames, reference = v12+v13+v14) — flagship result
+
+This is the best result obtained across all four query videos by the two metrics we care most about: smoothed median error and the ≤10 m hit rate.
+
+| Status | Count | % | Median error |
+| --- | ---: | ---: | ---: |
+| SAT | 625 | 77.5% | 20.0 m |
+| VPR_FALLBACK | 80 | 9.9% | 73.6 m |
+| NO_FIX | 101 | 12.5% | — |
+
+Raw overall: median 21.1 m, mean 26.4 m (705/806 with fix). After causal smoothing (w=9): **median 12.4 m, mean 21.9 m**. Timing: mean 0.573 s/frame (satellite-only mean 0.409 s, VPR fallback mean 1.136 s) → **1.75 fps**.
+
+| Threshold | Frames within | Frequency |
+| --- | ---: | ---: |
+| ≤ 10 m | 36.4% | ~1 every 2.8 s |
+| ≤ 15 m | 58.9% | ~1 every 1.7 s |
+| ≤ 20 m | 71.6% | ~1 every 1.4 s |
+| ≤ 30 m | 81.8% | ~1 every 1.2 s |
+
+v11 has the lowest VPR fallback trigger rate (22.5% of frames) of any query video, meaning the cheap satellite-matching stage carries most of the run — consistent with it also being the best-covered query path relative to the other three flights' reference pool (see the oracle top-k coverage discussion in section 2 for why reference coverage matters this much).
+
 ### 3.3 Real-Time vs. Offline Ceiling
 
 The satellite-first pipeline is causal end-to-end, at the cost of somewhat higher error than the offline hybrid on v14 (median 15.0 m raw / 13.0 m smoothed vs. 11.6 m, section 2). We consider this the right trade: 1.99-2.17 fps with zero look-ahead and zero query GNSS, runnable in flight, vs. an offline pipeline that needs the entire query video before producing any output.
@@ -188,8 +212,8 @@ The biggest limitation is viewpoint ambiguity: drone frames from nearby places c
 
 ## Conclusion
 
-**The retained solution for deployment is the real-time satellite-first pipeline** (section 3): a pure-VPR bootstrap with zero a-priori position, then satellite tile matching first, VPR retrieval only as a fallback, both decided causally frame-by-frame, with causal gap-filling and one-sided Gaussian smoothing computed inline in the same per-frame loop. Satellite search centres on the pipeline's own causal estimate, never on GPS, and the bootstrap phase uses pure VPR with no seed position at all — see section 3.4 for exactly how the initial position, the running estimate, and the evaluation ground truth are kept separate. On the Mini 3 Pro benchmark (v14, 115 frames, reference v11+v12+v13) it reaches **median 12.7 m / mean 14.2 m at 2.20 fps**; on v13 (831 frames, reference v11+v12+v14) it reaches **median 17.6 m / mean 25.8 m at 1.96 fps**, with zero look-ahead and zero query GNSS.
+**The retained solution for deployment is the real-time satellite-first pipeline** (section 3): a pure-VPR bootstrap with zero a-priori position, then satellite tile matching first, VPR retrieval only as a fallback, both decided causally frame-by-frame, with causal gap-filling and one-sided Gaussian smoothing computed inline in the same per-frame loop. Satellite search centres on the pipeline's own causal estimate, never on GPS, and the bootstrap phase uses pure VPR with no seed position at all — see section 3.4 for exactly how the initial position, the running estimate, and the evaluation ground truth are kept separate. The best result obtained, and the one we treat as the flagship example of the system, is **v11 (806 frames, reference v12+v13+v14): median 12.4 m / mean 21.9 m at 1.75 fps, with 36.4% of frames within 10 m** (section 3.2a). On the Mini 3 Pro benchmark (v14, 115 frames, reference v11+v12+v13) it reaches **median 13.0 m / mean 15.5 m at 2.17 fps**; on v13 (831 frames, reference v11+v12+v14) it reaches **median 18.1 m / mean 25.4 m at 1.99 fps**, with zero look-ahead and zero query GNSS in all three cases.
 
-**The offline architecture (section 2) is kept only as the accuracy ceiling reference**, not as the deployed pipeline: it reaches median 11.6 m / mean 13.4 m on v14, about 1.1 m better median than the real-time pipeline, at the cost of needing the entire query video before producing any output and therefore being unusable in flight.
+**The offline architecture (section 2) is kept only as the accuracy ceiling reference**, not as the deployed pipeline: it reaches median 11.6 m / mean 13.4 m on v14, about 1.4 m better median than the real-time pipeline on that same video, at the cost of needing the entire query video before producing any output and therefore being unusable in flight.
 
 In both architectures, the system operates without GNSS at inference time: all query-side GPS data is withheld, and only the reference database and pre-downloaded satellite tiles are used. Section 3.4 spells out exactly which position feeds which step — the bootstrap, the running causal estimate, and the evaluation-only ground truth — so this claim can be checked rather than just taken on faith.

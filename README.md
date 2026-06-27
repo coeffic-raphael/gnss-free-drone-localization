@@ -18,27 +18,34 @@ This work addresses Exercise 2 of the assignment: *design a real-time visual nav
 
 **Retained solution: real-time satellite-first pipeline** — `scripts/run_satellite_first_hybrid.sh`, a single script with a pure-VPR bootstrap, causal satellite-first/VPR-fallback fusion, and inline causal gap-fill + smoothing (no separate post-processing step). Fully causal (zero look-ahead, zero query GNSS), per-frame decision in well under a second. See `docs/final_report.md` section 3 for the full design rationale, including §3.4 on exactly how the bootstrap position, the running position estimate, and the evaluation ground truth are kept separate.
 
+**v11 is the best result obtained so far** — lowest smoothed median error (12.4 m) and highest ≤10 m hit rate (36.4%, 1 every ~2.8 s) of any query video tested. It leads the table below; see `docs/final_report.md` for the full breakdown.
+
 | Video (reference) | Frames | SAT / VPR_FALLBACK / NO_FIX | Raw median / mean | Smoothed median / mean (window) | Throughput |
 |---|---:|---|---:|---:|---:|
+| **v11 (v12+v13+v14)** | 806 | 77.5% / 9.9% / 12.5% | 21.1 m / 26.4 m | **12.4 m / 21.9 m (w=9)** | 1.75 fps |
 | v13 (v11+v12+v14) | 831 | 80.9% / 10.0% / 9.1% | 25.8 m / 30.4 m | 18.1 m / 25.4 m (w=9) | 1.99 fps |
 | v14 (v11+v12+v13) | 115 | 52.2% / 33.0% / 14.8% | 15.0 m / 17.6 m | 13.0 m / 15.5 m (w=5) | 2.17 fps |
 
 	
-Additional leave-one-out validation and `Test1_100m` stress test, using the same retained satellite-first pipeline on a different PC:
+Additional leave-one-out validation and `Test1_100m` stress test, using the same retained satellite-first pipeline. v11/v12/v13/v14 below were all re-run (or are identical runs to the headline table above) on the main machine after the causal-heading fix; only `Test1_100m` below predates that fix and was run on a different (slower) PC, hence its much lower throughput:
 | Video (reference/test) | Frames | SAT / VPR_FALLBACK / NO_FIX | Raw median / mean | Smoothed median / mean (best window) | Throughput |
 |---|---:|---|---:|---:|---:|
-| v11 (v12+v13+v14) | 806 | 83.9% / 5.1% / 11.0% | 19.8 m / 24.1 m | 11.1 m / 23.0 m (w=9) | 0.23 fps |
-| v12 (v11+v13+v14) | 260 | 51.5% / 26.5% / 21.9% | 30.0 m / 48.6 m | 25.3 m / 40.9 m (w=11) | 0.21 fps |
-| v13 (v11+v12+v14) | 831 | 79.5% / 12.2% / 8.3% | 27.0 m / 31.6 m | 17.6 m / 24.6 m (w=9) | 0.23 fps |
-| v14 (v11+v12+v13) | 115 | 62.6% / 20.9% / 16.5% | 13.6 m / 17.0 m | 12.8 m / 15.2 m (w=5) | 0.24 fps |
+| v11 (v12+v13+v14) | 806 | 77.5% / 9.9% / 12.5% | 21.1 m / 26.4 m | 12.4 m / 21.9 m (w=9) | 1.75 fps |
+| v12 (v11+v13+v14) | 260 | 50.4% / 27.3% / 22.3% | 29.7 m / 47.8 m | 22.6 m / 38.8 m (w=11) | 1.80 fps |
+| v13 (v11+v12+v14) | 831 | 80.9% / 10.0% / 9.1% | 25.8 m / 30.4 m | 18.1 m / 25.4 m (w=9) | 1.99 fps |
+| v14 (v11+v12+v13) | 115 | 52.2% / 33.0% / 14.8% | 15.0 m / 17.6 m | 13.0 m / 15.5 m (w=5) | 2.17 fps |
 | Test1_100m / v17 (v11+v12+v13+v14) | 370 | 48.1% / 2.4% / 49.5% | 29.1 m / 30.1 m | 32.9 m / 60.2 m (w=5) | 0.20 fps |
 
 Smoothed error tolerance — average frequency of being within threshold:
 
-| Video | ≤ 10 m | ≤ 15 m | ≤ 20 m | ≤ 30 m |
+| Video |≤ 10 m | ≤ 15 m | ≤ 20 m | ≤ 30 m |
 |---|---|---|---|---|
-| v13 | 22.9% (1 every 4.4 s) | 41.2% (1 every 2.4 s) | 58.2% (1 every 1.7 s) | 75.7% (1 every 1.3 s) |
+| **v11** | **36.4% (1 every 2.8 s)** | **58.9% (1 every 1.7 s)** | **71.6% (1 every 1.4 s)** | **81.8% (1 every 1.2 s)** |
+| v13 | 22.0% (1 every 4.5 s) | 39.4% (1 every 2.5 s) | 56.6% (1 every 1.8 s) | 72.8% (1 every 1.4 s) |
 | v14 | 19.1% (1 every 5.2 s) | 61.7% (1 every 1.6 s) | 85.2% (1 every 1.2 s) | 93.0% (1 every 1.1 s) |
+| v12 | 26.2% (1 every 3.8 s) | 37.3% (1 every 2.7 s) | 42.3% (1 every 2.4 s) | 59.2% (1 every 1.7 s) |
+
+`Test1_100m`/v17 is not in this table: that run predates the current per-frame summary JSON format (only KML/HTML debug output exists for it), so exact threshold counts aren't available without re-running it with the current script.
 
 *(For reference only — not the deployed solution: an offline, no-latency-constraint version of the same modules reaches median 11.6 m / mean 13.4 m on v14. See "Offline Batch Algorithm" below and `docs/final_report.md` sections 1-2 for the full breakdown and cross-validation.)*
 
