@@ -10,12 +10,12 @@ This work addresses Exercise 2 of the assignment: *design a real-time visual nav
 
 ## Key Results
 
-**Retained solution: real-time satellite-first pipeline** — `scripts/run_satellite_first_hybrid.sh` + `src/smooth_hybrid_path.py`. Fully causal (zero look-ahead), per-frame decision in well under a second. See `docs/final_report.md` section 10 for the full design rationale and section 10.5 for why this is honestly real-time (no precomputed query-side data).
+**Retained solution: real-time satellite-first pipeline** — `scripts/run_satellite_first_hybrid.sh`, a single script with a pure-VPR bootstrap, causal satellite-first/VPR-fallback fusion, and inline causal gap-fill + smoothing (no separate post-processing step). Fully causal (zero look-ahead, zero query GNSS), per-frame decision in well under a second. See `docs/final_report.md` section 3 for the full design rationale, including §3.4 on exactly how the bootstrap position, the running position estimate, and the evaluation ground truth are kept separate.
 
-| Video (reference) | Frames | SAT / VPR_FALLBACK / NO_FIX | Raw median / mean | Smoothed median / mean (best window) | Throughput |
+| Video (reference) | Frames | SAT / VPR_FALLBACK / NO_FIX | Raw median / mean | Smoothed median / mean (window) | Throughput |
 |---|---:|---|---:|---:|---:|
-| v13 (v11+v12+v14) | 831 | 80.1% / 11.2% / 8.7% | 26.1 m / 32.1 m | 17.9 m / 24.8 m (w=9) | 1.83 fps |
-| v14 (v11+v12+v13) | 115 | 62.6% / 22.6% / 14.8% | 14.5 m / 16.4 m | 13.0 m / 14.8 m (w=5) | 2.10 fps |
+| v13 (v11+v12+v14) | 831 | 82.2% / 9.7% / 8.1% | 26.2 m / 31.5 m | 17.6 m / 25.8 m (w=9) | 1.96 fps |
+| v14 (v11+v12+v13) | 115 | 55.7% / 29.6% / 14.8% | 13.6 m / 16.0 m | 12.7 m / 14.2 m (w=5) | 2.20 fps |
 
 	
 Additional leave-one-out validation and `Test1_100m` stress test, using the same retained satellite-first pipeline on a different PC:
@@ -31,67 +31,30 @@ Smoothed error tolerance — average frequency of being within threshold:
 
 | Video | ≤ 10 m | ≤ 15 m | ≤ 20 m | ≤ 30 m |
 |---|---|---|---|---|
-| v13 | 23.1% (1 every 4.3 s) | 40.9% (1 every 2.4 s) | 59.3% (1 every 1.7 s) | 76.4% (1 every 1.3 s) |
-| v14 | 19.1% (1 every 5.2 s) | 66.1% (1 every 1.5 s) | 87.8% (1 every 1.1 s) | 94.8% (1 every 1.1 s) |
+| v13 | 22.9% (1 every 4.4 s) | 41.2% (1 every 2.4 s) | 58.2% (1 every 1.7 s) | 75.7% (1 every 1.3 s) |
+| v14 | 28.7% (1 every 3.5 s) | 68.7% (1 every 1.5 s) | 89.6% (1 every 1.1 s) | 94.8% (1 every 1.1 s) |
 
-**Reference benchmark (offline, no latency constraint):** reference DB = v11 + v12 + v13, query = v14, 115 frames at 1 fps.
-
-| Method | Median error | Mean error |
-|---|---:|---:|
-| DINOv2 global retrieval | 20.0 m | 27.3 m |
-| + LightGlue + Motion Viterbi | 15.2 m | 18.8 m |
-| + Gaussian smoothing (w = 19) | 13.1 m | 14.2 m |
-| **Hybrid VPR + satellite (offline)** | **11.6 m** | **13.4 m** |
-
-**Cross-validation (v12 as query, v11+v13+v14 as reference):** offline hybrid median 31.4 m — oracle ceiling is 28.5 m, confirming that the gap vs. v14 (oracle 12.9 m) is a reference-coverage effect rather than an algorithm difference.
+*(For reference only — not the deployed solution: an offline, no-latency-constraint version of the same modules reaches median 11.6 m / mean 13.4 m on v14. See "Offline Batch Algorithm" below and `docs/final_report.md` sections 1-2 for the full breakdown and cross-validation.)*
 
 ---
 
 ## Real-Time Pipeline (Retained)
 
-`scripts/run_satellite_first_hybrid.sh` decides each frame causally, using only past and current data — no whole-video buffering, no future frames.
+`scripts/run_satellite_first_hybrid.sh` decides each frame causally, using only past and current data — no whole-video buffering, no future frames, no query-flight GNSS. See [`docs/algorithm_overview.md`](docs/algorithm_overview.md) for a step-by-step flow diagram of the loop below.
 
-1. **Satellite tile matching first.** IPM-warp the frame, build a 3×3 satellite mosaic around the last known position, match with SuperPoint + LightGlue, solve a RANSAC homography (≥8 inliers). Cost: ~0.2-0.4 s/frame. This is tried first because it's cheap and doesn't require a database search.
-2. **VPR fallback.** If satellite matching fails, extract the query frame's DINOv2 descriptor live (no precomputed batch — it's computed at this exact moment in the loop), compare against the cached reference-pool descriptors, then LightGlue-rerank the top-k (inliers ≥100, ratio ≥0.70). Cost: ~0.8-1.3 s/frame, including the live DINOv2 extraction — only paid when satellite matching fails.
+0. **Bootstrap with zero GNSS knowledge.** Before any fix exists, there's nothing causal to centre a satellite search on, so the very first frames go through VPR retrieval only (step 2 below), against the full reference pool, until the first fix is accepted.
+1. **Satellite tile matching, once a fix exists.** IPM-warp the frame, build a 3×3 satellite mosaic around the pipeline's own last causal position estimate (never the true GPS — see `docs/final_report.md` §3.4 for how this estimate, the bootstrap, and the evaluation ground truth are kept separate), match with SuperPoint + LightGlue, solve a RANSAC homography (≥8 inliers). Cost: ~0.2-0.4 s/frame. Tried first because it's cheap and doesn't require a database search.
+2. **VPR fallback.** If satellite matching fails (or hasn't started yet), extract the query frame's DINOv2 descriptor live (no precomputed batch — it's computed at this exact moment in the loop), compare against the cached reference-pool descriptors, then LightGlue-rerank the top-k (inliers ≥100, ratio ≥0.70). Cost: ~0.8-1.5 s/frame, including the live DINOv2 extraction.
 3. **NO_FIX.** If both fail, the frame is left unresolved rather than publishing a guess.
-4. **Causal post-processing** (`src/smooth_hybrid_path.py`): gap-fill `NO_FIX` frames by carrying the last fix forward, then apply a one-sided (past-only) Gaussian smoothing window — best window swept per-video (w=9 for v13, w=5 for v14).
+4. **Causal gap-fill + smoothing, inline.** In the same per-frame loop (not a separate script): gap-fill `NO_FIX` frames by carrying the last fix forward, then apply a one-sided (past-only) Gaussian smoothing window of fixed size (pre-tuned offline, w=9 for v13, w=5 for v14). The cost of this step is included in the same per-frame timing as steps 1-3.
 
-A causal trajectory-consistency gate (reject a candidate that deviates too far from a constant-velocity extrapolation of recent fixes) was also implemented and tested, but caused filter lock-in and, even after an escape-valve fix, was net-negative on aggregate — reverted, see `docs/final_report.md` §10.3.
+A causal trajectory-consistency gate (reject a candidate too far from a constant-velocity extrapolation of recent fixes) was tried but caused filter lock-in and was net-negative even after a fix — reverted; see `docs/final_report.md` for other tried-and-dropped ideas.
 
 ---
 
-## Offline Batch Algorithm (Reference Implementation)
+## Offline Batch Algorithm (kept for reference, not the deployed solution)
 
-This is the non-real-time pipeline used to establish the best achievable accuracy ceiling, with no constraint on latency or look-ahead. It has two complementary modules.
-
-### Module 1 — Visual Place Recognition (VPR)
-
-Uses GPS-annotated reference videos to localise the query by visual similarity.
-
-1. **DINOv2 global retrieval** — frozen ViT-S/14 backbone, 1536-dim descriptors, cosine top-10.
-2. **LightGlue local re-ranking** — SuperPoint keypoints matched between query and top-10 candidates; 6 best kept.
-3. **Motion Viterbi** — picks one candidate per frame using the whole sequence (backtracks from the last frame), penalizing jumps above 20 m/frame.
-4. **Gaussian path smoothing** — symmetric window w = 19, σ = 5.4, uses both past and future frames to suppress isolated spikes.
-5. **Confidence gate** — each frame labelled `FIX` / `NO_FIX` based on DINOv2 similarity and LightGlue inlier count.
-
-### Module 2 — Satellite Tile Matching (GIS fallback)
-
-For `NO_FIX` frames, matches the drone view against pre-downloaded Esri World Imagery tiles. Inspired by [WildNav (Gurgu et al., 2022)](https://arxiv.org/abs/2210.09727) and extended to oblique camera angles.
-
-1. **Inverse Perspective Mapping (IPM)** — warps the 60° tilted frame to a pseudo-nadir 512 × 512 px image (0.5 m/px), bridging the domain gap with nadir satellite tiles.
-2. **3 × 3 satellite mosaic** — centred on the estimated drone position, avoids tile-boundary failures.
-3. **SuperPoint + LightGlue matching** against the satellite mosaic.
-4. **RANSAC homography** — maps IPM image centre to a satellite pixel, then converted to lat/lon.
-
-### Fusion
-
-| Label | Condition | Median error (v14) |
-|---|---|---:|
-| `VPR_FIX` | Confidence gate passed | 9.1 m |
-| `SAT_FIX` | NO_FIX + satellite matched | 12.1 m |
-| `VPR_FALLBACK` | NO_FIX + satellite failed | 15.5 m |
-
-This architecture requires the entire query video before producing any output (Viterbi backtracking and symmetric smoothing both need future frames), which is why it is kept as an accuracy reference rather than the deployed pipeline.
+A non-real-time variant used only to establish the accuracy ceiling (no latency/look-ahead constraint): same two visual modules, but VPR-first with satellite as fallback, and whole-sequence Motion Viterbi + symmetric Gaussian smoothing instead of the causal version — both require the entire video upfront. ~1.1 m better than the real-time pipeline on v14, at the cost of being unusable in flight. Full breakdown: `docs/final_report.md` sections 1-2.
 
 ---
 
@@ -130,13 +93,16 @@ src/
   ipm_warp.py                     Inverse Perspective Mapping for tilted frames
   satellite_tiles.py              tile math, download, mosaic stitching
   hybrid_localize.py              VPR + satellite fusion → final output (offline)
-  export_hybrid_kml.py            KML export with colour-coded status
+  export_hybrid_kml.py            KML export for the offline hybrid pipeline
+  export_google_earth_kml.py      KML export for the raw VPR/Viterbi retrieval results
   geometry.py                     GPS ↔ local XY helpers
-  smooth_hybrid_path.py           causal gap-fill + one-sided Gaussian smoothing (real-time)
+  smooth_hybrid_path.py           offline tool only: used to sweep smoothing window sizes during development. Production pipeline does gap-fill + smoothing inline (see scripts/run_satellite_first_hybrid.sh)
+  frame_dead_reckoning.py         dropped idea (optical-flow dead reckoning), kept for reference — see docs/final_report.md
+  interpolated_navigation.py      dropped idea (linear interpolation across NO_FIX gaps), kept for reference — see docs/final_report.md
 
 scripts/
   setup.sh                       one-command preprocessing for all videos
-  run_satellite_first_hybrid.sh  retained real-time pipeline: satellite-first, VPR fallback
+  run_satellite_first_hybrid.sh  retained real-time pipeline: satellite-first, VPR fallback, writes CSV + summary + KML
   run_best_pipeline.sh           offline pipeline: VPR → satellite → hybrid (v14)
   run_v12_as_query.sh            cross-validation: v12 query, v11+v13+v14 reference
   test_satellite_match.sh        standalone satellite evaluation (any video)
@@ -145,16 +111,19 @@ outputs/
   anyloc/                     VPR retrieval, Viterbi, smoothed results (CSVs + JSONs)
   satellite_eval_v14.csv      per-frame satellite matching results (v14)
   satellite_eval_v12.csv      per-frame satellite matching results (v12 cross-val)
-  hybrid/                     final fusion results (CSV + JSON) for v14 and v12
+  hybrid/                     final fusion results (CSV + JSON) for v14, v13, and v12
   figures/
     preliminary_experiment_v14.svg        GT vs estimated path (v14)
   maps/
-    dji_mini3_v14_hybrid.kml             Google Earth overlay — v14 hybrid
+    dji_mini3_v14_hybrid.kml             Google Earth overlay — v14 offline hybrid
     dji_mini3_v12_hybrid.kml             Google Earth overlay — v12 cross-val
+    dji_mini3_v14_realtime.kml           Google Earth overlay — v14 real-time pipeline
+    dji_mini3_v13_realtime.kml           Google Earth overlay — v13 real-time pipeline
 
 docs/
-  final_report.md       full method description and results
-  literature_review.md  related work (AnyLoc, LightGlue, WildNav, DINOv2)
+  final_report.md        full method description and results
+  algorithm_overview.md  step-by-step flow diagram of the real-time pipeline
+  literature_review.md   related work (AnyLoc, LightGlue, WildNav, DINOv2)
 ```
 
 ---
@@ -234,36 +203,29 @@ python src/frozen_dino_cross_retrieval.py \
   --aggregation mean --top-k 10
 ```
 
-The `--descriptor-cache` path must follow the pattern `outputs/anyloc/dji_mini3_cross_<REFERENCES joined by _>_to_<VERSION>_1fps_descriptors.npy` — this is the default path `run_satellite_first_hybrid.sh` looks for (override with the `DESCRIPTOR_CACHE` env var if you place it elsewhere). It loads only the first `len(reference_rows)` rows of this file. This step only needs to be re-run if the reference pool changes; DINOv2 weights are downloaded automatically on first use. At runtime, `run_satellite_first_hybrid.sh` loads its own DINOv2 model (`DINO_MODEL_NAME`, default `dinov2_vits14`) and extracts the query frame's descriptor on the spot whenever satellite matching fails for that frame — see `docs/final_report.md` §10.5 for why this is the honest streaming latency rather than a benchmark shortcut.
+The `--descriptor-cache` path must follow the pattern `outputs/anyloc/dji_mini3_cross_<REFERENCES joined by _>_to_<VERSION>_1fps_descriptors.npy` — this is the default path `run_satellite_first_hybrid.sh` looks for (override with the `DESCRIPTOR_CACHE` env var if you place it elsewhere). It loads only the first `len(reference_rows)` rows of this file. This step only needs to be re-run if the reference pool changes; DINOv2 weights are downloaded automatically on first use. At runtime, `run_satellite_first_hybrid.sh` loads its own DINOv2 model (`DINO_MODEL_NAME`, default `dinov2_vits14`) and extracts the query frame's descriptor on the spot whenever satellite matching fails for that frame — see `docs/final_report.md` section 3 for why this is the honest streaming latency rather than a benchmark shortcut.
 
 Then run the real-time pipeline itself:
 
 ```bash
-VERSION=v14 ANGLE=60 REFERENCES="v11,v12,v13" ./scripts/run_satellite_first_hybrid.sh
+VERSION=v14 ANGLE=60 REFERENCES="v11,v12,v13" SMOOTH_HALF_WINDOW=2 ./scripts/run_satellite_first_hybrid.sh
 ```
 
-`VERSION` is the query flight, `REFERENCES` is the comma-separated reference pool used for the VPR fallback. This writes `outputs/hybrid/satellite_first_<VERSION>.csv` and `_summary.json`. Then apply the causal post-processing (gap-fill + one-sided Gaussian smoothing):
+`VERSION` is the query flight, `REFERENCES` is the comma-separated reference pool used for the VPR fallback, `SMOOTH_HALF_WINDOW` controls the inline causal smoothing window (default 4; use 2 for v14, 4 for v13 — see sections 3.1/3.2 of the final report). Gap-filling and smoothing now run inline, in the same per-frame loop, so this single command writes the final output directly — there is no separate post-processing step to run afterward, and a Google Earth KML of the run's own output is written automatically alongside the CSV.
 
-```bash
-python3 src/smooth_hybrid_path.py \
-  outputs/hybrid/satellite_first_v14.csv \
-  data/processed/DJI_v14_frame_manifest_1fps.csv \
-  --output-csv outputs/hybrid/satellite_first_v14_smoothed.csv \
-  --summary-json outputs/hybrid/satellite_first_v14_smoothed_summary.json
-```
-
-Final outputs:
+Final output:
 
 | File | Description |
 |---|---|
-| `outputs/hybrid/satellite_first_v14.csv` / `_summary.json` | raw per-frame causal output (SAT / VPR_FALLBACK / NO_FIX) |
-| `outputs/hybrid/satellite_first_v14_smoothed.csv` / `_summary.json` | gap-filled + causally smoothed output |
+| `outputs/hybrid/satellite_first_v14.csv` | per-frame causal output: status (SAT / VPR_FALLBACK / NO_FIX), raw fix, and inline gap-filled + causally smoothed position, all in one file |
+| `outputs/hybrid/satellite_first_v14_summary.json` | aggregate statistics (raw and smoothed, by status, timing breakdown, achievable fps) |
+| `outputs/maps/dji_mini3_v14_realtime.kml` | Google Earth overlay: estimated path (blue) vs. real GPS path (green), no per-frame markers |
 
-To reproduce the v13 run used in this report: regenerate the descriptor cache with `--query-manifest v13=...` and `--reference-manifest` v11/v12/v14, then run with `VERSION=v13` and `REFERENCES="v11,v12,v14"`, and point `smooth_hybrid_path.py` at `DJI_v13_frame_manifest_1fps.csv`.
+To reproduce the v13 run used in this report: regenerate the descriptor cache with `--query-manifest v13=...` and `--reference-manifest` v11/v12/v14, then run with `VERSION=v13 REFERENCES="v11,v12,v14" SMOOTH_HALF_WINDOW=4`.
 
 ---
 
-## Run the Offline Batch Pipeline
+## Run the Offline Batch Pipeline (secondary, kept for reference)
 
 ```bash
 source .venv-anyloc/bin/activate
@@ -299,11 +261,11 @@ source .venv-anyloc/bin/activate
 
 ## Design Notes
 
-**No GNSS at inference.** GNSS from SRT is used only to build the reference database and download satellite tiles. The query flight uses no GPS at inference — only video frames.
+**No GNSS at inference.** GNSS from SRT is used only to build the reference database and download satellite tiles. The query flight uses no GPS at inference — only video frames: the initial position comes from a pure-VPR bootstrap (no seed, not even a takeoff GPS fix), the running position estimate the algorithm uses is always its own last causal output, and the query flight's true GPS is read only once per frame, after the fact, to compute the error metric — see `docs/final_report.md` §3.4 for the full breakdown.
 
 **Camera separation.** Mini 3 Pro (v11–v14, 60°) and Air 3/3S (v17–v24, 45°) cannot share the same VPR reference database due to different sensor geometry. The Air 3/3S videos are available for future cross-camera experiments.
 
-**Real-time mode.** See the **Real-Time Pipeline** section above for the retained solution. An earlier attempt at causality kept the VPR-first batch architecture and made it causal in place — `motion_viterbi_rerank.py --online-lag N` (fixed-lag online Viterbi) and `smooth_path.py --causal` (past-only smoothing), exposed via `scripts/run_realtime_pipeline.sh` — kept in the repo for reference; the satellite-first ordering supersedes it since it pays the expensive VPR search only on fallback instead of every frame. See `docs/final_report.md` §10 for the full comparison.
+**Real-time mode.** See the **Real-Time Pipeline** section above for the retained solution. An earlier attempt at causality kept the VPR-first batch architecture and made it causal in place (fixed-lag online Viterbi + past-only smoothing) — dropped once the satellite-first ordering proved both faster and fully causal, since it pays the expensive VPR search only on fallback instead of every frame. See `docs/final_report.md`, "Other Ideas Tried And Not Retained", for the full comparison.
 
 ---
 

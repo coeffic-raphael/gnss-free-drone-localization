@@ -2,24 +2,28 @@
   "version": "v14",
   "frames_total": 115,
   "counts_by_source": {
-    "SAT": 72,
-    "VPR_FALLBACK": 26,
+    "VPR_FALLBACK": 34,
+    "SAT": 64,
     "NO_FIX": 17
   },
-  "vpr_trigger_rate": 0.3739130434782609,
-  "error_median_m": 14.512099837385147,
-  "error_mean_m": 16.43563381414158,
+  "vpr_trigger_rate": 0.4434782608695652,
+  "smooth_half_window": 2,
+  "smooth_window": 5,
+  "raw_error_median_m": 13.584350733630384,
+  "raw_error_mean_m": 16.04723312025926,
+  "error_median_m": 12.654515842683665,
+  "error_mean_m": 14.215914871910536,
   "thresholds": {
-    "5": 1,
-    "10": 21,
-    "15": 51,
-    "20": 68,
-    "30": 93
+    "5": 0,
+    "10": 33,
+    "15": 79,
+    "20": 103,
+    "30": 109
   },
-  "frame_seconds_mean": 0.4765711166410019,
-  "frame_seconds_median": 0.24903075001202524,
-  "frame_seconds_max": 1.5641039999900386,
-  "frame_seconds_sat_only_mean": 0.22462494386450593,
-  "frame_seconds_vpr_mean": 0.8984344757086229,
-  "achievable_fps": 2.0983227163413973
+  "frame_seconds_mean": 0.4547905412927756,
+  "frame_seconds_median": 0.22874170797877014,
+  "frame_seconds_max": 1.259787791990675,
+  "frame_seconds_sat_only_mean": 0.19697414843540173,
+  "frame_seconds_vpr_mean": 0.778324838211833,
+  "achievable_fps": 2.198814419397172
 }

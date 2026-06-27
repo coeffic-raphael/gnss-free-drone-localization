@@ -1,36 +1,73 @@
 #!/usr/bin/env bash
 # "Satellite-first" hybrid pipeline: for each query frame, try satellite
 # matching FIRST (cheap, ~1 LightGlue call). Only when satellite fails
-# (few_matches / ransac_fail / low_alt / no_tile) does it fall back to the
-# expensive VPR path — DINOv2 top-K retrieval + LightGlue rerank against only
-# TOP_K_FALLBACK reference frames (default 3, not the original top-10).
+# (few_matches / ransac_fail / low_alt / no_tile / no_position_yet) does it
+# fall back to the expensive VPR path — DINOv2 top-K retrieval + LightGlue
+# rerank against only TOP_K_FALLBACK reference frames (default 3, not the
+# original top-10).
 #
-# This inverts the existing offline architecture, where VPR (top-10 rerank +
-# full-sequence Viterbi) runs on EVERY frame regardless of whether satellite
-# would have succeeded. Since satellite alone already localizes ~85%+ of
-# frames on the tested flights, this should cut the average per-frame
-# LightGlue cost roughly proportionally to the satellite failure rate.
+# GNSS-free, end to end, no exceptions:
+#   - The satellite stage needs an approximate position to know which tile to
+#     load. That position is NEVER read from the query flight's true GPS.
+#     Before any fix has ever been produced, satellite matching is skipped
+#     entirely (there is nothing to center the search on) and every frame
+#     goes through VPR retrieval against the WHOLE reference pool (no
+#     geographic restriction) until VPR produces the first accepted fix.
+#     From that point on, the satellite search is centred on this script's
+#     own latest CAUSAL estimate (see "Causal state" below) — carried
+#     forward frame to frame, never read from the manifest's GPS columns.
+#   - An earlier version of this script centred the satellite search on
+#     row["drone_latitude"]/["drone_longitude"], i.e. the query flight's real
+#     GPS for that exact frame. That was a genuine GNSS leak (not just a
+#     bootstrap convenience: it was read on EVERY frame) and has been
+#     removed. See docs/final_report.md for the before/after comparison.
 #
-# Both stages use the "lite" LightGlue config validated by
-# benchmark_lightglue_lite.sh (2.4x faster than heavy defaults, no accuracy
-# loss): max-keypoints 512, depth_confidence 0.8, width_confidence 0.9.
+# Causal state carried frame to frame (no look-ahead, ever):
+#   - `have_fix` / `(state_lat, state_lon)`: this script's own latest
+#     position estimate, AFTER causal gap-fill + causal smoothing (see
+#     below). Used only to centre the next frame's satellite tile search.
+#   - Causal gap-fill: if a frame ends in NO_FIX, its "filled" position is
+#     simply the previous frame's filled position (carried forward) — never
+#     a future frame, unlike the original two-script version, whose
+#     fill_gaps() seeded the very first frames with the FIRST known fix in
+#     the whole sequence (a look-ahead bug). Frames before the first fix
+#     ever obtained are left with no position at all (correct: a real
+#     system would have nothing to carry forward there either).
+#   - Causal Gaussian smoothing: each frame's reported position is a
+#     Gaussian-weighted average of the filled position at this frame and up
+#     to SMOOTH_HALF_WINDOW*2 PAST filled positions only — see
+#     smooth_path.smooth_path_causal for the batch equivalent of the inline
+#     loop below. This used to be a separate post-processing step
+#     (src/smooth_hybrid_path.py, run after the whole CSV was written); it
+#     is now computed inline, per frame, inside the same timed loop, so the
+#     reported throughput includes its (negligible) cost.
+#   - The smoothing window itself (SMOOTH_HALF_WINDOW) is a FIXED parameter
+#     chosen ahead of time from prior offline tuning (v13: 4, v14: 2; see
+#     docs/final_report.md) — it is never picked by sweeping this run's own
+#     ground truth. src/smooth_hybrid_path.py is kept in the repo purely as
+#     an offline tuning/analysis tool to choose this parameter on held-out
+#     data; it plays no part in the production pipeline anymore.
+#
+# Both stages use the "lite" LightGlue config validated during development
+# (2.4x faster than heavy defaults, no accuracy loss): max-keypoints 512,
+# depth_confidence 0.8, width_confidence 0.9.
 #
 # This script measures REAL per-frame wall-clock latency (processed strictly
 # in temporal order, one frame at a time) — the actual number that matters
 # for real-time feasibility. The query frame's DINOv2 descriptor is computed
 # LIVE, inside the per-frame loop, only on frames where satellite matching
 # failed (i.e. only when the VPR fallback actually needs it) — this is the
-# honest streaming latency, not a benchmark shortcut: see docs/final_report.md
-# §10.5 for why an earlier version of this script precomputed query
-# descriptors in a batch ahead of time, and why that was a convenience for
-# repeated experiments rather than an algorithmic requirement.
+# honest streaming latency, not a benchmark shortcut: see
+# docs/final_report.md for why an earlier version of this script
+# precomputed query descriptors in a batch ahead of time, and why that was a
+# convenience for repeated experiments rather than an algorithmic
+# requirement.
 #
 # Usage:
 #   VERSION=v14 ANGLE=60 REFERENCES="v11,v12,v13" ./scripts/run_satellite_first_hybrid.sh
 #
 # Requires an existing DINOv2 descriptor cache covering the REFERENCE pool for
-# VERSION (e.g. produced by frozen_dino_cross_retrieval.py / the existing
-# run_v*_as_query.sh / benchmark_lightglue_lite.sh scripts) — only the
+# VERSION (produced by src/frozen_dino_cross_retrieval.py) — only the
 # reference-side descriptors are read from it; the query side is always
 # computed live. Override the default path with DESCRIPTOR_CACHE if it lives
 # elsewhere.
@@ -39,6 +76,8 @@
 #   TOP_K_FALLBACK   (default 3)   — DINOv2 candidates tried when satellite fails
 #   VPR_MIN_INLIERS  (default 100) — RANSAC inliers required to accept a VPR fix
 #   VPR_MIN_RATIO    (default 0.70)— inlier ratio required to accept a VPR fix
+#   SAT_GRID         (default 3)   — satellite mosaic grid size (tiles per side)
+#   SMOOTH_HALF_WINDOW (default 4) — causal smoothing half-window (full window = 2*h+1)
 #   SAT_MAX_KEYPOINTS / SAT_DEPTH_CONFIDENCE / SAT_WIDTH_CONFIDENCE — satellite stage
 #   VPR_IMAGE_RESIZE / VPR_MAX_KEYPOINTS / VPR_DEPTH_CONFIDENCE / VPR_WIDTH_CONFIDENCE — VPR stage
 #   DINO_MODEL_NAME / DINO_REPO / DINO_WEIGHTS / DINO_MAX_SIZE — live query-side DINOv2 extraction
@@ -46,7 +85,7 @@ set -euo pipefail
 PYTHON="${PYTHON_BIN:-.venv-anyloc/bin/python}"
 
 $PYTHON - <<'EOF'
-import sys, csv, math, time, json, os
+import sys, csv, html, math, time, json, os
 sys.path.insert(0, 'src')
 
 import cv2
@@ -74,6 +113,14 @@ THRESHOLDS  = [5, 10, 15, 20, 30]
 TOP_K_FALLBACK  = int(os.environ.get("TOP_K_FALLBACK", "3"))
 VPR_MIN_INLIERS = int(os.environ.get("VPR_MIN_INLIERS", "100"))
 VPR_MIN_RATIO   = float(os.environ.get("VPR_MIN_RATIO", "0.70"))
+SAT_GRID        = int(os.environ.get("SAT_GRID", "3"))
+
+# Causal smoothing — fixed window chosen ahead of time from offline tuning
+# (src/smooth_hybrid_path.py on held-out data), NOT swept against this run's
+# own ground truth.
+SMOOTH_HALF_WINDOW = int(os.environ.get("SMOOTH_HALF_WINDOW", "4"))
+SMOOTH_SIGMA = SMOOTH_HALF_WINDOW * 0.6 if SMOOTH_HALF_WINDOW > 0 else 1.0
+SMOOTH_WINDOW = 2 * SMOOTH_HALF_WINDOW + 1
 
 SAT_MAX_KEYPOINTS    = int(os.environ.get("SAT_MAX_KEYPOINTS", "512"))
 SAT_DEPTH_CONFIDENCE = float(os.environ.get("SAT_DEPTH_CONFIDENCE", "0.8"))
@@ -97,6 +144,7 @@ DESCRIPTOR_CACHE = Path(os.environ.get("DESCRIPTOR_CACHE", default_cache))
 
 OUT_CSV      = Path(f"outputs/hybrid/satellite_first_{VERSION}.csv")
 SUMMARY_JSON = Path(f"outputs/hybrid/satellite_first_{VERSION}_summary.json")
+OUT_KML      = Path(f"outputs/maps/dji_mini3_{VERSION}_realtime.kml")
 
 # ── Device / models ──────────────────────────────────────────────────────────
 if torch.cuda.is_available():
@@ -106,9 +154,10 @@ elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
 else:
     device = torch.device("cpu")
 print(f"Device: {device}")
-print(f"Satellite stage : max_keypoints={SAT_MAX_KEYPOINTS} depth={SAT_DEPTH_CONFIDENCE} width={SAT_WIDTH_CONFIDENCE}")
+print(f"Satellite stage : max_keypoints={SAT_MAX_KEYPOINTS} depth={SAT_DEPTH_CONFIDENCE} width={SAT_WIDTH_CONFIDENCE} grid={SAT_GRID}x{SAT_GRID}")
 print(f"VPR fallback    : resize={VPR_IMAGE_RESIZE} max_keypoints={VPR_MAX_KEYPOINTS} depth={VPR_DEPTH_CONFIDENCE} width={VPR_WIDTH_CONFIDENCE} top_k={TOP_K_FALLBACK}")
 print(f"VPR accept gate : inliers>={VPR_MIN_INLIERS} ratio>={VPR_MIN_RATIO}")
+print(f"Causal smoothing: half_window={SMOOTH_HALF_WINDOW} (window={SMOOTH_WINDOW}) sigma={SMOOTH_SIGMA:.2f}")
 
 sat_extractor = SuperPoint(max_num_keypoints=SAT_MAX_KEYPOINTS).eval().to(device)
 sat_matcher   = LightGlue(features="superpoint", depth_confidence=SAT_DEPTH_CONFIDENCE,
@@ -148,6 +197,47 @@ def extract_vpr_feats(path: str):
             vpr_feat_cache[path] = vpr_extractor.extract(image)
     return vpr_feat_cache[path]
 
+# ── KML export helpers ───────────────────────────────────────────────────────
+# Plots the SAME smoothed/causal positions written to OUT_CSV — no extra
+# computation, just a Google Earth view of this run's output. Ground truth is
+# read from the query manifest purely to draw the overlay; it is never fed
+# back into the loop above. Just two lines: the estimated path (blue) and the
+# real path (green) — no points, no per-frame markers.
+KML_STYLES = [  # KML colours are AABBGGRR (alpha, blue, green, red)
+    '    <Style id="gtPath"><LineStyle><color>ff00ff00</color><width>3</width></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>',
+    '    <Style id="estPath"><LineStyle><color>ffff0000</color><width>3</width></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>',
+]
+
+def kml_line(name, style_id, coords):
+    joined = "\n            ".join(coords)
+    return (f'    <Placemark><name>{html.escape(name)}</name><styleUrl>#{style_id}</styleUrl>'
+            f'<LineString><tessellate>1</tessellate><altitudeMode>clampToGround</altitudeMode>'
+            f'<coordinates>\n            {joined}\n        </coordinates></LineString></Placemark>')
+
+def export_realtime_kml(results, query_rows, out_path, version):
+    gt_by_frame = {r["frame_count"]: (float(r["ground_latitude"]), float(r["ground_longitude"])) for r in query_rows}
+    gt_coords, est_coords = [], []
+    for r in results:
+        gt_lat, gt_lon = gt_by_frame[r["frame_count"]]
+        gt_coords.append(f"{gt_lon:.8f},{gt_lat:.8f},0")
+        if r["smoothed_lat"] is not None:
+            est_coords.append(f"{r['smoothed_lon']:.8f},{r['smoothed_lat']:.8f},0")
+
+    placemarks = [
+        kml_line("Real itinerary (ground truth)", "gtPath", gt_coords),
+        kml_line("Estimated itinerary (causal, no GNSS)", "estPath", est_coords),
+    ]
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(
+        '<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2">\n  <Document>\n'
+        f'    <name>Real-time satellite-first pipeline — {version} (no GNSS at inference)</name>\n'
+        + "\n".join(KML_STYLES) + "\n" + "\n".join(placemarks) + "\n  </Document>\n</kml>\n",
+        encoding="utf-8",
+    )
+    print(f"KML  : {out_path}  ({len(gt_coords)} GT points, {len(est_coords)} estimated points)")
+
+
 def load_manifest(path, tag):
     with open(path) as f:
         rows = list(csv.DictReader(f))
@@ -178,6 +268,28 @@ if not DESCRIPTOR_CACHE.exists():
 descriptors = np.load(DESCRIPTOR_CACHE)
 reference_descriptors = descriptors[: len(reference_rows)]
 
+# ── Causal state (carried forward frame to frame, never read from GPS) ─────
+have_fix = False        # True once VPR or satellite has ever produced a fix
+state_lat = state_lon = None   # this script's own latest CAUSAL estimate
+hist_lats: list[float] = []    # gap-filled (pre-smoothing) history, oldest first
+hist_lons: list[float] = []
+
+def smooth_now() -> tuple[float, float]:
+    """Causal Gaussian-weighted average of hist_lats/hist_lons, using only the
+    current entry and up to SMOOTH_HALF_WINDOW*2 PAST entries (no look-ahead:
+    this is called once per frame, immediately after that frame's own
+    gap-filled value has been appended to the history)."""
+    n = len(hist_lats)
+    window = min(SMOOTH_WINDOW, n)
+    lat_sum = lon_sum = w_sum = 0.0
+    for j in range(window):
+        idx = n - 1 - j
+        w = math.exp(-0.5 * (j / SMOOTH_SIGMA) ** 2)
+        lat_sum += w * hist_lats[idx]
+        lon_sum += w * hist_lons[idx]
+        w_sum += w
+    return lat_sum / w_sum, lon_sum / w_sum
+
 # ── Main loop (strict temporal order, one frame at a time) ─────────────────
 OUT_CSV.parent.mkdir(parents=True, exist_ok=True)
 results = []
@@ -188,15 +300,13 @@ for i, row in enumerate(query_rows):
     head  = float(row["heading_deg"])
     gt_lat = float(row["ground_latitude"])
     gt_lon = float(row["ground_longitude"])
-    drone_lat = float(row["drone_latitude"])
-    drone_lon = float(row["drone_longitude"])
 
     t0 = time.perf_counter()
-    sat_status = "low_alt"
+    sat_status = "no_position_yet" if not have_fix else "low_alt"
     sat_lat = sat_lon = None
     sat_inliers = 0
 
-    if alt >= MIN_ALT_M:
+    if have_fix and alt >= MIN_ALT_M:
         img = cv2.imread(frame_path)
         if img is None:
             sat_status = "no_image"
@@ -206,9 +316,11 @@ for i, row in enumerate(query_rows):
                     img, altitude_m=alt, camera_angle_deg=ANGLE,
                     heading_deg=head, output_size=512, output_gsd_m=0.5,
                 )
-                lat_c = drone_lat + north / 111_320.0
-                lon_c = drone_lon + east  / (111_320.0 * math.cos(math.radians(drone_lat)))
-                tile_result = load_tile_mosaic(lat_c, lon_c, ZOOM, SAT_DIR, grid=3)
+                # Search centred on THIS SCRIPT'S OWN last causal estimate —
+                # never on the query flight's true GPS.
+                lat_c = state_lat + north / 111_320.0
+                lon_c = state_lon + east  / (111_320.0 * math.cos(math.radians(state_lat)))
+                tile_result = load_tile_mosaic(lat_c, lon_c, ZOOM, SAT_DIR, grid=SAT_GRID)
                 if tile_result is None:
                     sat_status = "no_tile"
                 else:
@@ -242,15 +354,19 @@ for i, row in enumerate(query_rows):
                 sat_status = "ipm_error"
 
     source = None
-    final_lat = final_lon = None
+    raw_lat = raw_lon = None
     vpr_triggered = False
     vpr_best_inliers = 0
     vpr_best_ratio = 0.0
 
     if sat_status == "ok":
         source = "SAT"
-        final_lat, final_lon = sat_lat, sat_lon
+        raw_lat, raw_lon = sat_lat, sat_lon
     else:
+        # Also the bootstrap path: when have_fix is False this is the ONLY
+        # way the pipeline can ever get its first position. The reference
+        # pool is searched in full (no geographic prior used to restrict
+        # it), so this is honest VPR retrieval, not GNSS-assisted retrieval.
         vpr_triggered = True
         # Live DINOv2 extraction for THIS frame only — not a precomputed batch.
         query_descriptor = extract_dino_descriptor(frame_path)
@@ -281,14 +397,36 @@ for i, row in enumerate(query_rows):
         vpr_best_inliers, vpr_best_ratio, best_ref = best
         if vpr_best_inliers >= VPR_MIN_INLIERS and vpr_best_ratio >= VPR_MIN_RATIO:
             source = "VPR_FALLBACK"
-            final_lat = float(best_ref["ground_latitude"])
-            final_lon = float(best_ref["ground_longitude"])
+            raw_lat = float(best_ref["ground_latitude"])
+            raw_lon = float(best_ref["ground_longitude"])
         else:
             source = "NO_FIX"
 
+    # ── Causal gap-fill + causal smoothing, inline (zero added latency) ────
+    # Gap-fill: carry the PREVIOUS frame's filled position forward if this
+    # frame is NO_FIX. Frames before the first-ever fix are left unfilled —
+    # there is genuinely nothing to carry forward yet (unlike the old batch
+    # fill_gaps(), which look-ahead-filled those with the sequence's first
+    # known fix).
+    if raw_lat is not None:
+        filled_lat, filled_lon = raw_lat, raw_lon
+    elif have_fix:
+        filled_lat, filled_lon = hist_lats[-1], hist_lons[-1]
+    else:
+        filled_lat = filled_lon = None
+
+    smoothed_lat = smoothed_lon = None
+    if filled_lat is not None:
+        hist_lats.append(filled_lat)
+        hist_lons.append(filled_lon)
+        smoothed_lat, smoothed_lon = smooth_now()
+        have_fix = True
+        state_lat, state_lon = smoothed_lat, smoothed_lon
+
     elapsed = time.perf_counter() - t0
-    err = haversine_m(gt_lat, gt_lon, final_lat, final_lon) if final_lat is not None else None
-    label = source if err is None else f"{source} err={err:.1f}m"
+    raw_err = haversine_m(gt_lat, gt_lon, raw_lat, raw_lon) if raw_lat is not None else None
+    smoothed_err = haversine_m(gt_lat, gt_lon, smoothed_lat, smoothed_lon) if smoothed_lat is not None else None
+    label = source if smoothed_err is None else f"{source} err={smoothed_err:.1f}m"
     print(f"  [{i+1}/{len(query_rows)}] {label}  ({elapsed:.2f}s)  sat={sat_status}"
           + (f" vpr_inliers={vpr_best_inliers} ratio={vpr_best_ratio:.2f}" if vpr_triggered else ""))
 
@@ -301,9 +439,12 @@ for i, row in enumerate(query_rows):
         "vpr_best_inliers": vpr_best_inliers,
         "vpr_best_ratio": round(vpr_best_ratio, 3),
         "source": source,
-        "final_lat": final_lat,
-        "final_lon": final_lon,
-        "error_m": err,
+        "raw_final_lat": raw_lat,
+        "raw_final_lon": raw_lon,
+        "raw_error_m": raw_err,
+        "smoothed_lat": smoothed_lat,
+        "smoothed_lon": smoothed_lon,
+        "smoothed_error_m": smoothed_err,
         "frame_seconds": elapsed,
     })
 
@@ -313,10 +454,15 @@ with open(OUT_CSV, "w", newline="") as f:
     w.writeheader()
     w.writerows(results)
 
+# ── KML export (Google Earth overlay of this run's own smoothed output) ───────
+export_realtime_kml(results, query_rows, OUT_KML, VERSION)
+
 # ── Summary ───────────────────────────────────────────────────────────────────
 import statistics
-fixed = [r for r in results if r["error_m"] is not None]
-errors = [r["error_m"] for r in fixed]
+fixed = [r for r in results if r["smoothed_error_m"] is not None]
+errors = [r["smoothed_error_m"] for r in fixed]
+raw_fixed = [r for r in results if r["raw_error_m"] is not None]
+raw_errors = [r["raw_error_m"] for r in raw_fixed]
 all_times = [r["frame_seconds"] for r in results]
 sat_only_times = [r["frame_seconds"] for r in results if not r["vpr_triggered"]]
 vpr_times = [r["frame_seconds"] for r in results if r["vpr_triggered"]]
@@ -330,22 +476,27 @@ print(f"Satellite-first hybrid — {VERSION}  ({len(results)} frames)")
 print(f"{'═'*60}")
 for s, rs in sorted(by_source.items()):
     pct = 100 * len(rs) / len(results)
-    errs = [r["error_m"] for r in rs if r["error_m"] is not None]
+    errs = [r["raw_error_m"] for r in rs if r["raw_error_m"] is not None]
     med = statistics.median(errs) if errs else float("nan")
-    print(f"  {s:<14} {len(rs):3d} frames ({pct:5.1f}%)  median err = {med:.1f} m")
+    print(f"  {s:<14} {len(rs):3d} frames ({pct:5.1f}%)  median raw err = {med:.1f} m")
 
 vpr_trigger_rate = sum(1 for r in results if r["vpr_triggered"]) / len(results)
 print(f"\n  VPR fallback triggered: {100*vpr_trigger_rate:.1f}% of frames")
 
+if raw_errors:
+    print(f"\n  Raw (pre-smoothing) error (frames with a fix, {len(raw_fixed)}/{len(results)}):")
+    print(f"    Median : {statistics.median(raw_errors):.1f} m")
+    print(f"    Mean   : {statistics.mean(raw_errors):.1f} m")
+
 if errors:
-    print(f"\n  Overall error (frames with a fix, {len(fixed)}/{len(results)}):")
+    print(f"\n  Smoothed error (causal gap-fill + causal Gaussian, window={SMOOTH_WINDOW}):")
     print(f"    Median : {statistics.median(errors):.1f} m")
     print(f"    Mean   : {statistics.mean(errors):.1f} m")
     for t in THRESHOLDS:
         n = sum(1 for e in errors if e <= t)
         print(f"    ≤ {t:2d} m : {n:3d}/{len(results)}  ({100*n/len(results):5.1f}%)")
 
-print(f"\n  Timing (per-frame wall clock, strictly sequential):")
+print(f"\n  Timing (per-frame wall clock, strictly sequential, includes gap-fill + smoothing):")
 print(f"    Overall          : mean={statistics.mean(all_times):.3f}s  median={statistics.median(all_times):.3f}s  max={max(all_times):.3f}s")
 if sat_only_times:
     print(f"    Satellite-only   : mean={statistics.mean(sat_only_times):.3f}s  ({len(sat_only_times)} frames)")
@@ -358,6 +509,10 @@ summary = {
     "frames_total": len(results),
     "counts_by_source": {s: len(rs) for s, rs in by_source.items()},
     "vpr_trigger_rate": vpr_trigger_rate,
+    "smooth_half_window": SMOOTH_HALF_WINDOW,
+    "smooth_window": SMOOTH_WINDOW,
+    "raw_error_median_m": statistics.median(raw_errors) if raw_errors else None,
+    "raw_error_mean_m": statistics.mean(raw_errors) if raw_errors else None,
     "error_median_m": statistics.median(errors) if errors else None,
     "error_mean_m": statistics.mean(errors) if errors else None,
     "thresholds": {t: sum(1 for e in errors if e <= t) for t in THRESHOLDS} if errors else {},
@@ -371,5 +526,6 @@ summary = {
 SUMMARY_JSON.write_text(json.dumps(summary, indent=2))
 print(f"\nCSV: {OUT_CSV}")
 print(f"Summary JSON: {SUMMARY_JSON}")
+print(f"KML: {OUT_KML}")
 print(f"{'═'*60}")
 EOF
