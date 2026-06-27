@@ -1,0 +1,1235 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Acceptance match debug — v14</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; background: #111; color: #eee; }
+    a { color: #9bd3ff; }
+    .card { background: #1d1d1d; border: 1px solid #444; border-radius: 10px; padding: 16px; margin: 20px 0; }
+    .match { display: block; max-width: 100%; border: 1px solid #666; margin: 12px 0; }
+    .maps { font-size: 16px; margin: 8px 0 10px; }
+    .reason { color: #ddd; }
+    .bad { color: #ff9d9d; }
+    table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+    th, td { border-bottom: 1px solid #333; padding: 6px 8px; text-align: left; vertical-align: top; }
+    th { width: 260px; color: #bbb; }
+    code { background: #222; padding: 2px 4px; }
+    .note { color: #bbb; }
+  </style>
+</head>
+<body>
+  <h1>Acceptance match debug — v14</h1>
+  <p class="note">
+    This page re-runs LightGlue/SuperPoint matching for selected accepted frames.
+    Green lines are RANSAC inlier matches. SAT frames use query IPM warp vs satellite mosaic.
+    VPR_FALLBACK frames use query frame vs selected reference video frame.
+  </p>
+  <p class="note">
+    Source CSV: <code>outputs\hybrid\satellite_first_v14_refs_v11_v12_v13.csv</code><br>
+    Smoothed CSV: <code>outputs\hybrid\satellite_first_v14_refs_v11_v12_v13_smoothed.csv</code><br>
+    Descriptor cache: <code>outputs\anyloc\dji_mini3_cross_v11_v12_v13_to_v14_1fps_descriptors.npy</code>
+  </p>
+  
+    <section class="card">
+      <h2>#1 frame_count=241 — SAT — error=58.712 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10433141,35.20510882" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10459405,35.20456888" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/001_frame_241_SAT.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>241</td></tr>
+<tr><th>error_m</th><td>58.712</td></tr>
+<tr><th>source</th><td>SAT</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</td></tr>
+<tr><th>sat_status</th><td>ok</td></tr>
+<tr><th>sat_inliers_original</th><td>12</td></tr>
+<tr><th>vpr_triggered</th><td>False</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.0</td></tr>
+<tr><th>debug_type</th><td>SAT</td></tr>
+<tr><th>reference_image</th><td>satellite mosaic</td></tr>
+<tr><th>reference_source</th><td>data/satellite mosaic</td></tr>
+<tr><th>reference_frame</th><td></td></tr>
+<tr><th>reference_path</th><td></td></tr>
+<tr><th>raw_matches_recomputed</th><td>76</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>14</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.184</td></tr>
+<tr><th>drawn_lines</th><td>14</td></tr>
+<tr><th>start_seconds</th><td>8.007</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000009.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>118.4</td></tr>
+<tr><th>heading_deg</th><td>114.08449221295365</td></tr>
+<tr><th>gt_lat</th><td>32.10433141</td></tr>
+<tr><th>gt_lon</th><td>35.20510882</td></tr>
+<tr><th>smoothed_lat</th><td>32.10459405</td></tr>
+<tr><th>smoothed_lon</th><td>35.20456888</td></tr>
+<tr><th>raw_final_lat</th><td>32.104942</td></tr>
+<tr><th>raw_final_lon</th><td>35.20398</td></tr>
+<tr><th>recomputed_lat</th><td>32.10439</td></tr>
+<tr><th>recomputed_lon</th><td>35.204132</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#2 frame_count=2309 — VPR_FALLBACK — error=55.782 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10297634,35.20987132" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10247536,35.20988347" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/002_frame_2309_VPR_FALLBACK.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>2309</td></tr>
+<tr><th>error_m</th><td>55.782</td></tr>
+<tr><th>source</th><td>VPR_FALLBACK</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</td></tr>
+<tr><th>sat_status</th><td>ransac_fail</td></tr>
+<tr><th>sat_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_triggered</th><td>True</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>149</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.892</td></tr>
+<tr><th>debug_type</th><td>VPR_FALLBACK</td></tr>
+<tr><th>reference_image</th><td>reference video frame</td></tr>
+<tr><th>reference_source</th><td>v12</td></tr>
+<tr><th>reference_frame</th><td>4227</td></tr>
+<tr><th>reference_path</th><td>data\processed\frames_v12_1fps\frame_000142.jpg</td></tr>
+<tr><th>raw_matches_recomputed</th><td>167</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>149</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.892</td></tr>
+<tr><th>drawn_lines</th><td>90</td></tr>
+<tr><th>start_seconds</th><td>77.002</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000078.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>75.2</td></tr>
+<tr><th>heading_deg</th><td>32.93374685988806</td></tr>
+<tr><th>gt_lat</th><td>32.10297634</td></tr>
+<tr><th>gt_lon</th><td>35.20987132</td></tr>
+<tr><th>smoothed_lat</th><td>32.10247536</td></tr>
+<tr><th>smoothed_lon</th><td>35.20988347</td></tr>
+<tr><th>raw_final_lat</th><td>32.10247237658621</td></tr>
+<tr><th>raw_final_lon</th><td>35.20988177730126</td></tr>
+<tr><th>recomputed_lat</th><td>32.10247237658621</td></tr>
+<tr><th>recomputed_lon</th><td>35.20988177730126</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#3 frame_count=271 — SAT — error=51.796 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10429408,35.2052117" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10446242,35.20469963" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/003_frame_271_SAT.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>271</td></tr>
+<tr><th>error_m</th><td>51.796</td></tr>
+<tr><th>source</th><td>SAT</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</td></tr>
+<tr><th>sat_status</th><td>ok</td></tr>
+<tr><th>sat_inliers_original</th><td>15</td></tr>
+<tr><th>vpr_triggered</th><td>False</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.0</td></tr>
+<tr><th>debug_type</th><td>SAT</td></tr>
+<tr><th>reference_image</th><td>satellite mosaic</td></tr>
+<tr><th>reference_source</th><td>data/satellite mosaic</td></tr>
+<tr><th>reference_frame</th><td></td></tr>
+<tr><th>reference_path</th><td></td></tr>
+<tr><th>raw_matches_recomputed</th><td>75</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>17</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.227</td></tr>
+<tr><th>drawn_lines</th><td>17</td></tr>
+<tr><th>start_seconds</th><td>9.008</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000010.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>118.4</td></tr>
+<tr><th>heading_deg</th><td>113.91339003096874</td></tr>
+<tr><th>gt_lat</th><td>32.10429408</td></tr>
+<tr><th>gt_lon</th><td>35.2052117</td></tr>
+<tr><th>smoothed_lat</th><td>32.10446242</td></tr>
+<tr><th>smoothed_lon</th><td>35.20469963</td></tr>
+<tr><th>raw_final_lat</th><td>32.10419</td></tr>
+<tr><th>raw_final_lon</th><td>35.205067</td></tr>
+<tr><th>recomputed_lat</th><td>32.104145</td></tr>
+<tr><th>recomputed_lon</th><td>35.205223</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#4 frame_count=2339 — VPR_FALLBACK — error=46.169 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10298259,35.20984947" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10257021,35.20990174" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/004_frame_2339_VPR_FALLBACK.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>2339</td></tr>
+<tr><th>error_m</th><td>46.169</td></tr>
+<tr><th>source</th><td>VPR_FALLBACK</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</td></tr>
+<tr><th>sat_status</th><td>ransac_fail</td></tr>
+<tr><th>sat_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_triggered</th><td>True</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>132</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.971</td></tr>
+<tr><th>debug_type</th><td>VPR_FALLBACK</td></tr>
+<tr><th>reference_image</th><td>reference video frame</td></tr>
+<tr><th>reference_source</th><td>v13</td></tr>
+<tr><th>reference_frame</th><td>19693</td></tr>
+<tr><th>reference_path</th><td>data\processed\frames_v13_1fps\frame_000658.jpg</td></tr>
+<tr><th>raw_matches_recomputed</th><td>136</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>132</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.971</td></tr>
+<tr><th>drawn_lines</th><td>90</td></tr>
+<tr><th>start_seconds</th><td>78.003</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000079.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>72.2</td></tr>
+<tr><th>heading_deg</th><td>30.21504547636141</td></tr>
+<tr><th>gt_lat</th><td>32.10298259</td></tr>
+<tr><th>gt_lon</th><td>35.20984947</td></tr>
+<tr><th>smoothed_lat</th><td>32.10257021</td></tr>
+<tr><th>smoothed_lon</th><td>35.20990174</td></tr>
+<tr><th>raw_final_lat</th><td>32.10266727486189</td></tr>
+<tr><th>raw_final_lon</th><td>35.209921727589595</td></tr>
+<tr><th>recomputed_lat</th><td>32.10266727486189</td></tr>
+<tr><th>recomputed_lon</th><td>35.209921727589595</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#5 frame_count=2639 — VPR_FALLBACK — error=38.711 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10248231,35.20978924" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10279277,35.20960431" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/005_frame_2639_VPR_FALLBACK.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>2639</td></tr>
+<tr><th>error_m</th><td>38.711</td></tr>
+<tr><th>source</th><td>VPR_FALLBACK</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</td></tr>
+<tr><th>sat_status</th><td>ransac_fail</td></tr>
+<tr><th>sat_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_triggered</th><td>True</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>159</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.859</td></tr>
+<tr><th>debug_type</th><td>VPR_FALLBACK</td></tr>
+<tr><th>reference_image</th><td>reference video frame</td></tr>
+<tr><th>reference_source</th><td>v11</td></tr>
+<tr><th>reference_frame</th><td>1230</td></tr>
+<tr><th>reference_path</th><td>data\processed\frames_v11_1fps\frame_000042.jpg</td></tr>
+<tr><th>raw_matches_recomputed</th><td>185</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>159</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.859</td></tr>
+<tr><th>drawn_lines</th><td>90</td></tr>
+<tr><th>start_seconds</th><td>88.012</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000089.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>42.2</td></tr>
+<tr><th>heading_deg</th><td>141.66991738979425</td></tr>
+<tr><th>gt_lat</th><td>32.10248231</td></tr>
+<tr><th>gt_lon</th><td>35.20978924</td></tr>
+<tr><th>smoothed_lat</th><td>32.10279277</td></tr>
+<tr><th>smoothed_lon</th><td>35.20960431</td></tr>
+<tr><th>raw_final_lat</th><td>32.10279268990399</td></tr>
+<tr><th>raw_final_lon</th><td>35.20960434281518</td></tr>
+<tr><th>recomputed_lat</th><td>32.10279268990399</td></tr>
+<tr><th>recomputed_lon</th><td>35.20960434281518</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#6 frame_count=2669 — VPR_FALLBACK — error=36.772 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10248058,35.20978437" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10277544,35.20960858" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/006_frame_2669_VPR_FALLBACK.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>2669</td></tr>
+<tr><th>error_m</th><td>36.772</td></tr>
+<tr><th>source</th><td>VPR_FALLBACK</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</td></tr>
+<tr><th>sat_status</th><td>ransac_fail</td></tr>
+<tr><th>sat_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_triggered</th><td>True</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>139</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.813</td></tr>
+<tr><th>debug_type</th><td>VPR_FALLBACK</td></tr>
+<tr><th>reference_image</th><td>reference video frame</td></tr>
+<tr><th>reference_source</th><td>v11</td></tr>
+<tr><th>reference_frame</th><td>1170</td></tr>
+<tr><th>reference_path</th><td>data\processed\frames_v11_1fps\frame_000040.jpg</td></tr>
+<tr><th>raw_matches_recomputed</th><td>171</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>139</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.813</td></tr>
+<tr><th>drawn_lines</th><td>90</td></tr>
+<tr><th>start_seconds</th><td>89.013</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000090.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>39.2</td></tr>
+<tr><th>heading_deg</th><td>143.02181011240623</td></tr>
+<tr><th>gt_lat</th><td>32.10248058</td></tr>
+<tr><th>gt_lon</th><td>35.20978437</td></tr>
+<tr><th>smoothed_lat</th><td>32.10277544</td></tr>
+<tr><th>smoothed_lon</th><td>35.20960858</td></tr>
+<tr><th>raw_final_lat</th><td>32.10275813379867</td></tr>
+<tr><th>raw_final_lon</th><td>35.20961283685613</td></tr>
+<tr><th>recomputed_lat</th><td>32.10275813379867</td></tr>
+<tr><th>recomputed_lon</th><td>35.20961283685613</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#7 frame_count=2699 — VPR_FALLBACK — error=33.946 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10248015,35.20976968" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10275463,35.20961285" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/007_frame_2699_VPR_FALLBACK.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>2699</td></tr>
+<tr><th>error_m</th><td>33.946</td></tr>
+<tr><th>source</th><td>VPR_FALLBACK</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</td></tr>
+<tr><th>sat_status</th><td>ransac_fail</td></tr>
+<tr><th>sat_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_triggered</th><td>True</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>127</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.825</td></tr>
+<tr><th>debug_type</th><td>VPR_FALLBACK</td></tr>
+<tr><th>reference_image</th><td>reference video frame</td></tr>
+<tr><th>reference_source</th><td>v11</td></tr>
+<tr><th>reference_frame</th><td>1140</td></tr>
+<tr><th>reference_path</th><td>data\processed\frames_v11_1fps\frame_000039.jpg</td></tr>
+<tr><th>raw_matches_recomputed</th><td>154</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>127</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.825</td></tr>
+<tr><th>drawn_lines</th><td>90</td></tr>
+<tr><th>start_seconds</th><td>90.014</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000091.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>36.3</td></tr>
+<tr><th>heading_deg</th><td>145.87601168436908</td></tr>
+<tr><th>gt_lat</th><td>32.10248015</td></tr>
+<tr><th>gt_lon</th><td>35.20976968</td></tr>
+<tr><th>smoothed_lat</th><td>32.10275463</td></tr>
+<tr><th>smoothed_lon</th><td>35.20961285</td></tr>
+<tr><th>raw_final_lat</th><td>32.10274084834777</td></tr>
+<tr><th>raw_final_lon</th><td>35.20961539230925</td></tr>
+<tr><th>recomputed_lat</th><td>32.10274084834777</td></tr>
+<tr><th>recomputed_lon</th><td>35.20961539230925</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#8 frame_count=2729 — VPR_FALLBACK — error=30.763 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10248903,35.20976238" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10273586,35.20961568" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/008_frame_2729_VPR_FALLBACK.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>2729</td></tr>
+<tr><th>error_m</th><td>30.763</td></tr>
+<tr><th>source</th><td>VPR_FALLBACK</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</td></tr>
+<tr><th>sat_status</th><td>ransac_fail</td></tr>
+<tr><th>sat_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_triggered</th><td>True</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>129</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.782</td></tr>
+<tr><th>debug_type</th><td>VPR_FALLBACK</td></tr>
+<tr><th>reference_image</th><td>reference video frame</td></tr>
+<tr><th>reference_source</th><td>v11</td></tr>
+<tr><th>reference_frame</th><td>1110</td></tr>
+<tr><th>reference_path</th><td>data\processed\frames_v11_1fps\frame_000038.jpg</td></tr>
+<tr><th>raw_matches_recomputed</th><td>165</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>129</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.782</td></tr>
+<tr><th>drawn_lines</th><td>90</td></tr>
+<tr><th>start_seconds</th><td>91.015</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000092.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>33.3</td></tr>
+<tr><th>heading_deg</th><td>145.87601168436908</td></tr>
+<tr><th>gt_lat</th><td>32.10248903</td></tr>
+<tr><th>gt_lon</th><td>35.20976238</td></tr>
+<tr><th>smoothed_lat</th><td>32.10273586</td></tr>
+<tr><th>smoothed_lon</th><td>35.20961568</td></tr>
+<tr><th>raw_final_lat</th><td>32.10272407029511</td></tr>
+<tr><th>raw_final_lon</th><td>35.20961713932973</td></tr>
+<tr><th>recomputed_lat</th><td>32.10272407029511</td></tr>
+<tr><th>recomputed_lon</th><td>35.20961713932973</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#9 frame_count=2759 — VPR_FALLBACK — error=26.528 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10250191,35.20975007" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10271279,35.20961905" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/009_frame_2759_VPR_FALLBACK.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>2759</td></tr>
+<tr><th>error_m</th><td>26.528</td></tr>
+<tr><th>source</th><td>VPR_FALLBACK</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</td></tr>
+<tr><th>sat_status</th><td>few_matches</td></tr>
+<tr><th>sat_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_triggered</th><td>True</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>134</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.812</td></tr>
+<tr><th>debug_type</th><td>VPR_FALLBACK</td></tr>
+<tr><th>reference_image</th><td>reference video frame</td></tr>
+<tr><th>reference_source</th><td>v11</td></tr>
+<tr><th>reference_frame</th><td>1050</td></tr>
+<tr><th>reference_path</th><td>data\processed\frames_v11_1fps\frame_000036.jpg</td></tr>
+<tr><th>raw_matches_recomputed</th><td>165</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>134</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.812</td></tr>
+<tr><th>drawn_lines</th><td>90</td></tr>
+<tr><th>start_seconds</th><td>92.015</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000093.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>30.3</td></tr>
+<tr><th>heading_deg</th><td>145.87601168436908</td></tr>
+<tr><th>gt_lat</th><td>32.10250191</td></tr>
+<tr><th>gt_lon</th><td>35.20975007</td></tr>
+<tr><th>smoothed_lat</th><td>32.10271279</td></tr>
+<tr><th>smoothed_lon</th><td>35.20961905</td></tr>
+<tr><th>raw_final_lat</th><td>32.1026955141898</td></tr>
+<tr><th>raw_final_lon</th><td>35.20962163337068</td></tr>
+<tr><th>recomputed_lat</th><td>32.1026955141898</td></tr>
+<tr><th>recomputed_lon</th><td>35.20962163337068</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#10 frame_count=2369 — SAT — error=26.453 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10296714,35.20983922" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10272961,35.20984755" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/010_frame_2369_SAT.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>2369</td></tr>
+<tr><th>error_m</th><td>26.453</td></tr>
+<tr><th>source</th><td>SAT</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</td></tr>
+<tr><th>sat_status</th><td>ok</td></tr>
+<tr><th>sat_inliers_original</th><td>11</td></tr>
+<tr><th>vpr_triggered</th><td>False</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.0</td></tr>
+<tr><th>debug_type</th><td>SAT</td></tr>
+<tr><th>reference_image</th><td>satellite mosaic</td></tr>
+<tr><th>reference_source</th><td>data/satellite mosaic</td></tr>
+<tr><th>reference_frame</th><td></td></tr>
+<tr><th>reference_path</th><td></td></tr>
+<tr><th>raw_matches_recomputed</th><td>58</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>12</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.207</td></tr>
+<tr><th>drawn_lines</th><td>12</td></tr>
+<tr><th>start_seconds</th><td>79.004</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000080.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>69.2</td></tr>
+<tr><th>heading_deg</th><td>30.21504547636141</td></tr>
+<tr><th>gt_lat</th><td>32.10296714</td></tr>
+<tr><th>gt_lon</th><td>35.20983922</td></tr>
+<tr><th>smoothed_lat</th><td>32.10272961</td></tr>
+<tr><th>smoothed_lon</th><td>35.20984755</td></tr>
+<tr><th>raw_final_lat</th><td>32.10285</td></tr>
+<tr><th>raw_final_lon</th><td>35.209785</td></tr>
+<tr><th>recomputed_lat</th><td>32.102905</td></tr>
+<tr><th>recomputed_lon</th><td>35.209755</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#11 frame_count=301 — SAT — error=23.957 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10425441,35.20531382" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10429261,35.2050638" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/011_frame_301_SAT.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>301</td></tr>
+<tr><th>error_m</th><td>23.957</td></tr>
+<tr><th>source</th><td>SAT</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</td></tr>
+<tr><th>sat_status</th><td>ok</td></tr>
+<tr><th>sat_inliers_original</th><td>15</td></tr>
+<tr><th>vpr_triggered</th><td>False</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.0</td></tr>
+<tr><th>debug_type</th><td>SAT</td></tr>
+<tr><th>reference_image</th><td>satellite mosaic</td></tr>
+<tr><th>reference_source</th><td>data/satellite mosaic</td></tr>
+<tr><th>reference_frame</th><td></td></tr>
+<tr><th>reference_path</th><td></td></tr>
+<tr><th>raw_matches_recomputed</th><td>74</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>20</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.27</td></tr>
+<tr><th>drawn_lines</th><td>20</td></tr>
+<tr><th>start_seconds</th><td>10.008</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000011.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>118.4</td></tr>
+<tr><th>heading_deg</th><td>114.0844922136128</td></tr>
+<tr><th>gt_lat</th><td>32.10425441</td></tr>
+<tr><th>gt_lon</th><td>35.20531382</td></tr>
+<tr><th>smoothed_lat</th><td>32.10429261</td></tr>
+<tr><th>smoothed_lon</th><td>35.20506380</td></tr>
+<tr><th>raw_final_lat</th><td>32.104206</td></tr>
+<tr><th>raw_final_lon</th><td>35.205326</td></tr>
+<tr><th>recomputed_lat</th><td>32.104103</td></tr>
+<tr><th>recomputed_lon</th><td>35.20548</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#12 frame_count=2789 — VPR_FALLBACK — error=23.508 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10250979,35.20972877" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10270018,35.20962092" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/012_frame_2789_VPR_FALLBACK.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>2789</td></tr>
+<tr><th>error_m</th><td>23.508</td></tr>
+<tr><th>source</th><td>VPR_FALLBACK</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</td></tr>
+<tr><th>sat_status</th><td>ransac_fail</td></tr>
+<tr><th>sat_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_triggered</th><td>True</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>151</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.899</td></tr>
+<tr><th>debug_type</th><td>VPR_FALLBACK</td></tr>
+<tr><th>reference_image</th><td>reference video frame</td></tr>
+<tr><th>reference_source</th><td>v11</td></tr>
+<tr><th>reference_frame</th><td>1050</td></tr>
+<tr><th>reference_path</th><td>data\processed\frames_v11_1fps\frame_000036.jpg</td></tr>
+<tr><th>raw_matches_recomputed</th><td>168</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>151</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.899</td></tr>
+<tr><th>drawn_lines</th><td>90</td></tr>
+<tr><th>start_seconds</th><td>93.016</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000094.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>27.3</td></tr>
+<tr><th>heading_deg</th><td>145.87601168436908</td></tr>
+<tr><th>gt_lat</th><td>32.10250979</td></tr>
+<tr><th>gt_lon</th><td>35.20972877</td></tr>
+<tr><th>smoothed_lat</th><td>32.10270018</td></tr>
+<tr><th>smoothed_lon</th><td>35.20962092</td></tr>
+<tr><th>raw_final_lat</th><td>32.1026955141898</td></tr>
+<tr><th>raw_final_lon</th><td>35.20962163337068</td></tr>
+<tr><th>recomputed_lat</th><td>32.1026955141898</td></tr>
+<tr><th>recomputed_lon</th><td>35.20962163337068</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#13 frame_count=2459 — VPR_FALLBACK — error=22.724 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10292636,35.20981318" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.1028664,35.20958283" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/013_frame_2459_VPR_FALLBACK.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>2459</td></tr>
+<tr><th>error_m</th><td>22.724</td></tr>
+<tr><th>source</th><td>VPR_FALLBACK</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</td></tr>
+<tr><th>sat_status</th><td>ransac_fail</td></tr>
+<tr><th>sat_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_triggered</th><td>True</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>210</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.905</td></tr>
+<tr><th>debug_type</th><td>VPR_FALLBACK</td></tr>
+<tr><th>reference_image</th><td>reference video frame</td></tr>
+<tr><th>reference_source</th><td>v11</td></tr>
+<tr><th>reference_frame</th><td>1410</td></tr>
+<tr><th>reference_path</th><td>data\processed\frames_v11_1fps\frame_000048.jpg</td></tr>
+<tr><th>raw_matches_recomputed</th><td>232</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>210</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.905</td></tr>
+<tr><th>drawn_lines</th><td>90</td></tr>
+<tr><th>start_seconds</th><td>82.006</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000083.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>60.1</td></tr>
+<tr><th>heading_deg</th><td>30.21504547636141</td></tr>
+<tr><th>gt_lat</th><td>32.10292636</td></tr>
+<tr><th>gt_lon</th><td>35.20981318</td></tr>
+<tr><th>smoothed_lat</th><td>32.10286640</td></tr>
+<tr><th>smoothed_lon</th><td>35.20958283</td></tr>
+<tr><th>raw_final_lat</th><td>32.10288534342346</td></tr>
+<tr><th>raw_final_lon</th><td>35.20957247755763</td></tr>
+<tr><th>recomputed_lat</th><td>32.10288534342346</td></tr>
+<tr><th>recomputed_lon</th><td>35.20957247755763</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#14 frame_count=2429 — VPR_FALLBACK — error=22.012 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10293925,35.20982273" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10285025,35.20961429" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/014_frame_2429_VPR_FALLBACK.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>2429</td></tr>
+<tr><th>error_m</th><td>22.012</td></tr>
+<tr><th>source</th><td>VPR_FALLBACK</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</td></tr>
+<tr><th>sat_status</th><td>ransac_fail</td></tr>
+<tr><th>sat_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_triggered</th><td>True</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>173</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.828</td></tr>
+<tr><th>debug_type</th><td>VPR_FALLBACK</td></tr>
+<tr><th>reference_image</th><td>reference video frame</td></tr>
+<tr><th>reference_source</th><td>v11</td></tr>
+<tr><th>reference_frame</th><td>1320</td></tr>
+<tr><th>reference_path</th><td>data\processed\frames_v11_1fps\frame_000045.jpg</td></tr>
+<tr><th>raw_matches_recomputed</th><td>209</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>173</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.828</td></tr>
+<tr><th>drawn_lines</th><td>90</td></tr>
+<tr><th>start_seconds</th><td>81.006</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000082.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>63.2</td></tr>
+<tr><th>heading_deg</th><td>30.21504547636141</td></tr>
+<tr><th>gt_lat</th><td>32.10293925</td></tr>
+<tr><th>gt_lon</th><td>35.20982273</td></tr>
+<tr><th>smoothed_lat</th><td>32.10285025</td></tr>
+<tr><th>smoothed_lon</th><td>35.20961429</td></tr>
+<tr><th>raw_final_lat</th><td>32.10283500926548</td></tr>
+<tr><th>raw_final_lon</th><td>35.20958671861906</td></tr>
+<tr><th>recomputed_lat</th><td>32.10283500926548</td></tr>
+<tr><th>recomputed_lon</th><td>35.20958671861906</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#15 frame_count=2489 — VPR_FALLBACK — error=21.909 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10291336,35.20980325" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10285389,35.20958177" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/015_frame_2489_VPR_FALLBACK.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>2489</td></tr>
+<tr><th>error_m</th><td>21.909</td></tr>
+<tr><th>source</th><td>VPR_FALLBACK</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</td></tr>
+<tr><th>sat_status</th><td>ransac_fail</td></tr>
+<tr><th>sat_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_triggered</th><td>True</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>176</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.826</td></tr>
+<tr><th>debug_type</th><td>VPR_FALLBACK</td></tr>
+<tr><th>reference_image</th><td>reference video frame</td></tr>
+<tr><th>reference_source</th><td>v11</td></tr>
+<tr><th>reference_frame</th><td>1320</td></tr>
+<tr><th>reference_path</th><td>data\processed\frames_v11_1fps\frame_000045.jpg</td></tr>
+<tr><th>raw_matches_recomputed</th><td>213</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>176</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.826</td></tr>
+<tr><th>drawn_lines</th><td>90</td></tr>
+<tr><th>start_seconds</th><td>83.007</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000084.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>57.2</td></tr>
+<tr><th>heading_deg</th><td>30.21504547636141</td></tr>
+<tr><th>gt_lat</th><td>32.10291336</td></tr>
+<tr><th>gt_lon</th><td>35.20980325</td></tr>
+<tr><th>smoothed_lat</th><td>32.10285389</td></tr>
+<tr><th>smoothed_lon</th><td>35.20958177</td></tr>
+<tr><th>raw_final_lat</th><td>32.10283500926548</td></tr>
+<tr><th>raw_final_lon</th><td>35.20958671861906</td></tr>
+<tr><th>recomputed_lat</th><td>32.10283500926548</td></tr>
+<tr><th>recomputed_lon</th><td>35.20958671861906</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#16 frame_count=31 — SAT — error=20.981 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10457277,35.20445435" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.1044207,35.2045858" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/016_frame_31_SAT.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>31</td></tr>
+<tr><th>error_m</th><td>20.981</td></tr>
+<tr><th>source</th><td>SAT</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</td></tr>
+<tr><th>sat_status</th><td>ok</td></tr>
+<tr><th>sat_inliers_original</th><td>13</td></tr>
+<tr><th>vpr_triggered</th><td>False</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.0</td></tr>
+<tr><th>debug_type</th><td>SAT</td></tr>
+<tr><th>reference_image</th><td>satellite mosaic</td></tr>
+<tr><th>reference_source</th><td>data/satellite mosaic</td></tr>
+<tr><th>reference_frame</th><td></td></tr>
+<tr><th>reference_path</th><td></td></tr>
+<tr><th>raw_matches_recomputed</th><td>60</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>8</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.133</td></tr>
+<tr><th>drawn_lines</th><td>8</td></tr>
+<tr><th>start_seconds</th><td>1.0</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000002.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>118.4</td></tr>
+<tr><th>heading_deg</th><td>114.55942409784149</td></tr>
+<tr><th>gt_lat</th><td>32.10457277</td></tr>
+<tr><th>gt_lon</th><td>35.20445435</td></tr>
+<tr><th>smoothed_lat</th><td>32.10442070</td></tr>
+<tr><th>smoothed_lon</th><td>35.20458580</td></tr>
+<tr><th>raw_final_lat</th><td>32.1044</td></tr>
+<tr><th>raw_final_lon</th><td>35.20458</td></tr>
+<tr><th>recomputed_lat</th><td>32.10445</td></tr>
+<tr><th>recomputed_lon</th><td>35.2046</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#17 frame_count=2519 — VPR_FALLBACK — error=20.765 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10289991,35.209794" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10284137,35.20958492" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/017_frame_2519_VPR_FALLBACK.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>2519</td></tr>
+<tr><th>error_m</th><td>20.765</td></tr>
+<tr><th>source</th><td>VPR_FALLBACK</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</td></tr>
+<tr><th>sat_status</th><td>ransac_fail</td></tr>
+<tr><th>sat_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_triggered</th><td>True</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>200</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.881</td></tr>
+<tr><th>debug_type</th><td>VPR_FALLBACK</td></tr>
+<tr><th>reference_image</th><td>reference video frame</td></tr>
+<tr><th>reference_source</th><td>v11</td></tr>
+<tr><th>reference_frame</th><td>1320</td></tr>
+<tr><th>reference_path</th><td>data\processed\frames_v11_1fps\frame_000045.jpg</td></tr>
+<tr><th>raw_matches_recomputed</th><td>227</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>200</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.881</td></tr>
+<tr><th>drawn_lines</th><td>90</td></tr>
+<tr><th>start_seconds</th><td>84.008</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000085.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>54.2</td></tr>
+<tr><th>heading_deg</th><td>30.21504547636141</td></tr>
+<tr><th>gt_lat</th><td>32.10289991</td></tr>
+<tr><th>gt_lon</th><td>35.209794</td></tr>
+<tr><th>smoothed_lat</th><td>32.10284137</td></tr>
+<tr><th>smoothed_lon</th><td>35.20958492</td></tr>
+<tr><th>raw_final_lat</th><td>32.10283500926548</td></tr>
+<tr><th>raw_final_lon</th><td>35.20958671861906</td></tr>
+<tr><th>recomputed_lat</th><td>32.10283500926548</td></tr>
+<tr><th>recomputed_lon</th><td>35.20958671861906</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#18 frame_count=1 — SAT — error=19.666 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10455678,35.20442785" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10445,35.204594" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/018_frame_1_SAT.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>1</td></tr>
+<tr><th>error_m</th><td>19.666</td></tr>
+<tr><th>source</th><td>SAT</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</td></tr>
+<tr><th>sat_status</th><td>ok</td></tr>
+<tr><th>sat_inliers_original</th><td>13</td></tr>
+<tr><th>vpr_triggered</th><td>False</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.0</td></tr>
+<tr><th>debug_type</th><td>SAT</td></tr>
+<tr><th>reference_image</th><td>satellite mosaic</td></tr>
+<tr><th>reference_source</th><td>data/satellite mosaic</td></tr>
+<tr><th>reference_frame</th><td></td></tr>
+<tr><th>reference_path</th><td></td></tr>
+<tr><th>raw_matches_recomputed</th><td>55</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>10</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.182</td></tr>
+<tr><th>drawn_lines</th><td>10</td></tr>
+<tr><th>start_seconds</th><td>0.0</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000001.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>118.4</td></tr>
+<tr><th>heading_deg</th><td>116.83674052193447</td></tr>
+<tr><th>gt_lat</th><td>32.10455678</td></tr>
+<tr><th>gt_lon</th><td>35.20442785</td></tr>
+<tr><th>smoothed_lat</th><td>32.10445000</td></tr>
+<tr><th>smoothed_lon</th><td>35.20459400</td></tr>
+<tr><th>raw_final_lat</th><td>32.10445</td></tr>
+<tr><th>raw_final_lon</th><td>35.204594</td></tr>
+<tr><th>recomputed_lat</th><td>32.104504</td></tr>
+<tr><th>recomputed_lon</th><td>35.20465</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#19 frame_count=61 — SAT — error=19.661 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10455933,35.20450478" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10442171,35.20463547" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/019_frame_61_SAT.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>61</td></tr>
+<tr><th>error_m</th><td>19.661</td></tr>
+<tr><th>source</th><td>SAT</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</td></tr>
+<tr><th>sat_status</th><td>ok</td></tr>
+<tr><th>sat_inliers_original</th><td>10</td></tr>
+<tr><th>vpr_triggered</th><td>False</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.0</td></tr>
+<tr><th>debug_type</th><td>SAT</td></tr>
+<tr><th>reference_image</th><td>satellite mosaic</td></tr>
+<tr><th>reference_source</th><td>data/satellite mosaic</td></tr>
+<tr><th>reference_frame</th><td></td></tr>
+<tr><th>reference_path</th><td></td></tr>
+<tr><th>raw_matches_recomputed</th><td>44</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>7</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.159</td></tr>
+<tr><th>drawn_lines</th><td>7</td></tr>
+<tr><th>start_seconds</th><td>2.001</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000003.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>118.4</td></tr>
+<tr><th>heading_deg</th><td>114.09278459249117</td></tr>
+<tr><th>gt_lat</th><td>32.10455933</td></tr>
+<tr><th>gt_lon</th><td>35.20450478</td></tr>
+<tr><th>smoothed_lat</th><td>32.10442171</td></tr>
+<tr><th>smoothed_lon</th><td>35.20463547</td></tr>
+<tr><th>raw_final_lat</th><td>32.10443</td></tr>
+<tr><th>raw_final_lon</th><td>35.204685</td></tr>
+<tr><th>recomputed_lat</th><td>None</td></tr>
+<tr><th>recomputed_lon</th><td>None</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#20 frame_count=2549 — VPR_FALLBACK — error=19.566 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10288647,35.20978476" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10281499,35.2095952" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/020_frame_2549_VPR_FALLBACK.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>2549</td></tr>
+<tr><th>error_m</th><td>19.566</td></tr>
+<tr><th>source</th><td>VPR_FALLBACK</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</td></tr>
+<tr><th>sat_status</th><td>ransac_fail</td></tr>
+<tr><th>sat_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_triggered</th><td>True</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>157</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.831</td></tr>
+<tr><th>debug_type</th><td>VPR_FALLBACK</td></tr>
+<tr><th>reference_image</th><td>reference video frame</td></tr>
+<tr><th>reference_source</th><td>v11</td></tr>
+<tr><th>reference_frame</th><td>1230</td></tr>
+<tr><th>reference_path</th><td>data\processed\frames_v11_1fps\frame_000042.jpg</td></tr>
+<tr><th>raw_matches_recomputed</th><td>189</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>157</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.831</td></tr>
+<tr><th>drawn_lines</th><td>90</td></tr>
+<tr><th>start_seconds</th><td>85.009</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000086.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>51.2</td></tr>
+<tr><th>heading_deg</th><td>30.21504547636141</td></tr>
+<tr><th>gt_lat</th><td>32.10288647</td></tr>
+<tr><th>gt_lon</th><td>35.20978476</td></tr>
+<tr><th>smoothed_lat</th><td>32.10281499</td></tr>
+<tr><th>smoothed_lon</th><td>35.20959520</td></tr>
+<tr><th>raw_final_lat</th><td>32.10279268990399</td></tr>
+<tr><th>raw_final_lon</th><td>35.20960434281518</td></tr>
+<tr><th>recomputed_lat</th><td>32.10279268990399</td></tr>
+<tr><th>recomputed_lon</th><td>35.20960434281518</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#21 frame_count=391 — SAT — error=18.482 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10413842,35.20562488" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.1040136,35.20575411" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/021_frame_391_SAT.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>391</td></tr>
+<tr><th>error_m</th><td>18.482</td></tr>
+<tr><th>source</th><td>SAT</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</td></tr>
+<tr><th>sat_status</th><td>ok</td></tr>
+<tr><th>sat_inliers_original</th><td>19</td></tr>
+<tr><th>vpr_triggered</th><td>False</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.0</td></tr>
+<tr><th>debug_type</th><td>SAT</td></tr>
+<tr><th>reference_image</th><td>satellite mosaic</td></tr>
+<tr><th>reference_source</th><td>data/satellite mosaic</td></tr>
+<tr><th>reference_frame</th><td></td></tr>
+<tr><th>reference_path</th><td></td></tr>
+<tr><th>raw_matches_recomputed</th><td>74</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>25</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.338</td></tr>
+<tr><th>drawn_lines</th><td>25</td></tr>
+<tr><th>start_seconds</th><td>13.011</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000014.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>118.4</td></tr>
+<tr><th>heading_deg</th><td>113.87891414764857</td></tr>
+<tr><th>gt_lat</th><td>32.10413842</td></tr>
+<tr><th>gt_lon</th><td>35.20562488</td></tr>
+<tr><th>smoothed_lat</th><td>32.10401360</td></tr>
+<tr><th>smoothed_lon</th><td>35.20575411</td></tr>
+<tr><th>raw_final_lat</th><td>32.103985</td></tr>
+<tr><th>raw_final_lon</th><td>35.205833</td></tr>
+<tr><th>recomputed_lat</th><td>32.103996</td></tr>
+<tr><th>recomputed_lon</th><td>35.205807</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#22 frame_count=2579 — VPR_FALLBACK — error=18.308 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10287402,35.20977452" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10279906,35.2096017" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/022_frame_2579_VPR_FALLBACK.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>2579</td></tr>
+<tr><th>error_m</th><td>18.308</td></tr>
+<tr><th>source</th><td>VPR_FALLBACK</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</td></tr>
+<tr><th>sat_status</th><td>ransac_fail</td></tr>
+<tr><th>sat_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_triggered</th><td>True</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>178</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.881</td></tr>
+<tr><th>debug_type</th><td>VPR_FALLBACK</td></tr>
+<tr><th>reference_image</th><td>reference video frame</td></tr>
+<tr><th>reference_source</th><td>v11</td></tr>
+<tr><th>reference_frame</th><td>1230</td></tr>
+<tr><th>reference_path</th><td>data\processed\frames_v11_1fps\frame_000042.jpg</td></tr>
+<tr><th>raw_matches_recomputed</th><td>202</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>178</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.881</td></tr>
+<tr><th>drawn_lines</th><td>90</td></tr>
+<tr><th>start_seconds</th><td>86.01</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000087.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>48.2</td></tr>
+<tr><th>heading_deg</th><td>30.21504547636141</td></tr>
+<tr><th>gt_lat</th><td>32.10287402</td></tr>
+<tr><th>gt_lon</th><td>35.20977452</td></tr>
+<tr><th>smoothed_lat</th><td>32.10279906</td></tr>
+<tr><th>smoothed_lon</th><td>35.20960170</td></tr>
+<tr><th>raw_final_lat</th><td>32.10279268990399</td></tr>
+<tr><th>raw_final_lon</th><td>35.20960434281518</td></tr>
+<tr><th>recomputed_lat</th><td>32.10279268990399</td></tr>
+<tr><th>recomputed_lon</th><td>35.20960434281518</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#23 frame_count=2399 — VPR_FALLBACK — error=18.127 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.1029537,35.20983098" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10283589,35.20969826" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/023_frame_2399_VPR_FALLBACK.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>2399</td></tr>
+<tr><th>error_m</th><td>18.127</td></tr>
+<tr><th>source</th><td>VPR_FALLBACK</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</td></tr>
+<tr><th>sat_status</th><td>ransac_fail</td></tr>
+<tr><th>sat_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_triggered</th><td>True</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>234</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.903</td></tr>
+<tr><th>debug_type</th><td>VPR_FALLBACK</td></tr>
+<tr><th>reference_image</th><td>reference video frame</td></tr>
+<tr><th>reference_source</th><td>v11</td></tr>
+<tr><th>reference_frame</th><td>1410</td></tr>
+<tr><th>reference_path</th><td>data\processed\frames_v11_1fps\frame_000048.jpg</td></tr>
+<tr><th>raw_matches_recomputed</th><td>259</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>234</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.903</td></tr>
+<tr><th>drawn_lines</th><td>90</td></tr>
+<tr><th>start_seconds</th><td>80.005</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000081.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>66.2</td></tr>
+<tr><th>heading_deg</th><td>30.21504547636141</td></tr>
+<tr><th>gt_lat</th><td>32.1029537</td></tr>
+<tr><th>gt_lon</th><td>35.20983098</td></tr>
+<tr><th>smoothed_lat</th><td>32.10283589</td></tr>
+<tr><th>smoothed_lon</th><td>35.20969826</td></tr>
+<tr><th>raw_final_lat</th><td>32.10288534342346</td></tr>
+<tr><th>raw_final_lon</th><td>35.20957247755763</td></tr>
+<tr><th>recomputed_lat</th><td>32.10288534342346</td></tr>
+<tr><th>recomputed_lon</th><td>35.20957247755763</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#24 frame_count=421 — SAT — error=18.032 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10410009,35.20572923" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10397444,35.20584992" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/024_frame_421_SAT.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>421</td></tr>
+<tr><th>error_m</th><td>18.032</td></tr>
+<tr><th>source</th><td>SAT</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</td></tr>
+<tr><th>sat_status</th><td>ok</td></tr>
+<tr><th>sat_inliers_original</th><td>24</td></tr>
+<tr><th>vpr_triggered</th><td>False</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.0</td></tr>
+<tr><th>debug_type</th><td>SAT</td></tr>
+<tr><th>reference_image</th><td>satellite mosaic</td></tr>
+<tr><th>reference_source</th><td>data/satellite mosaic</td></tr>
+<tr><th>reference_frame</th><td></td></tr>
+<tr><th>reference_path</th><td></td></tr>
+<tr><th>raw_matches_recomputed</th><td>75</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>22</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.293</td></tr>
+<tr><th>drawn_lines</th><td>22</td></tr>
+<tr><th>start_seconds</th><td>14.012</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000015.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>118.4</td></tr>
+<tr><th>heading_deg</th><td>113.81024242933336</td></tr>
+<tr><th>gt_lat</th><td>32.10410009</td></tr>
+<tr><th>gt_lon</th><td>35.20572923</td></tr>
+<tr><th>smoothed_lat</th><td>32.10397444</td></tr>
+<tr><th>smoothed_lon</th><td>35.20584992</td></tr>
+<tr><th>raw_final_lat</th><td>32.10395</td></tr>
+<tr><th>raw_final_lon</th><td>35.205906</td></tr>
+<tr><th>recomputed_lat</th><td>32.103947</td></tr>
+<tr><th>recomputed_lon</th><td>35.205917</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#25 frame_count=2968 — VPR_FALLBACK — error=17.587 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10252866,35.2097453" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10265517,35.20963358" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/025_frame_2968_VPR_FALLBACK.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>2968</td></tr>
+<tr><th>error_m</th><td>17.587</td></tr>
+<tr><th>source</th><td>VPR_FALLBACK</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</td></tr>
+<tr><th>sat_status</th><td>low_alt</td></tr>
+<tr><th>sat_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_triggered</th><td>True</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>154</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.755</td></tr>
+<tr><th>debug_type</th><td>VPR_FALLBACK</td></tr>
+<tr><th>reference_image</th><td>reference video frame</td></tr>
+<tr><th>reference_source</th><td>v11</td></tr>
+<tr><th>reference_frame</th><td>960</td></tr>
+<tr><th>reference_path</th><td>data\processed\frames_v11_1fps\frame_000033.jpg</td></tr>
+<tr><th>raw_matches_recomputed</th><td>204</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>154</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.755</td></tr>
+<tr><th>drawn_lines</th><td>90</td></tr>
+<tr><th>start_seconds</th><td>98.988</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000100.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>17.6</td></tr>
+<tr><th>heading_deg</th><td>149.12324510817655</td></tr>
+<tr><th>gt_lat</th><td>32.10252866</td></tr>
+<tr><th>gt_lon</th><td>35.2097453</td></tr>
+<tr><th>smoothed_lat</th><td>32.10265517</td></tr>
+<tr><th>smoothed_lon</th><td>35.20963358</td></tr>
+<tr><th>raw_final_lat</th><td>32.10265418003181</td></tr>
+<tr><th>raw_final_lon</th><td>35.20963387443211</td></tr>
+<tr><th>recomputed_lat</th><td>32.10265418003181</td></tr>
+<tr><th>recomputed_lon</th><td>35.20963387443211</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#26 frame_count=2099 — SAT — error=17.464 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10245247,35.21015737" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10246186,35.2099725" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/026_frame_2099_SAT.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>2099</td></tr>
+<tr><th>error_m</th><td>17.464</td></tr>
+<tr><th>source</th><td>SAT</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</td></tr>
+<tr><th>sat_status</th><td>ok</td></tr>
+<tr><th>sat_inliers_original</th><td>8</td></tr>
+<tr><th>vpr_triggered</th><td>False</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.0</td></tr>
+<tr><th>debug_type</th><td>SAT</td></tr>
+<tr><th>reference_image</th><td>satellite mosaic</td></tr>
+<tr><th>reference_source</th><td>data/satellite mosaic</td></tr>
+<tr><th>reference_frame</th><td></td></tr>
+<tr><th>reference_path</th><td></td></tr>
+<tr><th>raw_matches_recomputed</th><td>35</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>7</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.2</td></tr>
+<tr><th>drawn_lines</th><td>7</td></tr>
+<tr><th>start_seconds</th><td>69.996</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000071.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>96.2</td></tr>
+<tr><th>heading_deg</th><td>112.44970612366541</td></tr>
+<tr><th>gt_lat</th><td>32.10245247</td></tr>
+<tr><th>gt_lon</th><td>35.21015737</td></tr>
+<tr><th>smoothed_lat</th><td>32.10246186</td></tr>
+<tr><th>smoothed_lon</th><td>35.20997250</td></tr>
+<tr><th>raw_final_lat</th><td>32.102474</td></tr>
+<tr><th>raw_final_lon</th><td>35.209938</td></tr>
+<tr><th>recomputed_lat</th><td>None</td></tr>
+<tr><th>recomputed_lon</th><td>None</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#27 frame_count=91 — SAT — error=17.445 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10452795,35.20458911" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.1044167,35.20471941" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/027_frame_91_SAT.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>91</td></tr>
+<tr><th>error_m</th><td>17.445</td></tr>
+<tr><th>source</th><td>SAT</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</td></tr>
+<tr><th>sat_status</th><td>ok</td></tr>
+<tr><th>sat_inliers_original</th><td>10</td></tr>
+<tr><th>vpr_triggered</th><td>False</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.0</td></tr>
+<tr><th>debug_type</th><td>SAT</td></tr>
+<tr><th>reference_image</th><td>satellite mosaic</td></tr>
+<tr><th>reference_source</th><td>data/satellite mosaic</td></tr>
+<tr><th>reference_frame</th><td></td></tr>
+<tr><th>reference_path</th><td></td></tr>
+<tr><th>raw_matches_recomputed</th><td>60</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>15</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.25</td></tr>
+<tr><th>drawn_lines</th><td>15</td></tr>
+<tr><th>start_seconds</th><td>3.002</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000004.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>118.4</td></tr>
+<tr><th>heading_deg</th><td>114.02915280823976</td></tr>
+<tr><th>gt_lat</th><td>32.10452795</td></tr>
+<tr><th>gt_lon</th><td>35.20458911</td></tr>
+<tr><th>smoothed_lat</th><td>32.10441670</td></tr>
+<tr><th>smoothed_lon</th><td>35.20471941</td></tr>
+<tr><th>raw_final_lat</th><td>32.10441</td></tr>
+<tr><th>raw_final_lon</th><td>35.204784</td></tr>
+<tr><th>recomputed_lat</th><td>32.10439</td></tr>
+<tr><th>recomputed_lon</th><td>35.20476</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#28 frame_count=2609 — VPR_FALLBACK — error=16.939 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10286058,35.20976527" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.1027937,35.20960392" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/028_frame_2609_VPR_FALLBACK.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>2609</td></tr>
+<tr><th>error_m</th><td>16.939</td></tr>
+<tr><th>source</th><td>VPR_FALLBACK</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by VPR fallback because satellite matching failed, then the retrieved reference frame passed the VPR inlier/ratio gate.</td></tr>
+<tr><th>sat_status</th><td>ransac_fail</td></tr>
+<tr><th>sat_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_triggered</th><td>True</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>170</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.885</td></tr>
+<tr><th>debug_type</th><td>VPR_FALLBACK</td></tr>
+<tr><th>reference_image</th><td>reference video frame</td></tr>
+<tr><th>reference_source</th><td>v11</td></tr>
+<tr><th>reference_frame</th><td>1230</td></tr>
+<tr><th>reference_path</th><td>data\processed\frames_v11_1fps\frame_000042.jpg</td></tr>
+<tr><th>raw_matches_recomputed</th><td>192</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>170</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.885</td></tr>
+<tr><th>drawn_lines</th><td>90</td></tr>
+<tr><th>start_seconds</th><td>87.011</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000088.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>45.2</td></tr>
+<tr><th>heading_deg</th><td>30.21504547636141</td></tr>
+<tr><th>gt_lat</th><td>32.10286058</td></tr>
+<tr><th>gt_lon</th><td>35.20976527</td></tr>
+<tr><th>smoothed_lat</th><td>32.10279370</td></tr>
+<tr><th>smoothed_lon</th><td>35.20960392</td></tr>
+<tr><th>raw_final_lat</th><td>32.10279268990399</td></tr>
+<tr><th>raw_final_lon</th><td>35.20960434281518</td></tr>
+<tr><th>recomputed_lat</th><td>32.10279268990399</td></tr>
+<tr><th>recomputed_lon</th><td>35.20960434281518</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#29 frame_count=1290 — SAT — error=16.608 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10298406,35.20869517" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10300416,35.20852065" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/029_frame_1290_SAT.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>1290</td></tr>
+<tr><th>error_m</th><td>16.608</td></tr>
+<tr><th>source</th><td>SAT</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</td></tr>
+<tr><th>sat_status</th><td>ok</td></tr>
+<tr><th>sat_inliers_original</th><td>13</td></tr>
+<tr><th>vpr_triggered</th><td>False</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.0</td></tr>
+<tr><th>debug_type</th><td>SAT</td></tr>
+<tr><th>reference_image</th><td>satellite mosaic</td></tr>
+<tr><th>reference_source</th><td>data/satellite mosaic</td></tr>
+<tr><th>reference_frame</th><td></td></tr>
+<tr><th>reference_path</th><td></td></tr>
+<tr><th>raw_matches_recomputed</th><td>68</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>15</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.221</td></tr>
+<tr><th>drawn_lines</th><td>15</td></tr>
+<tr><th>start_seconds</th><td>43.005</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000044.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>118.4</td></tr>
+<tr><th>heading_deg</th><td>114.01738204315416</td></tr>
+<tr><th>gt_lat</th><td>32.10298406</td></tr>
+<tr><th>gt_lon</th><td>35.20869517</td></tr>
+<tr><th>smoothed_lat</th><td>32.10300416</td></tr>
+<tr><th>smoothed_lon</th><td>35.20852065</td></tr>
+<tr><th>raw_final_lat</th><td>32.10298</td></tr>
+<tr><th>raw_final_lon</th><td>35.208557</td></tr>
+<tr><th>recomputed_lat</th><td>32.102966</td></tr>
+<tr><th>recomputed_lon</th><td>35.20859</td></tr></table>
+      </details>
+    </section>
+    
+    <section class="card">
+      <h2>#30 frame_count=1320 — SAT — error=16.515 m</h2>
+      <div class="maps"><a href="https://www.google.com/maps/search/?api=1&query=32.10294878,35.20879859" target="_blank">GT in Google Maps</a> | <a href="https://www.google.com/maps/search/?api=1&query=32.10296641,35.20862469" target="_blank">Estimate in Google Maps</a></div>
+      <p class="reason">Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</p>
+      <img class="match" src="satellite_first_v14_refs_v11_v12_v13_matches/030_frame_1320_SAT.jpg" alt="match debug image">
+      <details open>
+        <summary>Frame metadata and acceptance details</summary>
+        <table><tr><th>frame_count</th><td>1320</td></tr>
+<tr><th>error_m</th><td>16.515</td></tr>
+<tr><th>source</th><td>SAT</td></tr>
+<tr><th>accepted_reason</th><td>Accepted by SAT stage because satellite matching returned sat_status=ok after homography/RANSAC.</td></tr>
+<tr><th>sat_status</th><td>ok</td></tr>
+<tr><th>sat_inliers_original</th><td>14</td></tr>
+<tr><th>vpr_triggered</th><td>False</td></tr>
+<tr><th>vpr_best_inliers_original</th><td>0</td></tr>
+<tr><th>vpr_best_ratio_original</th><td>0.0</td></tr>
+<tr><th>debug_type</th><td>SAT</td></tr>
+<tr><th>reference_image</th><td>satellite mosaic</td></tr>
+<tr><th>reference_source</th><td>data/satellite mosaic</td></tr>
+<tr><th>reference_frame</th><td></td></tr>
+<tr><th>reference_path</th><td></td></tr>
+<tr><th>raw_matches_recomputed</th><td>68</td></tr>
+<tr><th>ransac_inliers_recomputed</th><td>14</td></tr>
+<tr><th>inlier_ratio_recomputed</th><td>0.206</td></tr>
+<tr><th>drawn_lines</th><td>14</td></tr>
+<tr><th>start_seconds</th><td>44.006</td></tr>
+<tr><th>frame_path</th><td>data\processed\frames_v14_1fps\frame_000045.jpg</td></tr>
+<tr><th>rel_alt_m</th><td>118.4</td></tr>
+<tr><th>heading_deg</th><td>113.74014933801254</td></tr>
+<tr><th>gt_lat</th><td>32.10294878</td></tr>
+<tr><th>gt_lon</th><td>35.20879859</td></tr>
+<tr><th>smoothed_lat</th><td>32.10296641</td></tr>
+<tr><th>smoothed_lon</th><td>35.20862469</td></tr>
+<tr><th>raw_final_lat</th><td>32.102936</td></tr>
+<tr><th>raw_final_lon</th><td>35.20871</td></tr>
+<tr><th>recomputed_lat</th><td>32.102936</td></tr>
+<tr><th>recomputed_lon</th><td>35.208706</td></tr></table>
+      </details>
+    </section>
+    
+</body>
+</html>
