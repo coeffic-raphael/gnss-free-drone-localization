@@ -97,7 +97,8 @@ src/
   telemetry_parser.py             DJI SRT → structured telemetry CSV
   project_ground_point.py         geometric camera-centre ground projection
   build_frame_manifest.py         join frames with projected ground coordinates
-  frozen_dino_cross_retrieval.py  DINOv2 descriptor extraction + top-k retrieval
+  anyloc_dino_retrieval.py        DINOv2 model loading + patch descriptor extraction (used live, per-frame, by the real-time pipeline's VPR fallback, and as a library by frozen_dino_cross_retrieval.py below)
+  frozen_dino_cross_retrieval.py  DINOv2 descriptor extraction + top-k retrieval (builds the offline reference-pool descriptor cache)
   temporal_lightglue_rerank.py    LightGlue candidate verification
   motion_viterbi_rerank.py        temporal Viterbi path selection
   confidence_gate_results.py      FIX / NO_FIX confidence evaluation
@@ -111,6 +112,7 @@ src/
   smooth_hybrid_path.py           offline tool only: used to sweep smoothing window sizes during development. Production pipeline does gap-fill + smoothing inline (see scripts/run_satellite_first_hybrid.sh)
   frame_dead_reckoning.py         dropped idea (optical-flow dead reckoning), kept for reference — see docs/final_report.md
   interpolated_navigation.py      dropped idea (linear interpolation across NO_FIX gaps), kept for reference — see docs/final_report.md
+  preliminary_experiment_report.py  generates outputs/figures/preliminary_experiment_v14.svg (GT vs. estimated path figure), called by scripts/run_best_pipeline.sh
 
 scripts/
   setup.sh                       one-command preprocessing for all videos
