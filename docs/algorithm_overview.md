@@ -107,6 +107,8 @@ Before the very first accepted fix, there is nothing causal to centre a satellit
 
 Only attempted once `have_fix == True` and altitude ≥ 20 m.
 
+The "heading" used by the warp below is the one disclosed exception to "no query GNSS": neither drone records gimbal yaw, so heading is estimated from the query flight's own past GPS positions (backward-only window, never a future frame — see `docs/final_report.md` §3 and §"Limitations"). Altitude (`alt`) comes from the barometer, not GPS, so it isn't an exception.
+
 ```
 frame ──► IPM warp (bird's-eye view using altitude + heading)
                 │
@@ -221,9 +223,10 @@ filled = raw fix                  has any fix ever been
 
 ## What never happens (by design)
 
-- The query flight's true GPS is never read inside Stages 0-3 — only `ground_latitude`/`ground_longitude` is read once, after the frame's decision is already final, purely to compute `raw_error_m` / `smoothed_error_m` for the CSV.
+- The query flight's true GPS *position* is never read inside Stages 0-3 — only `ground_latitude`/`ground_longitude` is read once, after the frame's decision is already final, purely to compute `raw_error_m` / `smoothed_error_m` for the CSV.
 - The satellite search is never centred on the true GPS — only on `state_lat`/`state_lon`, this script's own latest causal output.
 - Gap-filling never uses a future frame's fix — only the last *past* filled value.
 - Smoothing never uses a future frame's fix — only the current and past entries in the window.
+- Nothing in Stages 0-3 ever reads a *future* frame's data — including `heading_deg` (Stage 1), which is estimated from a backward-only window over the query's own GPS trajectory.
 
-See `docs/final_report.md` §3.4 for the full discussion of why this separation matters and how an earlier version of the script violated it.
+**One disclosed exception:** `heading_deg`, used by Stage 1's IPM warp, is not from the query flight's true GPS *position* directly, but it is derived from the query flight's own *past* GPS trajectory (no gimbal yaw sensor exists on either drone). It is causal (backward-only, fixed during a code audit that found an earlier centered/look-ahead version), but it is still query GNSS in a narrow sense. See `docs/final_report.md` §3 and "Limitations" for the full discussion, including how an earlier version of the script violated causality more severely (centred the satellite search on the true GPS) and how an earlier heading estimator looked ahead.

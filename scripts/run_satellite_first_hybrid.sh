@@ -201,11 +201,20 @@ def extract_vpr_feats(path: str):
 # Plots the SAME smoothed/causal positions written to OUT_CSV — no extra
 # computation, just a Google Earth view of this run's output. Ground truth is
 # read from the query manifest purely to draw the overlay; it is never fed
-# back into the loop above. Just two lines: the estimated path (blue) and the
-# real path (green) — no points, no per-frame markers.
+# back into the loop above. Two lines (estimated path in blue, real path in
+# green) plus, for visual inspection of the takeoff phase only: a takeoff pin
+# for each route, and a small dot every 5 rows for the first 30 seconds.
 KML_STYLES = [  # KML colours are AABBGGRR (alpha, blue, green, red)
     '    <Style id="gtPath"><LineStyle><color>ff00ff00</color><width>3</width></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>',
     '    <Style id="estPath"><LineStyle><color>ffff0000</color><width>3</width></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>',
+    '    <Style id="gtTakeoff"><IconStyle><color>ff00ff00</color><scale>1.3</scale>'
+    '<Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon></IconStyle></Style>',
+    '    <Style id="estTakeoff"><IconStyle><color>ffff0000</color><scale>1.3</scale>'
+    '<Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon></IconStyle></Style>',
+    '    <Style id="gtEarly"><IconStyle><color>ff00ff00</color><scale>0.6</scale>'
+    '<Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon></IconStyle></Style>',
+    '    <Style id="estEarly"><IconStyle><color>ffff0000</color><scale>0.6</scale>'
+    '<Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon></IconStyle></Style>',
 ]
 
 def kml_line(name, style_id, coords):
@@ -214,19 +223,55 @@ def kml_line(name, style_id, coords):
             f'<LineString><tessellate>1</tessellate><altitudeMode>clampToGround</altitudeMode>'
             f'<coordinates>\n            {joined}\n        </coordinates></LineString></Placemark>')
 
+def kml_point(name, style_id, coord):
+    return (f'    <Placemark><name>{html.escape(name)}</name><styleUrl>#{style_id}</styleUrl>'
+            f'<Point><altitudeMode>clampToGround</altitudeMode>'
+            f'<coordinates>{coord}</coordinates></Point></Placemark>')
+
 def export_realtime_kml(results, query_rows, out_path, version):
     gt_by_frame = {r["frame_count"]: (float(r["ground_latitude"]), float(r["ground_longitude"])) for r in query_rows}
     gt_coords, est_coords = [], []
-    for r in results:
+    # (row_index, lon, lat) for rows in the first 30 seconds — used below to
+    # build the takeoff pin + early-flight dots. Rows are 1 fps, so row index
+    # doubles as elapsed seconds since the start of this run's query video.
+    gt_early, est_early = [], []
+    for idx, r in enumerate(results):
         gt_lat, gt_lon = gt_by_frame[r["frame_count"]]
         gt_coords.append(f"{gt_lon:.8f},{gt_lat:.8f},0")
+        if idx < 30:
+            gt_early.append((idx, gt_lon, gt_lat))
         if r["smoothed_lat"] is not None:
             est_coords.append(f"{r['smoothed_lon']:.8f},{r['smoothed_lat']:.8f},0")
+            if idx < 30:
+                est_early.append((idx, r["smoothed_lon"], r["smoothed_lat"]))
 
     placemarks = [
         kml_line("Real itinerary (ground truth)", "gtPath", gt_coords),
         kml_line("Estimated itinerary (causal, no GNSS)", "estPath", est_coords),
     ]
+
+    # Takeoff pin for each route: ground truth always has one at row 0; the
+    # estimated route's first pin is wherever its first fix actually lands
+    # (it may not be row 0 — the algorithm starts with zero GNSS knowledge
+    # and bootstraps via pure VPR, so the first few seconds can have no fix
+    # at all). Labelled accordingly rather than faking a row-0 estimate.
+    if gt_coords:
+        placemarks.append(kml_point("Takeoff (ground truth)", "gtTakeoff", gt_coords[0]))
+    if est_coords:
+        first_est_idx = next((idx for idx, lon, lat in est_early), None)
+        label = (f"Takeoff — first estimated fix (frame {first_est_idx})"
+                 if first_est_idx is not None and first_est_idx > 0
+                 else "Takeoff (first estimated fix)")
+        placemarks.append(kml_point(label, "estTakeoff", est_coords[0]))
+
+    # One dot every 5 rows (~every 5 s) for the first 30 s, for both routes —
+    # purely to make the takeoff phase legible in Google Earth.
+    for idx, lon, lat in gt_early:
+        if idx % 5 == 0:
+            placemarks.append(kml_point(f"GT +{idx}s", "gtEarly", f"{lon:.8f},{lat:.8f},0"))
+    for idx, lon, lat in est_early:
+        if idx % 5 == 0:
+            placemarks.append(kml_point(f"Est +{idx}s", "estEarly", f"{lon:.8f},{lat:.8f},0"))
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(
@@ -297,7 +342,11 @@ results = []
 for i, row in enumerate(query_rows):
     frame_path = row["frame_path"]
     alt   = float(row["rel_alt_m"])
-    head  = float(row["heading_deg"])
+    # heading_deg is "" for the very first frame(s), before the drone has
+    # moved far enough for the causal (backward-only) trajectory estimator to
+    # produce a heading. Stays None until then — harmless, since satellite
+    # matching (the only consumer) is skipped during bootstrap anyway.
+    head  = float(row["heading_deg"]) if row["heading_deg"] not in ("", None) else None
     gt_lat = float(row["ground_latitude"])
     gt_lon = float(row["ground_longitude"])
 
@@ -306,7 +355,9 @@ for i, row in enumerate(query_rows):
     sat_lat = sat_lon = None
     sat_inliers = 0
 
-    if have_fix and alt >= MIN_ALT_M:
+    if have_fix and alt >= MIN_ALT_M and head is None:
+        sat_status = "no_heading_yet"
+    elif have_fix and alt >= MIN_ALT_M:
         img = cv2.imread(frame_path)
         if img is None:
             sat_status = "no_image"

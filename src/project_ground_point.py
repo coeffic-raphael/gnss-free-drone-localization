@@ -79,7 +79,38 @@ def estimate_headings(
     window: int = 30,
     min_displacement_m: float = 2.0,
 ) -> list[float | None]:
-    """Estimate heading from local trajectory using a centered frame window."""
+    """Estimate heading from local trajectory using a backward-only frame window.
+
+    Causal by construction: at frame `index`, only positions up to and including
+    `index` are used (the bearing from `index - window` to `index`). No frame
+    after `index` is ever read — this is what makes it safe to feed straight
+    into the real-time pipeline's live heading input without a look-ahead leak.
+    """
+    headings: list[float | None] = []
+    for index, _point in enumerate(xy):
+        before = max(0, index - window)
+        after = index
+        dx = xy[after][0] - xy[before][0]
+        dy = xy[after][1] - xy[before][1]
+        if math.hypot(dx, dy) < min_displacement_m:
+            headings.append(None)
+        else:
+            headings.append(heading_from_delta(dx, dy))
+    return fill_missing_headings(headings)
+
+
+def estimate_headings_for_ground_truth(
+    xy: list[tuple[float, float]],
+    window: int = 30,
+    min_displacement_m: float = 2.0,
+) -> list[float | None]:
+    """Centered-window heading estimate, used ONLY to compute ground_latitude/
+    ground_longitude (the evaluation target read once per frame after the
+    fact — never fed into the live algorithm). Look-ahead here is fine: this
+    value never reaches scripts/run_satellite_first_hybrid.sh, it only makes
+    the ground-truth column as accurate as possible for scoring. Do not wire
+    this into `heading_deg` — that column must stay causal (see
+    `estimate_headings` above)."""
     headings: list[float | None] = []
     for index, _point in enumerate(xy):
         before = max(0, index - window)
@@ -90,10 +121,13 @@ def estimate_headings(
             headings.append(None)
         else:
             headings.append(heading_from_delta(dx, dy))
-    return fill_missing_headings(headings)
+    return fill_missing_headings_both_directions(headings)
 
 
-def fill_missing_headings(headings: list[float | None]) -> list[float | None]:
+def fill_missing_headings_both_directions(headings: list[float | None]) -> list[float | None]:
+    """Forward- and backward-fill. Only used for the ground-truth heading
+    estimate above, where look-ahead is harmless (see its docstring) — never
+    use this for the live `heading_deg` column."""
     last: float | None = None
     filled: list[float | None] = []
     for heading in headings:
@@ -107,6 +141,26 @@ def fill_missing_headings(headings: list[float | None]) -> list[float | None]:
             next_heading = filled[index]
         elif next_heading is not None:
             filled[index] = next_heading
+    return filled
+
+
+def fill_missing_headings(headings: list[float | None]) -> list[float | None]:
+    """Forward-fill only — carries the last known heading into later gaps.
+
+    Deliberately does NOT backward-fill: doing so would copy a heading
+    computed from later frames into earlier ones, which is itself a small
+    look-ahead. Any leading frames before the drone has moved
+    `min_displacement_m` simply stay None (heading unknown yet) — this only
+    affects the first few frames, while the live pipeline is still in
+    bootstrap (no satellite matching attempted, so heading isn't used there
+    anyway).
+    """
+    last: float | None = None
+    filled: list[float | None] = []
+    for heading in headings:
+        if heading is not None:
+            last = heading
+        filled.append(last)
     return filled
 
 
@@ -138,11 +192,27 @@ def project_ground_points(
         window=heading_window,
         min_displacement_m=min_heading_displacement_m,
     )
+    # Separate, more accurate (centered-window, look-ahead OK) heading used
+    # ONLY to compute ground_latitude/ground_longitude — the evaluation
+    # target, scored after the fact and never read by the live algorithm.
+    # Keeping this distinct from `headings` above is what lets the live
+    # `heading_deg` column stay strictly causal while the ground-truth
+    # column still gets a usable value during the first few seconds of a
+    # flight (before the causal/backward estimator has enough displacement
+    # to produce anything).
+    eval_headings = estimate_headings_for_ground_truth(
+        drone_xy,
+        window=heading_window,
+        min_displacement_m=min_heading_displacement_m,
+    )
 
     output_rows: list[dict[str, float | str]] = []
-    for row, (x, y), estimated_heading in zip(rows, drone_xy, headings):
+    for row, (x, y), estimated_heading, estimated_eval_heading in zip(
+        rows, drone_xy, headings, eval_headings
+    ):
         altitude = float(row["rel_alt"])
         heading = select_heading(row, estimated_heading, heading_source)
+        gt_heading = select_heading(row, estimated_eval_heading, heading_source)
         camera_angle = select_camera_angle(row, camera_angle_deg, camera_angle_source)
         ground_distance = ground_distance_from_camera_angle(
             altitude,
@@ -150,13 +220,13 @@ def project_ground_points(
             angle_reference=angle_reference,
         )
 
-        if heading is None or not math.isfinite(ground_distance):
+        if gt_heading is None or not math.isfinite(ground_distance):
             ground_x = math.nan
             ground_y = math.nan
             ground_lat = math.nan
             ground_lon = math.nan
         else:
-            ux, uy = heading_unit_vector(heading)
+            ux, uy = heading_unit_vector(gt_heading)
             ground_x = x + ground_distance * ux
             ground_y = y + ground_distance * uy
             ground_lat, ground_lon = local_xy_to_gps(
