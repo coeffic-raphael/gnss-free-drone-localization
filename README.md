@@ -21,7 +21,7 @@ This work addresses Exercise 2 of the assignment: *design a real-time visual nav
 | Video (reference) | Frames | SAT / VPR_FALLBACK / NO_FIX | Raw median / mean | Smoothed median / mean (window) | Throughput |
 |---|---:|---|---:|---:|---:|
 | v13 (v11+v12+v14) | 831 | 80.9% / 10.0% / 9.1% | 25.8 m / 30.4 m | 18.1 m / 25.4 m (w=9) | 1.99 fps |
-| v14 (v11+v12+v13) | 115 | 55.7% / 29.6% / 14.8% | 13.6 m / 16.0 m | 12.7 m / 14.2 m (w=5) | 2.20 fps |
+| v14 (v11+v12+v13) | 115 | 52.2% / 33.0% / 14.8% | 15.0 m / 17.6 m | 13.0 m / 15.5 m (w=5) | 2.17 fps |
 
 	
 Additional leave-one-out validation and `Test1_100m` stress test, using the same retained satellite-first pipeline on a different PC:
@@ -38,7 +38,7 @@ Smoothed error tolerance — average frequency of being within threshold:
 | Video | ≤ 10 m | ≤ 15 m | ≤ 20 m | ≤ 30 m |
 |---|---|---|---|---|
 | v13 | 22.9% (1 every 4.4 s) | 41.2% (1 every 2.4 s) | 58.2% (1 every 1.7 s) | 75.7% (1 every 1.3 s) |
-| v14 | 28.7% (1 every 3.5 s) | 68.7% (1 every 1.5 s) | 89.6% (1 every 1.1 s) | 94.8% (1 every 1.1 s) |
+| v14 | 19.1% (1 every 5.2 s) | 61.7% (1 every 1.6 s) | 85.2% (1 every 1.2 s) | 93.0% (1 every 1.1 s) |
 
 *(For reference only — not the deployed solution: an offline, no-latency-constraint version of the same modules reaches median 11.6 m / mean 13.4 m on v14. See "Offline Batch Algorithm" below and `docs/final_report.md` sections 1-2 for the full breakdown and cross-validation.)*
 
@@ -60,13 +60,13 @@ A causal trajectory-consistency gate (reject a candidate too far from a constant
 
 ## Offline Batch Algorithm (kept for reference, not the deployed solution)
 
-A non-real-time variant used only to establish the accuracy ceiling (no latency/look-ahead constraint): same two visual modules, but VPR-first with satellite as fallback, and whole-sequence Motion Viterbi + symmetric Gaussian smoothing instead of the causal version — both require the entire video upfront. ~1.1 m better than the real-time pipeline on v14, at the cost of being unusable in flight. Full breakdown: `docs/final_report.md` sections 1-2.
+A non-real-time variant used only to establish the accuracy ceiling (no latency/look-ahead constraint): same two visual modules, but VPR-first with satellite as fallback, and whole-sequence Motion Viterbi + symmetric Gaussian smoothing instead of the causal version — both require the entire video upfront. ~1.4 m better than the real-time pipeline on v14, at the cost of being unusable in flight. Full breakdown: `docs/final_report.md` sections 1-2.
 
 ---
 
 ## Known Limitation — Heading Accuracy (and the one disclosed GNSS exception)
 
-Neither the DJI Mini 3 Pro nor the DJI Air 3/Air 3S records gimbal yaw in the SRT file. Heading is therefore estimated from the query flight's own GPS trajectory (bearing from `window` frames ago to the current frame). This is the **one disclosed exception** to "no query GNSS at inference": Stage 1's IPM warp needs a heading, and the only source available is the flight's own past positions. It is strictly **causal** — only a backward-only window is ever used for the live `heading_deg` field, never a future frame — see `src/project_ground_point.py`'s `estimate_headings()` and `docs/algorithm_overview.md` ("What never happens (by design)") for exactly how this is kept separate from the ground-truth heading used only for scoring (`estimate_headings_for_ground_truth()`, which is allowed to look ahead since it never reaches the live algorithm). An earlier version of the estimator used a centred (look-ahead) window for both purposes; this was found during a code audit and fixed — see `docs/final_report.md` section 3 and "Limitations" for the full account. Re-running v13 after the fix changed the smoothed median from 17.6 m to 18.1 m (mean 25.8 m → 25.4 m) — no measurable accuracy cost for closing the leak.
+Neither the DJI Mini 3 Pro nor the DJI Air 3/Air 3S records gimbal yaw in the SRT file. Heading is therefore estimated from the query flight's own GPS trajectory (bearing from `window` frames ago to the current frame). This is the **one disclosed exception** to "no query GNSS at inference": Stage 1's IPM warp needs a heading, and the only source available is the flight's own past positions. It is strictly **causal** — only a backward-only window is ever used for the live `heading_deg` field, never a future frame — see `src/project_ground_point.py`'s `estimate_headings()` and `docs/algorithm_overview.md` ("What never happens (by design)") for exactly how this is kept separate from the ground-truth heading used only for scoring (`estimate_headings_for_ground_truth()`, which is allowed to look ahead since it never reaches the live algorithm). An earlier version of the estimator used a centred (look-ahead) window for both purposes; this was found during a code audit and fixed — see `docs/final_report.md` section 3 and "Limitations" for the full account. Re-running v13 after the fix changed the smoothed median from 17.6 m to 18.1 m (mean 25.8 m → 25.4 m) — no measurable accuracy cost for closing the leak. Re-running v14 with the correctly-tuned smoothing window (`SMOOTH_HALF_WINDOW=2`, w=5) gave smoothed median 13.0 m / mean 15.5 m (raw 15.0 m / 17.6 m, SAT 52.2% / VPR_FALLBACK 33.0% / NO_FIX 14.8%, 2.17 fps) — the numbers in the table above are from this corrected run, replacing an earlier mis-configured rerun that had used the script's default window instead of v14's tuned value.
 
 During the first few seconds of a flight, before the drone has moved far enough for the causal estimator to produce a heading, `heading_deg` is empty and the satellite stage is skipped (`sat_status = "no_heading_yet"`) — harmless, since the pipeline falls back to VPR retrieval during that window anyway (see Stage 0/1 above).
 

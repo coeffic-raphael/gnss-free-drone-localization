@@ -109,22 +109,24 @@ Raw overall: median 26.2 m, mean 31.5 m (764/831 with fix). After causal smoothi
 
 | Status | Count | % | Median error |
 | --- | ---: | ---: | ---: |
-| SAT | 64 | 55.7% | ~12.9 m |
-| VPR_FALLBACK | 34 | 29.6% | 18.7 m |
+| SAT | 60 | 52.2% | ~13.3 m |
+| VPR_FALLBACK | 38 | 33.0% | 18.7 m |
 | NO_FIX | 17 | 14.8% | — |
 
-Raw overall: median 13.6 m, mean 16.0 m (98/115 with fix). After causal smoothing (w=5): **median 12.7 m, mean 14.2 m**. Timing: mean 0.455 s/frame (satellite-only mean 0.197 s, VPR fallback mean 0.778 s) → **2.20 fps**.
+Raw overall: median 15.0 m, mean 17.6 m (98/115 with fix). After causal smoothing (w=5): **median 13.0 m, mean 15.5 m**. Timing: mean 0.461 s/frame (satellite-only mean 0.198 s, VPR fallback mean 0.748 s) → **2.17 fps**.
 
 | Threshold | Frames within | Frequency |
 | --- | ---: | ---: |
-| ≤ 10 m | 28.7% | ~1 every 3.5 s |
-| ≤ 15 m | 68.7% | ~1 every 1.5 s |
-| ≤ 20 m | 89.6% | ~1 every 1.1 s |
-| ≤ 30 m | 94.8% | ~1 every 1.1 s |
+| ≤ 10 m | 19.1% | ~1 every 5.2 s |
+| ≤ 15 m | 61.7% | ~1 every 1.6 s |
+| ≤ 20 m | 85.2% | ~1 every 1.2 s |
+| ≤ 30 m | 93.0% | ~1 every 1.1 s |
+
+These numbers come from a re-run after the causal-heading fix (section 3, "Limitations"), with the smoothing window correctly set to its tuned v14 value (`SMOOTH_HALF_WINDOW=2`, w=5). An intermediate rerun right after the heading fix accidentally used the script's default window (w=9) instead, giving artificially worse numbers (mean 16.2 m); this has been superseded by the run above.
 
 ### 3.3 Real-Time vs. Offline Ceiling
 
-The satellite-first pipeline is causal end-to-end, at the cost of somewhat higher error than the offline hybrid on v14 (median 13.6 m raw / 12.7 m smoothed vs. 11.6 m, section 2). We consider this the right trade: 1.96-2.20 fps with zero look-ahead and zero query GNSS, runnable in flight, vs. an offline pipeline that needs the entire query video before producing any output.
+The satellite-first pipeline is causal end-to-end, at the cost of somewhat higher error than the offline hybrid on v14 (median 15.0 m raw / 13.0 m smoothed vs. 11.6 m, section 2). We consider this the right trade: 1.99-2.17 fps with zero look-ahead and zero query GNSS, runnable in flight, vs. an offline pipeline that needs the entire query video before producing any output.
 
 ### 3.4 No GNSS At Inference — How Each Position Is Actually Obtained
 
