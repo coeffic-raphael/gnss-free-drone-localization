@@ -1,0 +1,858 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>satellite_first_v14_refs_v11_v12_v13</name>
+    <Style id="gt">
+      <LineStyle><color>ff00aa00</color><width>4</width></LineStyle>
+    </Style>
+    <Style id="raw">
+      <LineStyle><color>ff00aaff</color><width>3</width></LineStyle>
+    </Style>
+    <Style id="smooth">
+      <LineStyle><color>ffff0000</color><width>4</width></LineStyle>
+    </Style>
+    <Style id="error">
+      <LineStyle><color>660000ff</color><width>2</width></LineStyle>
+    </Style>
+    <Style id="bad">
+      <IconStyle><color>ff0000ff</color><scale>0.75</scale><Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon></IconStyle>
+      <LabelStyle><scale>0</scale></LabelStyle>
+    </Style>
+    <Placemark>
+      <name>GT / SRT projected camera-center path</name>
+      <styleUrl>#gt</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>
+            35.20442785,32.10455678,0
+            35.20445435,32.10457277,0
+            35.20450478,32.10455933,0
+            35.20458911,32.10452795,0
+            35.20469388,32.10449042,0
+            35.20479648,32.10444876,0
+            35.20489992,32.10440898,0
+            35.20500588,32.10437242,0
+            35.20510882,32.10433141,0
+            35.20521170,32.10429408,0
+            35.20531382,32.10425441,0
+            35.20541540,32.10421174,0
+            35.20552035,32.10417642,0
+            35.20562488,32.10413842,0
+            35.20572923,32.10410009,0
+            35.20583017,32.10406006,0
+            35.20593217,32.10402106,0
+            35.20603470,32.10398408,0
+            35.20613717,32.10394406,0
+            35.20623906,32.10390776,0
+            35.20634159,32.10387078,0
+            35.20644359,32.10383278,0
+            35.20654417,32.10379206,0
+            35.20664528,32.10375139,0
+            35.20675023,32.10371609,0
+            35.20685323,32.10367809,0
+            35.20695623,32.10363909,0
+            35.20705870,32.10360008,0
+            35.20716070,32.10356108,0
+            35.20726370,32.10352308,0
+            35.20736570,32.10348408,0
+            35.20746870,32.10344608,0
+            35.20757070,32.10340708,0
+            35.20767370,32.10336908,0
+            35.20777570,32.10333008,0
+            35.20788011,32.10329479,0
+            35.20798017,32.10325306,0
+            35.20808270,32.10321508,0
+            35.20818711,32.10317979,0
+            35.20828717,32.10313806,0
+            35.20838917,32.10309906,0
+            35.20849259,32.10306378,0
+            35.20859317,32.10302306,0
+            35.20869517,32.10298406,0
+            35.20879859,32.10294878,0
+            35.20889917,32.10290806,0
+            35.20900117,32.10286906,0
+            35.20910459,32.10283378,0
+            35.20920659,32.10279578,0
+            35.20930859,32.10275778,0
+            35.20941059,32.10271978,0
+            35.20951259,32.10268178,0
+            35.20961317,32.10264106,0
+            35.20971319,32.10259833,0
+            35.20981670,32.10256407,0
+            35.20991396,32.10253150,0
+            35.20998108,32.10249712,0
+            35.21003036,32.10248534,0
+            35.21006259,32.10248165,0
+            35.21008978,32.10246708,0
+            35.21011387,32.10245087,0
+            35.21012285,32.10244018,0
+            35.21014478,32.10246378,0
+            35.21014951,32.10244863,0
+            35.21015034,32.10242507,0
+            35.21016744,32.10242875,0
+            35.21019012,32.10244206,0
+            35.21020544,32.10243868,0
+            35.21019176,32.10243979,0
+            35.21017335,32.10244653,0
+            35.21015737,32.10245247,0
+            35.21014139,32.10245741,0
+            35.21012442,32.10246335,0
+            35.21010787,32.10246949,0
+            35.21009090,32.10247444,0
+            35.21007349,32.10248118,0
+            35.21005651,32.10248712,0
+            35.20987132,32.10297634,0
+            35.20984947,32.10298259,0
+            35.20983922,32.10296714,0
+            35.20983098,32.10295370,0
+            35.20982273,32.10293925,0
+            35.20981318,32.10292636,0
+            35.20980325,32.10291336,0
+            35.20979400,32.10289991,0
+            35.20978476,32.10288647,0
+            35.20977452,32.10287402,0
+            35.20976527,32.10286058,0
+            35.20978924,32.10248231,0
+            35.20978437,32.10248058,0
+            35.20976968,32.10248015,0
+            35.20976238,32.10248903,0
+            35.20975007,32.10250191,0
+            35.20972877,32.10250979,0
+            35.20975928,32.10270533,0
+            35.20975648,32.10270732,0
+            35.20974704,32.10269961,0
+            35.20973331,32.10257426,0
+            35.20973845,32.10254744,0
+            35.20974530,32.10252866,0
+            35.20973965,32.10253567,0
+            35.20972791,32.10254947,0
+            35.20971942,32.10256249,0
+            35.20971548,32.10255982,0
+            35.20971022,32.10255860,0
+            35.20970142,32.10257107,0
+            35.20969777,32.10257708,0
+            35.20970177,32.10257108,0
+            35.20970577,32.10256608,0
+            35.20970045,32.10256052,0
+            35.20969286,32.10256887,0
+            35.20968877,32.10257566,0
+            35.20968751,32.10257744,0
+            35.20968494,32.10257966,0
+            35.20968400,32.10258100,0
+        </coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>RAW valid fixes only</name>
+      <styleUrl>#raw</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>
+            35.20459400,32.10445000,0
+            35.20458000,32.10440000,0
+            35.20468500,32.10443000,0
+            35.20478400,32.10441000,0
+            35.20484500,32.10437000,0
+            35.20495200,32.10433200,0
+            35.20509000,32.10428000,0
+            35.20519300,32.10423000,0
+            35.20398000,32.10494200,0
+            35.20506700,32.10419000,0
+            35.20532600,32.10420600,0
+            35.20561200,32.10406500,0
+            35.20572300,32.10402300,0
+            35.20583300,32.10398500,0
+            35.20590600,32.10395000,0
+            35.20592500,32.10390000,0
+            35.20610000,32.10387800,0
+            35.20618000,32.10384800,0
+            35.20627200,32.10381300,0
+            35.20635000,32.10378600,0
+            35.20642000,32.10375600,0
+            35.20653500,32.10372500,0
+            35.20662700,32.10368000,0
+            35.20670700,32.10365700,0
+            35.20681000,32.10362000,0
+            35.20688200,32.10359200,0
+            35.20699000,32.10354600,0
+            35.20710400,32.10350000,0
+            35.20719500,32.10349300,0
+            35.20729400,32.10345500,0
+            35.20739400,32.10338000,0
+            35.20750000,32.10336300,0
+            35.20760700,32.10334400,0
+            35.20778000,32.10329400,0
+            35.20789000,32.10320000,0
+            35.20772401,32.10318212,0
+            35.20814411,32.10312869,0
+            35.20814411,32.10312869,0
+            35.20824400,32.10312700,0
+            35.20826700,32.10308500,0
+            35.20845400,32.10295500,0
+            35.20851000,32.10305000,0
+            35.20855700,32.10298000,0
+            35.20871000,32.10293600,0
+            35.20882000,32.10289000,0
+            35.20893000,32.10284000,0
+            35.20904000,32.10280600,0
+            35.20914500,32.10276000,0
+            35.20926000,32.10272200,0
+            35.20936200,32.10268000,0
+            35.20946500,32.10263000,0
+            35.20957600,32.10259600,0
+            35.20966700,32.10257300,0
+            35.20979700,32.10251600,0
+            35.20987000,32.10249300,0
+            35.20987700,32.10249000,0
+            35.20997200,32.10246000,0
+            35.20993000,32.10247400,0
+            35.20996000,32.10246300,0
+            35.21001400,32.10243000,0
+            35.21000700,32.10242000,0
+            35.21002600,32.10243000,0
+            35.21006400,32.10240000,0
+            35.21010200,32.10240600,0
+            35.21020000,32.10254700,0
+            35.21003700,32.10243200,0
+            35.21013300,32.10240000,0
+            35.21011700,32.10241000,0
+            35.20996000,32.10246700,0
+            35.20993800,32.10247400,0
+            35.21004500,32.10247800,0
+            35.20998278,32.10244338,0
+            35.21004000,32.10243200,0
+            35.20999500,32.10245500,0
+            35.20987300,32.10250000,0
+            35.20988178,32.10247238,0
+            35.20988178,32.10247238,0
+            35.20992173,32.10266727,0
+            35.20978500,32.10285000,0
+            35.20957248,32.10288534,0
+            35.20958672,32.10283501,0
+            35.20957248,32.10288534,0
+            35.20958672,32.10283501,0
+            35.20958672,32.10283501,0
+            35.20960434,32.10279269,0
+            35.20960434,32.10279269,0
+            35.20960434,32.10279269,0
+            35.20960434,32.10279269,0
+            35.20961284,32.10275813,0
+            35.20961539,32.10274085,0
+            35.20961714,32.10272407,0
+            35.20962163,32.10269551,0
+            35.20962163,32.10269551,0
+            35.20962163,32.10269551,0
+            35.20963387,32.10265418,0
+            35.20963387,32.10265418,0
+        </coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>FINAL smoothed/gap-filled output</name>
+      <styleUrl>#smooth</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>
+            35.20459400,32.10445000,0
+            35.20458580,32.10442070,0
+            35.20463547,32.10442171,0
+            35.20471941,32.10441670,0
+            35.20479728,32.10439238,0
+            35.20488679,32.10435739,0
+            35.20500336,32.10431268,0
+            35.20511827,32.10426374,0
+            35.20456888,32.10459405,0
+            35.20469963,32.10446242,0
+            35.20506380,32.10429261,0
+            35.20540673,32.10414983,0
+            35.20561671,32.10406602,0
+            35.20575411,32.10401360,0
+            35.20584992,32.10397444,0
+            35.20590182,32.10393123,0
+            35.20600756,32.10389734,0
+            35.20611338,32.10386755,0
+            35.20620984,32.10383560,0
+            35.20629504,32.10380547,0
+            35.20637102,32.10377593,0
+            35.20646497,32.10374569,0
+            35.20656204,32.10370791,0
+            35.20665040,32.10367599,0
+            35.20674412,32.10364308,0
+            35.20682857,32.10361215,0
+            35.20692261,32.10357412,0
+            35.20702896,32.10353060,0
+            35.20712979,32.10350448,0
+            35.20722798,32.10347626,0
+            35.20732683,32.10342346,0
+            35.20742953,32.10338356,0
+            35.20753510,32.10335790,0
+            35.20767475,32.10332242,0
+            35.20780648,32.10325499,0
+            35.20778652,32.10320624,0
+            35.20795532,32.10316045,0
+            35.20808556,32.10313722,0
+            35.20813441,32.10313000,0
+            35.20819315,32.10312795,0
+            35.20824066,32.10310629,0
+            35.20835453,32.10302639,0
+            35.20845347,32.10302269,0
+            35.20852065,32.10300416,0
+            35.20862469,32.10296641,0
+            35.20874098,32.10292106,0
+            35.20885484,32.10287305,0
+            35.20896566,32.10283163,0
+            35.20907325,32.10278937,0
+            35.20918398,32.10274877,0
+            35.20929113,32.10270784,0
+            35.20939533,32.10266227,0
+            35.20950247,32.10262152,0
+            35.20960230,32.10259084,0
+            35.20971553,32.10254887,0
+            35.20981177,32.10251359,0
+            35.20985939,32.10249632,0
+            35.20992138,32.10247613,0
+            35.20993664,32.10247155,0
+            35.20994892,32.10246716,0
+            35.20998332,32.10244789,0
+            35.21000186,32.10243014,0
+            35.21001617,32.10242728,0
+            35.21004221,32.10241385,0
+            35.21007689,32.10240722,0
+            35.21014433,32.10247617,0
+            35.21010314,32.10246861,0
+            35.21010667,32.10242971,0
+            35.21011448,32.10241221,0
+            35.21003905,32.10243795,0
+            35.20997250,32.10246186,0
+            35.20999844,32.10247358,0
+            35.20999891,32.10245985,0
+            35.21001805,32.10244272,0
+            35.21001033,32.10244598,0
+            35.20993954,32.10247438,0
+            35.20989644,32.10247901,0
+            35.20988347,32.10247536,0
+            35.20990174,32.10257021,0
+            35.20984755,32.10272961,0
+            35.20969826,32.10283589,0
+            35.20961429,32.10285025,0
+            35.20958283,32.10286640,0
+            35.20958177,32.10285389,0
+            35.20958492,32.10284137,0
+            35.20959520,32.10281499,0
+            35.20960170,32.10279906,0
+            35.20960392,32.10279370,0
+            35.20960431,32.10279277,0
+            35.20960858,32.10277544,0
+            35.20961285,32.10275463,0
+            35.20961568,32.10273586,0
+            35.20961905,32.10271279,0
+            35.20962092,32.10270018,0
+            35.20962152,32.10269623,0
+            35.20962162,32.10269557,0
+            35.20962163,32.10269551,0
+            35.20962774,32.10267489,0
+            35.20963206,32.10266031,0
+            35.20963358,32.10265517,0
+            35.20963385,32.10265426,0
+            35.20963387,32.10265418,0
+            35.20963387,32.10265418,0
+            35.20963387,32.10265418,0
+            35.20963387,32.10265418,0
+            35.20963387,32.10265418,0
+            35.20963387,32.10265418,0
+            35.20963387,32.10265418,0
+            35.20963387,32.10265418,0
+            35.20963387,32.10265418,0
+            35.20963387,32.10265418,0
+            35.20963387,32.10265418,0
+            35.20963387,32.10265418,0
+            35.20963387,32.10265418,0
+            35.20963387,32.10265418,0
+        </coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20510882,32.10433141,0 35.20456888,32.10459405,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 241: 58.7 m</name>
+      <description>frame_count=241
+error_m=58.712
+source=SAT
+raw_source=SAT
+sat_status=ok
+sat_inliers=12
+vpr_triggered=False
+vpr_best_inliers=0
+GT=32.10433141,35.20510882
+SMOOTHED=32.10459405,35.20456888
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20456888,32.10459405,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20987132,32.10297634,0 35.20988347,32.10247536,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 2309: 55.8 m</name>
+      <description>frame_count=2309
+error_m=55.782
+source=VPR_FALLBACK
+raw_source=VPR_FALLBACK
+sat_status=ransac_fail
+sat_inliers=0
+vpr_triggered=True
+vpr_best_inliers=149
+GT=32.10297634,35.20987132
+SMOOTHED=32.10247536,35.20988347
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20988347,32.10247536,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20521170,32.10429408,0 35.20469963,32.10446242,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 271: 51.8 m</name>
+      <description>frame_count=271
+error_m=51.796
+source=SAT
+raw_source=SAT
+sat_status=ok
+sat_inliers=15
+vpr_triggered=False
+vpr_best_inliers=0
+GT=32.10429408,35.20521170
+SMOOTHED=32.10446242,35.20469963
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20469963,32.10446242,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20984947,32.10298259,0 35.20990174,32.10257021,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 2339: 46.2 m</name>
+      <description>frame_count=2339
+error_m=46.169
+source=VPR_FALLBACK
+raw_source=VPR_FALLBACK
+sat_status=ransac_fail
+sat_inliers=0
+vpr_triggered=True
+vpr_best_inliers=132
+GT=32.10298259,35.20984947
+SMOOTHED=32.10257021,35.20990174
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20990174,32.10257021,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20978924,32.10248231,0 35.20960431,32.10279277,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 2639: 38.7 m</name>
+      <description>frame_count=2639
+error_m=38.711
+source=VPR_FALLBACK
+raw_source=VPR_FALLBACK
+sat_status=ransac_fail
+sat_inliers=0
+vpr_triggered=True
+vpr_best_inliers=159
+GT=32.10248231,35.20978924
+SMOOTHED=32.10279277,35.20960431
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20960431,32.10279277,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20978437,32.10248058,0 35.20960858,32.10277544,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 2669: 36.8 m</name>
+      <description>frame_count=2669
+error_m=36.772
+source=VPR_FALLBACK
+raw_source=VPR_FALLBACK
+sat_status=ransac_fail
+sat_inliers=0
+vpr_triggered=True
+vpr_best_inliers=139
+GT=32.10248058,35.20978437
+SMOOTHED=32.10277544,35.20960858
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20960858,32.10277544,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20976968,32.10248015,0 35.20961285,32.10275463,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 2699: 33.9 m</name>
+      <description>frame_count=2699
+error_m=33.946
+source=VPR_FALLBACK
+raw_source=VPR_FALLBACK
+sat_status=ransac_fail
+sat_inliers=0
+vpr_triggered=True
+vpr_best_inliers=127
+GT=32.10248015,35.20976968
+SMOOTHED=32.10275463,35.20961285
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20961285,32.10275463,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20976238,32.10248903,0 35.20961568,32.10273586,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 2729: 30.8 m</name>
+      <description>frame_count=2729
+error_m=30.763
+source=VPR_FALLBACK
+raw_source=VPR_FALLBACK
+sat_status=ransac_fail
+sat_inliers=0
+vpr_triggered=True
+vpr_best_inliers=129
+GT=32.10248903,35.20976238
+SMOOTHED=32.10273586,35.20961568
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20961568,32.10273586,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20975007,32.10250191,0 35.20961905,32.10271279,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 2759: 26.5 m</name>
+      <description>frame_count=2759
+error_m=26.528
+source=VPR_FALLBACK
+raw_source=VPR_FALLBACK
+sat_status=few_matches
+sat_inliers=0
+vpr_triggered=True
+vpr_best_inliers=134
+GT=32.10250191,35.20975007
+SMOOTHED=32.10271279,35.20961905
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20961905,32.10271279,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20983922,32.10296714,0 35.20984755,32.10272961,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 2369: 26.5 m</name>
+      <description>frame_count=2369
+error_m=26.453
+source=SAT
+raw_source=SAT
+sat_status=ok
+sat_inliers=11
+vpr_triggered=False
+vpr_best_inliers=0
+GT=32.10296714,35.20983922
+SMOOTHED=32.10272961,35.20984755
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20984755,32.10272961,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20531382,32.10425441,0 35.20506380,32.10429261,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 301: 24.0 m</name>
+      <description>frame_count=301
+error_m=23.957
+source=SAT
+raw_source=SAT
+sat_status=ok
+sat_inliers=15
+vpr_triggered=False
+vpr_best_inliers=0
+GT=32.10425441,35.20531382
+SMOOTHED=32.10429261,35.20506380
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20506380,32.10429261,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20972877,32.10250979,0 35.20962092,32.10270018,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 2789: 23.5 m</name>
+      <description>frame_count=2789
+error_m=23.508
+source=VPR_FALLBACK
+raw_source=VPR_FALLBACK
+sat_status=ransac_fail
+sat_inliers=0
+vpr_triggered=True
+vpr_best_inliers=151
+GT=32.10250979,35.20972877
+SMOOTHED=32.10270018,35.20962092
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20962092,32.10270018,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20981318,32.10292636,0 35.20958283,32.10286640,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 2459: 22.7 m</name>
+      <description>frame_count=2459
+error_m=22.724
+source=VPR_FALLBACK
+raw_source=VPR_FALLBACK
+sat_status=ransac_fail
+sat_inliers=0
+vpr_triggered=True
+vpr_best_inliers=210
+GT=32.10292636,35.20981318
+SMOOTHED=32.10286640,35.20958283
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20958283,32.10286640,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20982273,32.10293925,0 35.20961429,32.10285025,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 2429: 22.0 m</name>
+      <description>frame_count=2429
+error_m=22.012
+source=VPR_FALLBACK
+raw_source=VPR_FALLBACK
+sat_status=ransac_fail
+sat_inliers=0
+vpr_triggered=True
+vpr_best_inliers=173
+GT=32.10293925,35.20982273
+SMOOTHED=32.10285025,35.20961429
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20961429,32.10285025,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20980325,32.10291336,0 35.20958177,32.10285389,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 2489: 21.9 m</name>
+      <description>frame_count=2489
+error_m=21.909
+source=VPR_FALLBACK
+raw_source=VPR_FALLBACK
+sat_status=ransac_fail
+sat_inliers=0
+vpr_triggered=True
+vpr_best_inliers=176
+GT=32.10291336,35.20980325
+SMOOTHED=32.10285389,35.20958177
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20958177,32.10285389,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20445435,32.10457277,0 35.20458580,32.10442070,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 31: 21.0 m</name>
+      <description>frame_count=31
+error_m=20.981
+source=SAT
+raw_source=SAT
+sat_status=ok
+sat_inliers=13
+vpr_triggered=False
+vpr_best_inliers=0
+GT=32.10457277,35.20445435
+SMOOTHED=32.10442070,35.20458580
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20458580,32.10442070,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20979400,32.10289991,0 35.20958492,32.10284137,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 2519: 20.8 m</name>
+      <description>frame_count=2519
+error_m=20.765
+source=VPR_FALLBACK
+raw_source=VPR_FALLBACK
+sat_status=ransac_fail
+sat_inliers=0
+vpr_triggered=True
+vpr_best_inliers=200
+GT=32.10289991,35.20979400
+SMOOTHED=32.10284137,35.20958492
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20958492,32.10284137,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20442785,32.10455678,0 35.20459400,32.10445000,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 1: 19.7 m</name>
+      <description>frame_count=1
+error_m=19.666
+source=SAT
+raw_source=SAT
+sat_status=ok
+sat_inliers=13
+vpr_triggered=False
+vpr_best_inliers=0
+GT=32.10455678,35.20442785
+SMOOTHED=32.10445000,35.20459400
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20459400,32.10445000,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20450478,32.10455933,0 35.20463547,32.10442171,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 61: 19.7 m</name>
+      <description>frame_count=61
+error_m=19.661
+source=SAT
+raw_source=SAT
+sat_status=ok
+sat_inliers=10
+vpr_triggered=False
+vpr_best_inliers=0
+GT=32.10455933,35.20450478
+SMOOTHED=32.10442171,35.20463547
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20463547,32.10442171,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <styleUrl>#error</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>35.20978476,32.10288647,0 35.20959520,32.10281499,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Worst frame 2549: 19.6 m</name>
+      <description>frame_count=2549
+error_m=19.566
+source=VPR_FALLBACK
+raw_source=VPR_FALLBACK
+sat_status=ransac_fail
+sat_inliers=0
+vpr_triggered=True
+vpr_best_inliers=157
+GT=32.10288647,35.20978476
+SMOOTHED=32.10281499,35.20959520
+</description>
+      <styleUrl>#bad</styleUrl>
+      <Point><coordinates>35.20959520,32.10281499,0</coordinates></Point>
+    </Placemark>
+  </Document>
+</kml>
