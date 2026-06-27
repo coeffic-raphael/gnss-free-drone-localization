@@ -287,7 +287,6 @@ Additional KML/debug outputs generated for the leave-one-out and Test1 runs:
 | v13 as query, v11+v12+v14 as reference | `outputs/maps/satellite_first_v13_refs_v11_v12_v14.kml` | `outputs/debug/satellite_first_v13_refs_v11_v12_v14.html` |
 | v14 as query, v11+v12+v13 as reference | `outputs/maps/satellite_first_v14_refs_v11_v12_v13.kml` | `outputs/debug/satellite_first_v14_refs_v11_v12_v13.html` |
 | Test1_100m / v17 as query, v11+v12+v13+v14 as reference | `outputs/maps/satellite_first_v17_refs_v11_v12_v13_v14.kml` | `outputs/debug/satellite_first_v17_refs_v11_v12_v13_v14.html` |
-A separate acceptance-debug helper can also generate side-by-side query/reference match images with LightGlue/RANSAC inlier lines for accepted `SAT` and `VPR_FALLBACK` frames.
 
 ### Cross-Validation
 
