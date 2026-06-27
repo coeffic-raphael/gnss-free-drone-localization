@@ -4,7 +4,13 @@ A hybrid visual localisation pipeline for drones that operates **without GNSS at
 
 This work addresses Exercise 2 of the assignment: *design a real-time visual navigation algorithm based on predefined annotated previous videos and GIS datasets*.
 
-**This README is a quick-start and results summary. The full write-up — detailed methodology, all experiments tried (including ones that were reverted), the complete results breakdown, and the discussion of what is and isn't truly real-time — is in [`docs/final_report.md`](docs/final_report.md). Read that document for the complete picture; this README intentionally only covers the essentials.**
+**This README is a quick-start and results summary. Three documents in `docs/` carry the actual depth — read them for the complete picture, since this README intentionally only covers the essentials:**
+
+| Document | What's in it |
+|---|---|
+| [`docs/final_report.md`](docs/final_report.md) | The full write-up: detailed methodology, every experiment tried (including the ones reverted), the complete results breakdown, the GNSS-causality audit and the heading/camera-angle/terrain limitations, and the discussion of what is and isn't truly real-time. Start here for the full story. |
+| [`docs/algorithm_overview.md`](docs/algorithm_overview.md) | A step-by-step flow diagram of `scripts/run_satellite_first_hybrid.sh`, frame by frame — Stage 0 bootstrap through Stage 3 smoothing, plus the "What never happens (by design)" section listing every causality guarantee and the one disclosed exception (heading). Read this if you want to understand the control flow without wading through the report's prose. |
+| [`docs/literature_review.md`](docs/literature_review.md) | The related-work survey (AnyLoc, LightGlue, WildNav, DINOv2) that motivated the chosen VPR + satellite-matching architecture — read this for the "why these methods" context behind the design choices summarized below. |
 
 ---
 
@@ -276,6 +282,8 @@ source .venv-anyloc/bin/activate
 ---
 
 ## References
+
+See [`docs/literature_review.md`](docs/literature_review.md) for the full survey of related work and how it shaped the architecture (why VPR + satellite-matching over pure GPS-denied SLAM, why DINOv2 over earlier descriptors, etc.). Key papers:
 
 - **AnyLoc** (Keetha et al., 2023) — [arxiv.org/abs/2308.00688](https://arxiv.org/abs/2308.00688)
 - **LightGlue** (Lindenberger et al., 2023) — [arxiv.org/abs/2306.13643](https://arxiv.org/abs/2306.13643)
