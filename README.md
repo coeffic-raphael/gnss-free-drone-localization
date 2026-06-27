@@ -17,6 +17,16 @@ This work addresses Exercise 2 of the assignment: *design a real-time visual nav
 | v13 (v11+v12+v14) | 831 | 80.1% / 11.2% / 8.7% | 26.1 m / 32.1 m | 17.9 m / 24.8 m (w=9) | 1.83 fps |
 | v14 (v11+v12+v13) | 115 | 62.6% / 22.6% / 14.8% | 14.5 m / 16.4 m | 13.0 m / 14.8 m (w=5) | 2.10 fps |
 
+	
+Additional leave-one-out validation and `Test1_100m` stress test, using the same retained satellite-first pipeline on a different PC:
+| Video (reference/test) | Frames | SAT / VPR_FALLBACK / NO_FIX | Raw median / mean | Smoothed median / mean (best window) | Throughput |
+|---|---:|---|---:|---:|---:|
+| v11 (v12+v13+v14) | 806 | 83.9% / 5.1% / 11.0% | 19.8 m / 24.1 m | 11.1 m / 23.0 m (w=9) | 0.23 fps |
+| v12 (v11+v13+v14) | 260 | 51.5% / 26.5% / 21.9% | 30.0 m / 48.6 m | 25.3 m / 40.9 m (w=11) | 0.21 fps |
+| v13 (v11+v12+v14) | 831 | 79.5% / 12.2% / 8.3% | 27.0 m / 31.6 m | 17.6 m / 24.6 m (w=9) | 0.23 fps |
+| v14 (v11+v12+v13) | 115 | 62.6% / 20.9% / 16.5% | 13.6 m / 17.0 m | 12.8 m / 15.2 m (w=5) | 0.24 fps |
+| Test1_100m / v17 (v11+v12+v13+v14) | 370 | 48.1% / 2.4% / 49.5% | 29.1 m / 30.1 m | 32.9 m / 60.2 m (w=5) | 0.20 fps |
+
 Smoothed error tolerance — average frequency of being within threshold:
 
 | Video | ≤ 10 m | ≤ 15 m | ≤ 20 m | ≤ 30 m |
@@ -268,6 +278,16 @@ Final outputs:
 | `outputs/hybrid/hybrid_summary_v14.json` | aggregate statistics |
 | `outputs/figures/preliminary_experiment_v14.svg` | path comparison figure |
 | `outputs/maps/dji_mini3_v14_hybrid.kml` | Google Earth overlay |
+
+Additional KML/debug outputs generated for the leave-one-out and Test1 runs:
+| Run | KML | HTML debug |
+|---|---|---|
+| v11 as query, v12+v13+v14 as reference | `outputs/maps/satellite_first_v11_refs_v12_v13_v14.kml` | `outputs/debug/satellite_first_v11_refs_v12_v13_v14.html` |
+| v12 as query, v11+v13+v14 as reference | `outputs/maps/satellite_first_v12_refs_v11_v13_v14.kml` | `outputs/debug/satellite_first_v12_refs_v11_v13_v14.html` |
+| v13 as query, v11+v12+v14 as reference | `outputs/maps/satellite_first_v13_refs_v11_v12_v14.kml` | `outputs/debug/satellite_first_v13_refs_v11_v12_v14.html` |
+| v14 as query, v11+v12+v13 as reference | `outputs/maps/satellite_first_v14_refs_v11_v12_v13.kml` | `outputs/debug/satellite_first_v14_refs_v11_v12_v13.html` |
+| Test1_100m / v17 as query, v11+v12+v13+v14 as reference | `outputs/maps/satellite_first_v17_refs_v11_v12_v13_v14.kml` | `outputs/debug/satellite_first_v17_refs_v11_v12_v13_v14.html` |
+A separate acceptance-debug helper can also generate side-by-side query/reference match images with LightGlue/RANSAC inlier lines for accepted `SAT` and `VPR_FALLBACK` frames.
 
 ### Cross-Validation
 
