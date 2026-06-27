@@ -14,7 +14,7 @@ This work addresses Exercise 2 of the assignment: *design a real-time visual nav
 
 | Video (reference) | Frames | SAT / VPR_FALLBACK / NO_FIX | Raw median / mean | Smoothed median / mean (window) | Throughput |
 |---|---:|---|---:|---:|---:|
-| v13 (v11+v12+v14) | 831 | 82.2% / 9.7% / 8.1% | 26.2 m / 31.5 m | 17.6 m / 25.8 m (w=9) | 1.96 fps |
+| v13 (v11+v12+v14) | 831 | 80.9% / 10.0% / 9.1% | 25.8 m / 30.4 m | 18.1 m / 25.4 m (w=9) | 1.99 fps |
 | v14 (v11+v12+v13) | 115 | 55.7% / 29.6% / 14.8% | 13.6 m / 16.0 m | 12.7 m / 14.2 m (w=5) | 2.20 fps |
 
 	
@@ -58,9 +58,15 @@ A non-real-time variant used only to establish the accuracy ceiling (no latency/
 
 ---
 
-## Known Limitation — Heading Accuracy
+## Known Limitation — Heading Accuracy (and the one disclosed GNSS exception)
 
-Neither the DJI Mini 3 Pro nor the DJI Air 3/Air 3S records gimbal yaw in the SRT file. Heading is therefore estimated from the GPS trajectory (bearing between consecutive positions). At 118 m altitude with a 60° tilt, the IPM footprint centre lies 204 m ahead of the drone, so an 8° heading error shifts the projected ground point by ~28 m. This is the primary bottleneck of the satellite module on complex flight paths (confirmed by v12 cross-validation: systematic ~30 m offset on straight-line segments, vs. 0.4–7.5 m where heading happened to be accurate).
+Neither the DJI Mini 3 Pro nor the DJI Air 3/Air 3S records gimbal yaw in the SRT file. Heading is therefore estimated from the query flight's own GPS trajectory (bearing from `window` frames ago to the current frame). This is the **one disclosed exception** to "no query GNSS at inference": Stage 1's IPM warp needs a heading, and the only source available is the flight's own past positions. It is strictly **causal** — only a backward-only window is ever used for the live `heading_deg` field, never a future frame — see `src/project_ground_point.py`'s `estimate_headings()` and `docs/algorithm_overview.md` ("What never happens (by design)") for exactly how this is kept separate from the ground-truth heading used only for scoring (`estimate_headings_for_ground_truth()`, which is allowed to look ahead since it never reaches the live algorithm). An earlier version of the estimator used a centred (look-ahead) window for both purposes; this was found during a code audit and fixed — see `docs/final_report.md` section 3 and "Limitations" for the full account. Re-running v13 after the fix changed the smoothed median from 17.6 m to 18.1 m (mean 25.8 m → 25.4 m) — no measurable accuracy cost for closing the leak.
+
+During the first few seconds of a flight, before the drone has moved far enough for the causal estimator to produce a heading, `heading_deg` is empty and the satellite stage is skipped (`sat_status = "no_heading_yet"`) — harmless, since the pipeline falls back to VPR retrieval during that window anyway (see Stage 0/1 above).
+
+At 118 m altitude with a 60° tilt, the IPM footprint centre lies 204 m ahead of the drone, so an 8° heading error shifts the projected ground point by ~28 m. This is the primary bottleneck of the satellite module on complex flight paths (confirmed by v12 cross-validation: systematic ~30 m offset on straight-line segments, vs. 0.4–7.5 m where heading happened to be accurate).
+
+**Also undocumented until now, disclosed here:** the camera angle (`camera_angle_deg`, fixed at 60° via `--camera-angle-source fixed`) is a constant, never measured — `gimbal_pitch` is parsed in `src/project_ground_point.py`'s telemetry loader but is never populated by `telemetry_parser.py` for these drones, so gimbal drift would go undetected. Similarly, the ground-point projection (`ground_distance_from_camera_angle` in `src/geometry.py`) assumes flat terrain at the same elevation as the takeoff point — `abs_alt` (absolute altitude) is parsed but not used for any terrain correction, and no digital elevation model is consulted anywhere in the codebase. On the flat test sites used here this is a non-issue; on hilly terrain it would silently bias the projected ground point. Neither limitation affects causality (both are static constants, never derived from the query's live GNSS) — they are accuracy caveats, not GNSS leaks.
 
 ---
 
