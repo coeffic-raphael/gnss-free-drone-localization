@@ -6,11 +6,13 @@ This work addresses Exercise 2 of the assignment: *design a real-time visual nav
 
 **This README is a quick-start and results summary. Three documents in `docs/` carry the actual depth — read them for the complete picture, since this README intentionally only covers the essentials:**
 
-| Document | What's in it |
-|---|---|
-| [`docs/final_report.md`](docs/final_report.md) | The full write-up: detailed methodology, every experiment tried (including the ones reverted), the complete results breakdown, the GNSS-causality audit and the heading/camera-angle/terrain limitations, and the discussion of what is and isn't truly real-time. Start here for the full story. |
-| [`docs/algorithm_overview.md`](docs/algorithm_overview.md) | A step-by-step flow diagram of `scripts/run_satellite_first_hybrid.sh`, frame by frame — Stage 0 bootstrap through Stage 3 smoothing, plus the "What never happens (by design)" section listing every causality guarantee and the one disclosed exception (heading). Read this if you want to understand the control flow without wading through the report's prose. |
-| [`docs/literature_review.md`](docs/literature_review.md) | The related-work survey (AnyLoc, LightGlue, WildNav, DINOv2) that motivated the chosen VPR + satellite-matching architecture — read this for the "why these methods" context behind the design choices summarized below. |
+
+| Document                                                   | What's in it                                                                                                                                                                                                                                                                                                                                                         |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `[docs/final_report.md](docs/final_report.md)`             | The full write-up: detailed methodology, every experiment tried (including the ones reverted), the complete results breakdown, the GNSS-causality audit and the heading/camera-angle/terrain limitations, and the discussion of what is and isn't truly real-time. Start here for the full story.                                                                    |
+| `[docs/algorithm_overview.md](docs/algorithm_overview.md)` | A step-by-step flow diagram of `scripts/run_satellite_first_hybrid.sh`, frame by frame — Stage 0 bootstrap through Stage 3 smoothing, plus the "What never happens (by design)" section listing every causality guarantee and the one disclosed exception (heading). Read this if you want to understand the control flow without wading through the report's prose. |
+| `[docs/literature_review.md](docs/literature_review.md)`   | The related-work survey (AnyLoc, LightGlue, WildNav, DINOv2) that motivated the chosen VPR + satellite-matching architecture — read this for the "why these methods" context behind the design choices summarized below.                                                                                                                                             |
+
 
 ---
 
@@ -20,30 +22,36 @@ This work addresses Exercise 2 of the assignment: *design a real-time visual nav
 
 **v11 is the best result obtained so far** — lowest smoothed median error (12.4 m) and highest ≤10 m hit rate (36.4%, 1 every ~2.8 s) of any query video tested. It leads the table below; see `docs/final_report.md` for the full breakdown.
 
-| Video (reference) | Frames | SAT / VPR_FALLBACK / NO_FIX | Raw median / mean | Smoothed median / mean (window) | Throughput |
-|---|---:|---|---:|---:|---:|
-| **v11 (v12+v13+v14)** | 806 | 77.5% / 9.9% / 12.5% | 21.1 m / 26.4 m | **12.4 m / 21.9 m (w=9)** | 1.75 fps |
-| v13 (v11+v12+v14) | 831 | 80.9% / 10.0% / 9.1% | 25.8 m / 30.4 m | 18.1 m / 25.4 m (w=9) | 1.99 fps |
-| v14 (v11+v12+v13) | 115 | 52.2% / 33.0% / 14.8% | 15.0 m / 17.6 m | 13.0 m / 15.5 m (w=5) | 2.17 fps |
 
-	
+| Video (reference)     | Frames | SAT / VPR_FALLBACK / NO_FIX | Raw median / mean | Smoothed median / mean (window) | Throughput |
+| --------------------- | ------ | --------------------------- | ----------------- | ------------------------------- | ---------- |
+| **v11 (v12+v13+v14)** | 806    | 77.5% / 9.9% / 12.5%        | 21.1 m / 26.4 m   | **12.4 m / 21.9 m (w=9)**       | 1.75 fps   |
+| v13 (v11+v12+v14)     | 831    | 80.9% / 10.0% / 9.1%        | 25.8 m / 30.4 m   | 18.1 m / 25.4 m (w=9)           | 1.99 fps   |
+| v14 (v11+v12+v13)     | 115    | 52.2% / 33.0% / 14.8%       | 15.0 m / 17.6 m   | 13.0 m / 15.5 m (w=5)           | 2.17 fps   |
+
+
 Additional leave-one-out validation and `Test1_100m` stress test, using the same retained satellite-first pipeline. v11/v12/v13/v14 below were all re-run (or are identical runs to the headline table above) on the main machine after the causal-heading fix; only `Test1_100m` below predates that fix and was run on a different (slower) PC, hence its much lower throughput:
-| Video (reference/test) | Frames | SAT / VPR_FALLBACK / NO_FIX | Raw median / mean | Smoothed median / mean (best window) | Throughput |
-|---|---:|---|---:|---:|---:|
-| v11 (v12+v13+v14) | 806 | 77.5% / 9.9% / 12.5% | 21.1 m / 26.4 m | 12.4 m / 21.9 m (w=9) | 1.75 fps |
-| v12 (v11+v13+v14) | 260 | 50.4% / 27.3% / 22.3% | 29.7 m / 47.8 m | 22.6 m / 38.8 m (w=11) | 1.80 fps |
-| v13 (v11+v12+v14) | 831 | 80.9% / 10.0% / 9.1% | 25.8 m / 30.4 m | 18.1 m / 25.4 m (w=9) | 1.99 fps |
-| v14 (v11+v12+v13) | 115 | 52.2% / 33.0% / 14.8% | 15.0 m / 17.6 m | 13.0 m / 15.5 m (w=5) | 2.17 fps |
-| Test1_100m / v17 (v11+v12+v13+v14) | 370 | 48.1% / 2.4% / 49.5% | 29.1 m / 30.1 m | 32.9 m / 60.2 m (w=5) | 0.20 fps |
+
+
+| Video (reference/test)             | Frames | SAT / VPR_FALLBACK / NO_FIX | Raw median / mean | Smoothed median / mean (best window) | Throughput |
+| ---------------------------------- | ------ | --------------------------- | ----------------- | ------------------------------------ | ---------- |
+| v11 (v12+v13+v14)                  | 806    | 77.5% / 9.9% / 12.5%        | 21.1 m / 26.4 m   | 12.4 m / 21.9 m (w=9)                | 1.75 fps   |
+| v12 (v11+v13+v14)                  | 260    | 50.4% / 27.3% / 22.3%       | 29.7 m / 47.8 m   | 22.6 m / 38.8 m (w=11)               | 1.80 fps   |
+| v13 (v11+v12+v14)                  | 831    | 80.9% / 10.0% / 9.1%        | 25.8 m / 30.4 m   | 18.1 m / 25.4 m (w=9)                | 1.99 fps   |
+| v14 (v11+v12+v13)                  | 115    | 52.2% / 33.0% / 14.8%       | 15.0 m / 17.6 m   | 13.0 m / 15.5 m (w=5)                | 2.17 fps   |
+| Test1_100m / v17 (v11+v12+v13+v14) | 370    | 48.1% / 2.4% / 49.5%        | 29.1 m / 30.1 m   | 32.9 m / 60.2 m (w=5)                | 0.20 fps   |
+
 
 Smoothed error tolerance — average frequency of being within threshold:
 
-| Video |≤ 10 m | ≤ 15 m | ≤ 20 m | ≤ 30 m |
-|---|---|---|---|---|
+
+| Video   | ≤ 10 m                    | ≤ 15 m                    | ≤ 20 m                    | ≤ 30 m                    |
+| ------- | ------------------------- | ------------------------- | ------------------------- | ------------------------- |
 | **v11** | **36.4% (1 every 2.8 s)** | **58.9% (1 every 1.7 s)** | **71.6% (1 every 1.4 s)** | **81.8% (1 every 1.2 s)** |
-| v13 | 22.0% (1 every 4.5 s) | 39.4% (1 every 2.5 s) | 56.6% (1 every 1.8 s) | 72.8% (1 every 1.4 s) |
-| v14 | 19.1% (1 every 5.2 s) | 61.7% (1 every 1.6 s) | 85.2% (1 every 1.2 s) | 93.0% (1 every 1.1 s) |
-| v12 | 26.2% (1 every 3.8 s) | 37.3% (1 every 2.7 s) | 42.3% (1 every 2.4 s) | 59.2% (1 every 1.7 s) |
+| v13     | 22.0% (1 every 4.5 s)     | 39.4% (1 every 2.5 s)     | 56.6% (1 every 1.8 s)     | 72.8% (1 every 1.4 s)     |
+| v14     | 19.1% (1 every 5.2 s)     | 61.7% (1 every 1.6 s)     | 85.2% (1 every 1.2 s)     | 93.0% (1 every 1.1 s)     |
+| v12     | 26.2% (1 every 3.8 s)     | 37.3% (1 every 2.7 s)     | 42.3% (1 every 2.4 s)     | 59.2% (1 every 1.7 s)     |
+
 
 `Test1_100m`/v17 is not in this table: that run predates the current per-frame summary JSON format (only KML/HTML debug output exists for it), so exact threshold counts aren't available without re-running it with the current script.
 
@@ -53,13 +61,13 @@ Smoothed error tolerance — average frequency of being within threshold:
 
 ## Real-Time Pipeline (Retained)
 
-`scripts/run_satellite_first_hybrid.sh` decides each frame causally, using only past and current data — no whole-video buffering, no future frames, no query-flight GNSS. See [`docs/algorithm_overview.md`](docs/algorithm_overview.md) for a step-by-step flow diagram of the loop below.
+`scripts/run_satellite_first_hybrid.sh` decides each frame causally, using only past and current data — no whole-video buffering, no future frames, no query-flight GNSS. See `[docs/algorithm_overview.md](docs/algorithm_overview.md)` for a step-by-step flow diagram of the loop below.
 
-0. **Bootstrap with zero GNSS knowledge.** Before any fix exists, there's nothing causal to centre a satellite search on, so the very first frames go through VPR retrieval only (step 2 below), against the full reference pool, until the first fix is accepted.
-1. **Satellite tile matching, once a fix exists.** IPM-warp the frame, build a 3×3 satellite mosaic around the pipeline's own last causal position estimate (never the true GPS — see `docs/final_report.md` §3.4 for how this estimate, the bootstrap, and the evaluation ground truth are kept separate), match with SuperPoint + LightGlue, solve a RANSAC homography (≥8 inliers). Cost: ~0.2-0.4 s/frame. Tried first because it's cheap and doesn't require a database search.
-2. **VPR fallback.** If satellite matching fails (or hasn't started yet), extract the query frame's DINOv2 descriptor live (no precomputed batch — it's computed at this exact moment in the loop), compare against the cached reference-pool descriptors, then LightGlue-rerank the top-k (inliers ≥100, ratio ≥0.70). Cost: ~0.8-1.5 s/frame, including the live DINOv2 extraction.
-3. **NO_FIX.** If both fail, the frame is left unresolved rather than publishing a guess.
-4. **Causal gap-fill + smoothing, inline.** In the same per-frame loop (not a separate script): gap-fill `NO_FIX` frames by carrying the last fix forward, then apply a one-sided (past-only) Gaussian smoothing window of fixed size (pre-tuned offline, w=9 for v13, w=5 for v14). The cost of this step is included in the same per-frame timing as steps 1-3.
+1. **Bootstrap with zero GNSS knowledge.** Before any fix exists, there's nothing causal to centre a satellite search on, so the very first frames go through VPR retrieval only (step 2 below), against the full reference pool, until the first fix is accepted.
+2. **Satellite tile matching, once a fix exists.** IPM-warp the frame, build a 3×3 satellite mosaic around the pipeline's own last causal position estimate (never the true GPS — see `docs/final_report.md` §3.4 for how this estimate, the bootstrap, and the evaluation ground truth are kept separate), match with SuperPoint + LightGlue, solve a RANSAC homography (≥8 inliers). Cost: ~0.2-0.4 s/frame. Tried first because it's cheap and doesn't require a database search.
+3. **VPR fallback.** If satellite matching fails (or hasn't started yet), extract the query frame's DINOv2 descriptor live (no precomputed batch — it's computed at this exact moment in the loop), compare against the cached reference-pool descriptors, then LightGlue-rerank the top-k (inliers ≥100, ratio ≥0.70). Cost: ~0.8-1.5 s/frame, including the live DINOv2 extraction.
+4. **NO_FIX.** If both fail, the frame is left unresolved rather than publishing a guess.
+5. **Causal gap-fill + smoothing, inline.** In the same per-frame loop (not a separate script): gap-fill `NO_FIX` frames by carrying the last fix forward, then apply a one-sided (past-only) Gaussian smoothing window of fixed size (pre-tuned offline, w=9 for v13, w=5 for v14). The cost of this step is included in the same per-frame timing as steps 1-3.
 
 A causal trajectory-consistency gate (reject a candidate too far from a constant-velocity extrapolation of recent fixes) was tried but caused filter lock-in and was net-negative even after a fix — reverted; see `docs/final_report.md` for other tried-and-dropped ideas.
 
@@ -174,16 +182,18 @@ pip install -r requirements-anyloc.txt
 
 Place `.mp4` and `.SRT` files in `data/raw/`. File naming:
 
-| File | Description |
-|---|---|
-| `DJI_v11.mp4` + `.SRT` | Reference flight 1 (Mini 3 Pro, 60°) |
-| `DJI_v12.mp4` + `.SRT` | Reference flight 2 |
-| `DJI_v13.mp4` + `.SRT` | Reference flight 3 |
-| `DJI_v14.mp4` + `.SRT` | Query flight |
-| `DJI_20260427152226_0017_D.{MP4,SRT}` | Air 3 flight v17 (45°) |
-| `DJI_20260427152735_0019_D.{MP4,SRT}` | Air 3 flight v19 (45°) |
-| `DJI_20260609082834_0023_D.{MP4,SRT}` | Air 3S flight v23 (45°) |
-| `DJI_20260609083433_0024_D.{MP4,SRT}` | Air 3S flight v24 (45°) |
+
+| File                                  | Description                          |
+| ------------------------------------- | ------------------------------------ |
+| `DJI_v11.mp4` + `.SRT`                | Reference flight 1 (Mini 3 Pro, 60°) |
+| `DJI_v12.mp4` + `.SRT`                | Reference flight 2                   |
+| `DJI_v13.mp4` + `.SRT`                | Reference flight 3                   |
+| `DJI_v14.mp4` + `.SRT`                | Query flight                         |
+| `DJI_20260427152226_0017_D.{MP4,SRT}` | Air 3 flight v17 (45°)               |
+| `DJI_20260427152735_0019_D.{MP4,SRT}` | Air 3 flight v19 (45°)               |
+| `DJI_20260609082834_0023_D.{MP4,SRT}` | Air 3S flight v23 (45°)              |
+| `DJI_20260609083433_0024_D.{MP4,SRT}` | Air 3S flight v24 (45°)              |
+
 
 ### 3. Preprocessing
 
@@ -236,11 +246,13 @@ VERSION=v14 ANGLE=60 REFERENCES="v11,v12,v13" SMOOTH_HALF_WINDOW=2 ./scripts/run
 
 Final output:
 
-| File | Description |
-|---|---|
-| `outputs/hybrid/satellite_first_v14.csv` | per-frame causal output: status (SAT / VPR_FALLBACK / NO_FIX), raw fix, and inline gap-filled + causally smoothed position, all in one file |
-| `outputs/hybrid/satellite_first_v14_summary.json` | aggregate statistics (raw and smoothed, by status, timing breakdown, achievable fps) |
-| `outputs/maps/dji_mini3_v14_realtime.kml` | Google Earth overlay: estimated path (blue) vs. real GPS path (green), no per-frame markers |
+
+| File                                              | Description                                                                                                                                 |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `outputs/hybrid/satellite_first_v14.csv`          | per-frame causal output: status (SAT / VPR_FALLBACK / NO_FIX), raw fix, and inline gap-filled + causally smoothed position, all in one file |
+| `outputs/hybrid/satellite_first_v14_summary.json` | aggregate statistics (raw and smoothed, by status, timing breakdown, achievable fps)                                                        |
+| `outputs/maps/dji_mini3_v14_realtime.kml`         | Google Earth overlay: estimated path (blue) vs. real GPS path (green), no per-frame markers                                                 |
+
 
 To reproduce the v13 run used in this report: regenerate the descriptor cache with `--query-manifest v13=...` and `--reference-manifest` v11/v12/v14, then run with `VERSION=v13 REFERENCES="v11,v12,v14" SMOOTH_HALF_WINDOW=4`.
 
@@ -255,21 +267,26 @@ source .venv-anyloc/bin/activate
 
 Final outputs:
 
-| File | Description |
-|---|---|
-| `outputs/hybrid/hybrid_results_v14.csv` | per-frame position with source label |
-| `outputs/hybrid/hybrid_summary_v14.json` | aggregate statistics |
-| `outputs/figures/preliminary_experiment_v14.svg` | path comparison figure |
-| `outputs/maps/dji_mini3_v14_hybrid.kml` | Google Earth overlay |
+
+| File                                             | Description                          |
+| ------------------------------------------------ | ------------------------------------ |
+| `outputs/hybrid/hybrid_results_v14.csv`          | per-frame position with source label |
+| `outputs/hybrid/hybrid_summary_v14.json`         | aggregate statistics                 |
+| `outputs/figures/preliminary_experiment_v14.svg` | path comparison figure               |
+| `outputs/maps/dji_mini3_v14_hybrid.kml`          | Google Earth overlay                 |
+
 
 Additional KML/debug outputs generated for the leave-one-out and Test1 runs:
-| Run | KML | HTML debug |
-|---|---|---|
-| v11 as query, v12+v13+v14 as reference | `outputs/maps/satellite_first_v11_refs_v12_v13_v14.kml` | `outputs/debug/satellite_first_v11_refs_v12_v13_v14.html` |
-| v12 as query, v11+v13+v14 as reference | `outputs/maps/satellite_first_v12_refs_v11_v13_v14.kml` | `outputs/debug/satellite_first_v12_refs_v11_v13_v14.html` |
-| v13 as query, v11+v12+v14 as reference | `outputs/maps/satellite_first_v13_refs_v11_v12_v14.kml` | `outputs/debug/satellite_first_v13_refs_v11_v12_v14.html` |
-| v14 as query, v11+v12+v13 as reference | `outputs/maps/satellite_first_v14_refs_v11_v12_v13.kml` | `outputs/debug/satellite_first_v14_refs_v11_v12_v13.html` |
+
+
+| Run                                                     | KML                                                         | HTML debug                                                    |
+| ------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------- |
+| v11 as query, v12+v13+v14 as reference                  | `outputs/maps/satellite_first_v11_refs_v12_v13_v14.kml`     | `outputs/debug/satellite_first_v11_refs_v12_v13_v14.html`     |
+| v12 as query, v11+v13+v14 as reference                  | `outputs/maps/satellite_first_v12_refs_v11_v13_v14.kml`     | `outputs/debug/satellite_first_v12_refs_v11_v13_v14.html`     |
+| v13 as query, v11+v12+v14 as reference                  | `outputs/maps/satellite_first_v13_refs_v11_v12_v14.kml`     | `outputs/debug/satellite_first_v13_refs_v11_v12_v14.html`     |
+| v14 as query, v11+v12+v13 as reference                  | `outputs/maps/satellite_first_v14_refs_v11_v12_v13.kml`     | `outputs/debug/satellite_first_v14_refs_v11_v12_v13.html`     |
 | Test1_100m / v17 as query, v11+v12+v13+v14 as reference | `outputs/maps/satellite_first_v17_refs_v11_v12_v13_v14.kml` | `outputs/debug/satellite_first_v17_refs_v11_v12_v13_v14.html` |
+
 
 ### Cross-Validation
 
@@ -292,9 +309,10 @@ source .venv-anyloc/bin/activate
 
 ## References
 
-See [`docs/literature_review.md`](docs/literature_review.md) for the full survey of related work and how it shaped the architecture (why VPR + satellite-matching over pure GPS-denied SLAM, why DINOv2 over earlier descriptors, etc.). Key papers:
+See `[docs/literature_review.md](docs/literature_review.md)` for the full survey of related work and how it shaped the architecture (why VPR + satellite-matching over pure GPS-denied SLAM, why DINOv2 over earlier descriptors, etc.). Key papers:
 
 - **AnyLoc** (Keetha et al., 2023) — [arxiv.org/abs/2308.00688](https://arxiv.org/abs/2308.00688)
 - **LightGlue** (Lindenberger et al., 2023) — [arxiv.org/abs/2306.13643](https://arxiv.org/abs/2306.13643)
 - **WildNav** (Gurgu et al., 2022) — [arxiv.org/abs/2210.09727](https://arxiv.org/abs/2210.09727)
 - **DINOv2** (Oquab et al., 2023) — [arxiv.org/abs/2304.07193](https://arxiv.org/abs/2304.07193)
+
