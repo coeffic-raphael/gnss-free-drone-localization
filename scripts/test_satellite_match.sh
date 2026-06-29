@@ -101,11 +101,22 @@ frame_count_timed = 0
 for i, row in enumerate(rows):
     frame_path = row["frame_path"]
     alt   = float(row["rel_alt_m"])
-    head  = float(row["heading_deg"])
     gt_lat = float(row["ground_latitude"])
     gt_lon = float(row["ground_longitude"])
     drone_lat = float(row["drone_latitude"])
     drone_lon = float(row["drone_longitude"])
+
+    # Skip frames before the causal heading estimator has enough history yet
+    # (empty heading_deg) — mirrors scripts/run_satellite_first_hybrid.sh's
+    # "no_heading_yet" handling, since IPM cannot run without a heading.
+    if row["heading_deg"] == "":
+        print(f"  [{i+1}/{len(rows)}] SKIP (no_heading_yet): {Path(frame_path).name}")
+        results.append({**row, "status": "no_heading_yet", "error_m": None,
+                        "matches": 0, "inliers": 0, "est_lat": None, "est_lon": None,
+                        "frame_seconds": None})
+        continue
+
+    head  = float(row["heading_deg"])
 
     # Skip low-altitude frames (landing / takeoff) — IPM invalid below MIN_ALT_M
     if alt < MIN_ALT_M:
